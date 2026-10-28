@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cozy Bake | Customer Account</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            min-height: 100%;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            min-height: 100vh;
+        }
+
+        .account-box {
+            width: 100%;
+            max-width: 670px;
+            max-height: calc(100vh - 24px);
+            overflow-y: auto;
+            background: #fffdfa;
+            border-radius: 18px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.18);
+        }
+
+        .account-header {
+            background: linear-gradient(120deg, #8d6053, #b98c7c);
+            color: white;
+            padding: 28px 35px;
+            position: relative;
+        }
+
+        .account-header small {
+            display: block;
+            font-size: 12px;
+            letter-spacing: 4px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .account-header h1 {
+            margin: 0;
+            font-family: Georgia, serif;
+            font-size: clamp(25px, 4vw, 38px);
+            font-weight: normal;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            border: 1px solid white;
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+        }
+
+        .account-content {
+            text-align: center;
+            padding: 35px;
+        }
+
+        .avatar {
+            width: 78px;
+            height: 78px;
+            margin: 0 auto 25px;
+            background: #e5c9be;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-size: 35px;
+        }
+
+        .small-title {
+            font-size: 11px;
+            letter-spacing: 3px;
+            color: #9b8d85;
+            font-weight: bold;
+        }
+
+        .account-content h2 {
+            font-family: Georgia, serif;
+            color: #3d281b;
+            font-size: clamp(25px, 4vw, 34px);
+            font-weight: normal;
+            margin: 18px 0;
+        }
+
+        .description {
+            font-size: 14px;
+            color: #8d817a;
+            line-height: 1.7;
+            margin-bottom: 30px;
+        }
+
+        .account-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-login,
+        .btn-register {
+            flex: 1;
+            padding: 16px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .btn-login {
+            background: #ad857b;
+            color: white;
+            border: none;
+        }
+
+        .btn-register {
+            background: transparent;
+            color: #57443b;
+            border: 1px solid #dacbc4;
+        }
+
+        .guest-link {
+            margin-top: 25px;
+            border: none;
+            background: none;
+            color: #9b8f89;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e9ddd6;
+            margin-bottom: 25px;
+        }
+
+        .tab {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 14px;
+            color: #a69a93;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .tab.active {
+            color: #8d6053;
+            border-bottom: 3px solid #ad8273;
+        }
+
+        .account-form {
+            max-width: 430px;
+            margin: auto;
+            text-align: left;
+        }
+
+        .account-form label {
+            display: block;
+            margin: 16px 0 7px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #57443b;
+        }
+
+        .account-form input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #dacbc4;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            margin-top: 25px;
+            padding: 16px;
+            background: #ad857b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        @media (max-width: 480px) {
+            .account-header,
+            .account-content {
+                padding: 25px 20px;
+            }
+
+            .account-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="account-box">
+
+    <div class="account-header">
+        <small>COZY BAKE</small>
+        <h1>Your Cozy Bake Account</h1>
+
+        <button class="close-btn"
+                type="button"
+                onclick="closeLogin()">
+            &times;
+        </button>
+    </div>
+
+    <!-- FIRST SCREEN -->
+    <div class="account-content" id="welcomeScreen">
+
+        <div class="avatar">👤</div>
+
+        <div class="small-title">
+            BEFORE WE GET STARTED
+        </div>
+
+        <h2>Already have an account?</h2>
+
+        <p class="description">
+            Log in to continue, or create an account to save
+            your orders, receipts and reservations.
+        </p>
+
+        <div class="account-buttons">
+
+            <button class="btn-login"
+                    onclick="showForm('login')">
+                YES, LOG IN
+            </button>
+
+            <button class="btn-register"
+                    onclick="showForm('register')">
+                NO, REGISTER
+            </button>
+
+        </div>
+
+        <button class="guest-link"
+                onclick="closeLogin()">
+            Continue browsing as guest
+        </button>
+
+    </div>
+
+    <!-- LOGIN / REGISTER SCREEN -->
+    <div class="account-content hidden" id="formScreen">
+
+        <div class="small-title">
+            WELCOME TO COZY BAKE
+        </div>
+
+        <h2 id="formHeading">Welcome in</h2>
+
+        <div class="tabs">
+
+            <button class="tab active"
+                    id="loginTab"
+                    onclick="showForm('login')">
+                Log In
+            </button>
+
+            <button class="tab"
+                    id="registerTab"
+                    onclick="showForm('register')">
+                Create Account
+            </button>
+
+        </div>
+
+        <form class="account-form"
+              onsubmit="submitForm(event)">
+
+            <div id="nameField" class="hidden">
+                <label for="fullName">Full Name</label>
+                <input type="text" id="fullName"
+                       placeholder="Enter your full name">
+            </div>
+
+            <label for="email">Email Address</label>
+            <input type="email" id="email"
+                   placeholder="Enter your email"
+                   required>
+
+            <label for="password">Password</label>
+            <input type="password" id="password"
+                   placeholder="Enter your password"
+                   minlength="6"
+                   required>
+
+            <button class="submit-btn"
+                    id="submitBtn"
+                    type="submit">
+                LOG IN
+            </button>
+
+        </form>
+
+        <button class="guest-link"
+                onclick="backToWelcome()">
+            Back
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+    let currentMode = "login";
+
+    function showForm(mode) {
+        currentMode = mode;
+
+        document.getElementById("welcomeScreen")
+            .classList.add("hidden");
+
+        document.getElementById("formScreen")
+            .classList.remove("hidden");
+
+        const register = mode === "register";
+
+        document.getElementById("nameField")
+            .classList.toggle("hidden", !register);
+
+        document.getElementById("fullName")
+            .required = register;
+
+        document.getElementById("loginTab")
+            .classList.toggle("active", !register);
+
+        document.getElementById("registerTab")
+            .classList.toggle("active", register);
+
+        document.getElementById("formHeading")
+            .textContent = register
+                ? "Create your account"
+                : "Welcome in";
+
+        document.getElementById("submitBtn")
+            .textContent = register
+                ? "CREATE ACCOUNT"
+                : "LOG IN";
+    }
+
+    function backToWelcome() {
+        document.getElementById("welcomeScreen")
+            .classList.remove("hidden");
+
+        document.getElementById("formScreen")
+            .classList.add("hidden");
+    }
+
+    function closeLogin() {
+        if (window.parent !== window &&
+            typeof window.parent.closeAccount === "function") {
+            window.parent.closeAccount();
+        } else {
+            window.location.href = "index.html";
+        }
+    }
+
+    function submitForm(event) {
+        event.preventDefault();
+
+        if (currentMode === "register") {
+            alert("Registration form ready! Connect PHP/MySQL.");
+        } else {
+            alert("Login form ready! Connect PHP/MySQL.");
+        }
+    }
+</script>
+
+</body>
+</html>
