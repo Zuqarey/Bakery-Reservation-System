@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cozy Bake - Welcome In</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <! Google Fonts: Playfair Display for elegant serif titles & Plus Jakarta Sans for UI text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">    
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cozy: {
+                            header: '#B58B67',
+                            headerDark: '#A37956'
+                            bg: '#FFFBF7',
+                            cardBg: '#FAF4ED',
+                            roleBg: '#F3E5D8',
+                            darkbrown: '#542E1B'
+                            textDark: '#4A3528'
+                            label: '8C684D',
+                            border: 'E8D5C4',
+                            borderFocus: '#B58B67',
+                            btn: "#B58B67",
+                            btnHover: '#A07654',
+                        }
+                    },
+                    fontFamily: {
+                        playfair: ['Playfair Display', 'serif'],
+                        jakarta: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #2D2520;
+            background-image: radial-gradient(#423630 1px, transparent 1px);
+            background-size: 20px 20px;
+        }  
+        
+        /* Custom smooth scrollbar inside modal if needed */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #FAF4ED;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #D4BBA5;
+            border-radius: 3px;
+        }
+        .tab-active {
+            font-weight: 700;
+            border-bottom: 2px solid #B58B67;
+            color: #B58B67;
+        }   
+        .tab-inactive {
+            color: #A08C7D;
+            border-bottom: 2.5px solid transparent;
+            font-weight: 600;  
+        }
+        .tab-inactive:hover {
+            color: #542E1B; 
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 sm:p-6">
+
+    <!-- Modal Container Outer Overlay-->
+     <div class="w-full max-w-d bg-white rounded-3xl shadow-2xl
+     overflow-hidden transform transition-all duration-300 border
+     border-amber-900/10">
+
+     <!-- Header Section -->
+     <div class="'bg-cozy-header p-6 sm:p-7 text-white relative flex justify-between items-starts">
+           <div>
+           <p class="text-xs uppercase tracking-[0.25em] font-bold
+           text-amber-100/90 mb-1">COZY BAKE</p>
+           <h1 class="font-serif text-3xl sm:text-4xl font-normal
+           tracking-wide leading-tight">Welcome in</h1>
+           </div>
+           <!-- Close Button -->
+           <button onclick="handleClose()" class=""w-10 h-10 rounded-full
+           border border-white/40 flex items-center justify-center text-white/
+           90 hover:bg-white/10 hover:border-white transition-colors
+           focus:outline-none" aria-label="CLose modal">
+               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                path
+               </svg>
+        </button>
+     </div>
+       
+     <!-- Body Section -->
+     <div class="bg-cozy-bg p-6 sm:p-8 custom-scrollbar max-h-[85vh]overflow-y-auto"></div>
+             This is the body content of the modal.
+         </p>
+     </div>
+ </body>
