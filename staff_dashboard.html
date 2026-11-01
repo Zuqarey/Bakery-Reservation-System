@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cozy Bake - Staff Portal</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Plus Jakarta Sans & Playfair Display -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cozy: {
+                            sidebarBg: '#402719',
+                            sidebarBorder: '#533422',
+                            textMuted: '#B39886',
+                            activePill: 'rgba(255, 255, 255, 0.08)',
+                            activePillHover: 'rgba(255, 255, 255, 0.12)',
+                            hoverPill: 'rgba(255, 255, 255, 0.04)',
+                            lightBg: '#FAF7F2',
+                            cardBg: '#FFFFFF',
+                            accent: '#B08865'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        serif: ['"Playfair Display"', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #FAF7F2;
+        }
+
+        /* Wooden Texture and Horizontal Subtle Lines matching the image */
+        .sidebar-wood-texture {
+            background-color: #3b2214;
+            background-image: 
+                /* Subtle warm vertical highlight sheen */
+                linear-gradient(90deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.08) 12%, rgba(255,255,255,0.01) 30%, transparent 100%),
+                /* Fine horizontal wood grain stripes */
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 3px,
+                    rgba(0, 0, 0, 0.15) 3px,
+                    rgba(0, 0, 0, 0.15) 4px
+                ),
+                /* Dark brown wood gradient */
+                linear-gradient(180deg, #4d2f1d 0%, #381f11 50%, #2b170c 100%);
+            box-shadow: inset -10px 0 20px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Active Menu Item Styling matching the rounded glass/warm pill look */
+        .nav-item.active {
+            background-color: rgba(255, 255, 255, 0.09);
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 4px 12px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #FFFFFF !important;
+            font-weight: 700;
+        }
+        
+        .nav-item:not(.active):hover {
+            background-color: rgba(255, 255, 255, 0.04);
+            color: #FFFFFF;
+        }
+
+        /* Custom Scrollbar */
+        .sidebar-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen overflow-hidden flex flex-col md:flex-row">
+
+    <!-- Mobile Header Bar -->
+    <div class="md:hidden bg-[#3b2214] text-white p-4 flex items-center justify-between border-b border-amber-900/40">
+        <div class="flex items-center gap-2">
+            <span class="font-serif text-xl font-medium tracking-wide">Cozy Bake</span>
+            <span class="text-[10px] bg-amber-900/60 px-2 py-0.5 rounded text-amber-200 uppercase font-bold tracking-wider">Staff</span>
+        </div>
+        <button id="mobile-menu-btn" class="p-2 text-stone-300 hover:text-white focus:outline-none">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+    </div>
+
+    <!-- SIDEBAR CONTAINER -->
+    <aside id="sidebar" class="sidebar-wood-texture text-white w-72 h-full flex flex-col justify-between shrink-0 fixed md:relative z-40 transition-transform duration-300 -translate-x-full md:translate-x-0 border-r border-stone-800/50">
+        
+        <!-- Top Section -->
+        <div class="px-6 pt-7 pb-4 flex-1 flex flex-col sidebar-scroll overflow-y-auto">
+            
+            <!-- Brand Name -->
+            <div class="mb-5">
+                <h1 class="font-sans text-2xl font-normal tracking-tight text-white/95">Cozy Bake</h1>
+            </div>
+
+            <!-- Subtle Line Separator -->
+            <div class="h-[1px] w-full bg-white/10 mb-6"></div>
+
+            <!-- Staff Portal Header -->
+            <div class="mb-6">
+                <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-[#C4A895]/90 mb-1">STAFF PORTAL</p>
+                <h2 id="user-display-name" class="font-sans text-2xl font-extrabold tracking-tight text-white leading-none">aina</h2>
+            </div>
+
+            <!-- Main Navigation Links -->
+            <nav class="space-y-1.5 flex-1">
+                
+                <button onclick="setActiveNav('dashboard')" id="nav-dashboard" class="nav-item active w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[15px] font-semibold text-stone-200/90 transition-all duration-200 group">
+                    <i data-lucide="layout-grid" class="w-5 h-5 shrink-0 stroke-[1.8] group-hover:scale-105 transition-transform"></i>
+                    <span>Dashboard</span>
+                </button>
+
+                <button onclick="setActiveNav('inventory')" id="nav-inventory" class="nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[15px] font-semibold text-stone-300/80 transition-all duration-200 group">
+                    <i data-lucide="box" class="w-5 h-5 shrink-0 stroke-[1.8] group-hover:scale-105 transition-transform"></i>
+                    <span>Inventory</span>
+                </button>
+
+                <button onclick="setActiveNav('orders')" id="nav-orders" class="nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[15px] font-semibold text-stone-300/80 transition-all duration-200 group">
+                    <i data-lucide="receipt" class="w-5 h-5 shrink-0 stroke-[1.8] group-hover:scale-105 transition-transform"></i>
+                    <span>Orders</span>
+                </button>
+
+                <button onclick="setActiveNav('ingredients')" id="nav-ingredients" class="nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[15px] font-semibold text-stone-300/80 transition-all duration-200 group">
+                    <i data-lucide="leaf" class="w-5 h-5 shrink-0 stroke-[1.8] group-hover:scale-105 transition-transform"></i>
+                    <span>Ingredients</span>
+                </button>
+
+                <button onclick="setActiveNav('schedule')" id="nav-schedule" class="nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[15px] font-semibold text-stone-300/80 transition-all duration-200 group">
+                    <i data-lucide="calendar" class="w-5 h-5 shrink-0 stroke-[1.8] group-hover:scale-105 transition-transform"></i>
+                    <span>Schedule</span>
+                </button>
+
+            </nav>
+        </div>
+
+        <!-- Bottom Navigation Section -->
+        <div class="px-6 pb-8 pt-2 space-y-1.5 border-t border-white/5">
+            
+            <button onclick="setActiveNav('storefront')" id="nav-storefront" class="nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[15px] font-semibold text-stone-300/80 transition-all duration-200 group">
+                <i data-lucide="map-pin" class="w-5 h-5 shrink-0 stroke-[1.8] group-hover:scale-105 transition-transform"></i>
+                <span>Storefront</span>
+            </button>
+
+            <button onclick="handleLogout()" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-[15px] font-semibold text-stone-300/80 hover:bg-red-500/10 hover:text-red-200 transition-all duration-200 group">
+                <i data-lucide="log-out" class="w-5 h-5 shrink-0 stroke-[1.8] group-hover:-translate-x-0.5 transition-transform"></i>
+                <span>Log out</span>
+            </button>
+
+        </div>
+
+    </aside>
+
+    <!-- Overlay for Mobile Sidebar -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-30 hidden md:hidden"></div>
+
+    <!-- MAIN DASHBOARD CONTENT AREA -->
+    <main class="flex-1 h-full overflow-y-auto bg-cozy-lightBg p-6 sm:p-10">
+        
+        <!-- Header Topbar -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+            <div>
+                <h2 id="page-title" class="text-3xl font-bold text-stone-800 tracking-tight">Dashboard</h2>
+                <p class="text-stone-500 text-sm mt-1">Welcome back, <span class="font-semibold text-amber-900 capitalize">aina</span>! Here is today's bakery overview.</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="text-xs font-semibold px-3 py-1.5 bg-amber-100 text-amber-900 rounded-full border border-amber-200/80 flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    Shift: Morning (07:00 - 15:00)
+                </span>
+            </div>
+        </div>
+
+        <!-- Dynamic Page Content Card Showcase -->
+        <div id="content-container">
+            
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+                <div class="bg-white p-5 rounded-2xl border border-stone-200/70 shadow-sm flex items-center gap-4">
+                    <div class="p-3 bg-amber-50 text-amber-800 rounded-xl">
+                        <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs uppercase font-bold text-stone-400 tracking-wider">Pending Orders</p>
+                        <h3 class="text-2xl font-extrabold text-stone-800 mt-0.5">14</h3>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-stone-200/70 shadow-sm flex items-center gap-4">
+                    <div class="p-3 bg-emerald-50 text-emerald-800 rounded-xl">
+                        <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs uppercase font-bold text-stone-400 tracking-wider">Completed Today</p>
+                        <h3 class="text-2xl font-extrabold text-stone-800 mt-0.5">38</h3>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-stone-200/70 shadow-sm flex items-center gap-4">
+                    <div class="p-3 bg-rose-50 text-rose-800 rounded-xl">
+                        <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs uppercase font-bold text-stone-400 tracking-wider">Low Stock Items</p>
+                        <h3 class="text-2xl font-extrabold text-stone-800 mt-0.5">3</h3>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-stone-200/70 shadow-sm flex items-center gap-4">
+                    <div class="p-3 bg-orange-50 text-orange-800 rounded-xl">
+                        <i data-lucide="flame" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs uppercase font-bold text-stone-400 tracking-wider">Baking Schedule</p>
+                        <h3 class="text-2xl font-extrabold text-stone-800 mt-0.5">8 Batches</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity Table / Status -->
+            <div class="bg-white rounded-2xl border border-stone-200/70 shadow-sm p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-bold text-stone-800">Current Baking Batch Status</h3>
+                    <span class="text-xs text-amber-800 font-semibold cursor-pointer hover:underline">View All Schedule</span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead>
+                            <tr class="border-b border-stone-200/70 text-xs text-stone-400 uppercase font-extrabold tracking-wider">
+                                <th class="pb-3 px-2">Item</th>
+                                <th class="pb-3 px-2">Quantity</th>
+                                <th class="pb-3 px-2">Baker</th>
+                                <th class="pb-3 px-2">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-stone-100 text-stone-700">
+                            <tr>
+                                <td class="py-3.5 px-2 font-semibold">Sourdough Bread</td>
+                                <td class="py-3.5 px-2">24 loaves</td>
+                                <td class="py-3.5 px-2">Aina</td>
+                                <td class="py-3.5 px-2"><span class="px-2.5 py-1 text-xs rounded-full bg-amber-100 text-amber-800 font-semibold">In Oven (15m left)</span></td>
+                            </tr>
+                            <tr>
+                                <td class="py-3.5 px-2 font-semibold">Butter Croissant</td>
+                                <td class="py-3.5 px-2">40 pcs</td>
+                                <td class="py-3.5 px-2">Aina</td>
+                                <td class="py-3.5 px-2"><span class="px-2.5 py-1 text-xs rounded-full bg-blue-100 text-blue-800 font-semibold">Proofing</span></td>
+                            </tr>
+                            <tr>
+                                <td class="py-3.5 px-2 font-semibold">Cinnamon Roll</td>
+                                <td class="py-3.5 px-2">18 pcs</td>
+                                <td class="py-3.5 px-2">Chef Lee</td>
+                                <td class="py-3.5 px-2"><span class="px-2.5 py-1 text-xs rounded-full bg-emerald-100 text-emerald-800 font-semibold">Ready on Counter</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Interactive Script -->
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Active State Navigation Handler
+        function setActiveNav(navId) {
+            // Remove active class from all nav buttons
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // Add active class to target
+            const activeBtn = document.getElementById(`nav-${navId}`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+
+            // Update Header Title dynamically for demo preview
+            const pageTitle = document.getElementById('page-title');
+            const capitalizedTitle = navId.charAt(0).toUpperCase() + navId.slice(1);
+            pageTitle.innerText = capitalizedTitle;
+
+            // Close mobile menu after selection
+            closeMobileMenu();
+        }
+
+        function handleLogout() {
+            if (confirm("Are you sure you want to log out from Staff Portal?")) {
+                alert("Logged out successfully.");
+            }
+        }
+
+        // Mobile Menu Functionality
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+
+        function toggleMobileMenu() {
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        function closeMobileMenu() {
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('hidden');
+        }
+
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+            overlay.addEventListener('click', closeMobileMenu);
+        }
+    </script>
+</body>
+</html>
