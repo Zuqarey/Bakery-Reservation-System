@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,13 +7,6 @@
 <title>Cozy Bake | Payment</title>
 
 <style>
-
-    .payment-qr {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    border-radius: 10px;
-}
 :root {
     --cream: #FAF8F5;
     --brown: #3D281B;
@@ -22,7 +16,9 @@
     --muted: #806B5D;
 }
 
-* { box-sizing: border-box; }
+* {
+    box-sizing: border-box;
+}
 
 body {
     margin: 0;
@@ -31,8 +27,13 @@ body {
     font-family: Arial, sans-serif;
 }
 
-button, input { font: inherit; }
-button { cursor: pointer; }
+button, input {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
 
 .topbar {
     display: flex;
@@ -99,7 +100,9 @@ button { cursor: pointer; }
     border-radius: 25px;
 }
 
-.arrow { color: var(--accent); }
+.arrow {
+    color: var(--accent);
+}
 
 .layout {
     display: grid;
@@ -177,20 +180,16 @@ button { cursor: pointer; }
     border-radius: 12px;
     background: white;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    overflow: hidden;
 }
 
-.qr-icon {
-    font-size: 75px;
-}
-
-.qr-placeholder strong {
-    font-size: 13px;
-    text-align: center;
-    color: #A13E3E;
+.payment-qr {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 10px;
 }
 
 .demo-warning {
@@ -198,21 +197,7 @@ button { cursor: pointer; }
     font-size: 13px;
     font-weight: bold;
     text-align: center;
-}
-
-.upload-label {
-    display: block;
-    margin: 20px 0 10px;
-    font-size: 14px;
-    font-weight: bold;
-}
-
-.upload-input {
-    width: 100%;
-    padding: 12px;
-    background: white;
-    border: 1px solid var(--line);
-    border-radius: 10px;
+    line-height: 1.7;
 }
 
 .cash-icon {
@@ -233,7 +218,9 @@ button { cursor: pointer; }
     line-height: 1.7;
 }
 
-.hidden { display: none; }
+.hidden {
+    display: none;
+}
 
 .summary {
     position: sticky;
@@ -297,18 +284,36 @@ button { cursor: pointer; }
     margin-top: 15px;
 }
 
-.error.show { display: block; }
+.error.show {
+    display: block;
+}
 
 @media(max-width: 800px) {
-    .layout { grid-template-columns: 1fr; }
-    .summary { position: static; }
+    .layout {
+        grid-template-columns: 1fr;
+    }
+
+    .summary {
+        position: static;
+    }
 }
 
 @media(max-width: 500px) {
-    .heading { font-size: 36px; }
-    .card { padding: 20px; }
-    .steps { gap: 6px; }
-    .step { font-size: 11px; }
+    .heading {
+        font-size: 36px;
+    }
+
+    .card {
+        padding: 20px;
+    }
+
+    .steps {
+        gap: 6px;
+    }
+
+    .step {
+        font-size: 11px;
+    }
 }
 </style>
 </head>
@@ -317,7 +322,9 @@ button { cursor: pointer; }
 
 <header class="topbar">
     <a href="index.html" class="brand">Cozy Bake</a>
-    <a href="checkout.html" class="back">← Back to Checkout</a>
+    <a href="checkout.html" class="back">
+        ← Back to Checkout
+    </a>
 </header>
 
 <main class="container">
@@ -347,12 +354,13 @@ button { cursor: pointer; }
             <h2>Choose Payment Method</h2>
 
             <p class="description">
-                Select how you would like to pay for your
-                delicious treats.
+                Select how you would like to pay
+                for your delicious treats.
             </p>
 
             <div class="methods">
 
+                <!-- QR PAYMENT OPTION -->
                 <label class="method">
                     <input
                         type="radio"
@@ -363,10 +371,11 @@ button { cursor: pointer; }
 
                     <span>
                         <strong>📱 QR Payment</strong>
-                        <small>Scan QR code to pay</small>
+                        <small>QR payment demonstration</small>
                     </span>
                 </label>
 
+                <!-- CASH OPTION -->
                 <label class="method">
                     <input
                         type="radio"
@@ -382,34 +391,37 @@ button { cursor: pointer; }
 
             </div>
 
-            <!-- QR PAYMENT -->
-            <!-- QR PAYMENT -->
-<div id="qr-section" class="payment-details">
+            <!-- QR PAYMENT SECTION -->
+            <div id="qr-section" class="payment-details">
 
-    <h2 style="text-align:center;">
-        QR Payment
-    </h2>
+                <h2 style="text-align:center;">
+                    QR Payment
+                </h2>
 
-    <p class="description" style="text-align:center;">
-        Scan the QR code below.
-        This is for demonstration purposes only.
-    </p>
+                <p class="description"
+                   style="text-align:center;">
+                    QR payment demonstration
+                    for the Cozy Bake project.
+                </p>
 
-    <div class="qr-placeholder">
-        <img src="paymentqr.jpeg"
-             alt="Cozy Bake QR Payment"
-             class="payment-qr">
-    </div>
+                <div class="qr-placeholder">
+                    <img
+                        src="paymentqr.jpeg"
+                        alt="Cozy Bake QR Payment"
+                        class="payment-qr">
+                </div>
 
-    <p class="demo-warning">
-        DEMO ONLY 
-    </p>
+                <p class="demo-warning">
+                    DEMO ONLY — No real payment required.
+                    Please do not transfer money.
+                </p>
 
-</div>
+            </div>
 
-            <!-- CASH PAYMENT -->
-            <div id="cash-section"
-                 class="payment-details hidden">
+            <!-- CASH PAYMENT SECTION -->
+            <div
+                id="cash-section"
+                class="payment-details hidden">
 
                 <div class="cash-icon">💵</div>
 
@@ -418,9 +430,10 @@ button { cursor: pointer; }
                 </h3>
 
                 <p class="cash-text">
-                    Your order will be placed with payment
-                    pending. Please pay at the selected
-                    Cozy Bake outlet when you arrive.
+                    Your order will be placed with
+                    payment pending. Please pay at
+                    the selected Cozy Bake outlet
+                    when you arrive.
                 </p>
 
             </div>
@@ -440,19 +453,23 @@ button { cursor: pointer; }
             </div>
 
             <button
+                type="button"
                 class="confirm-btn"
                 id="confirm-btn"
                 onclick="confirmOrder()">
                 Confirm Order →
             </button>
 
-            <p id="payment-error"
-               class="error"
-               role="alert"></p>
+            <p
+                id="payment-error"
+                class="error"
+                role="alert">
+            </p>
 
             <p class="secure-note">
-                Demo payment only. No real payment
-                will be processed on this page.
+                Demo payment only.
+                No real payment will be processed
+                on this page.
             </p>
 
         </aside>
@@ -477,6 +494,10 @@ try {
     checkoutData = null;
 }
 
+// ======================================
+// PRODUCT PRICES
+// ======================================
+
 const PRODUCT_PRICES = {
     "Strawberry Cloud Cake": 58.90,
     "Morning Croissant": 8.90,
@@ -490,20 +511,28 @@ const PRODUCT_PRICES = {
     "Blueberry Cookies": 7.90
 };
 
+// ======================================
+// PREPARE ORDER ITEMS
+// ======================================
+
 let items = [];
 
 if (checkoutData && Array.isArray(checkoutData.items)) {
+
     items = checkoutData.items
         .filter(item =>
             item &&
-            Object.hasOwn(PRODUCT_PRICES, item.name) &&
-            Number.isInteger(item.quantity) &&
-            item.quantity > 0
+            Object.prototype.hasOwnProperty.call(
+                PRODUCT_PRICES,
+                item.name
+            ) &&
+            Number.isInteger(Number(item.quantity)) &&
+            Number(item.quantity) > 0
         )
         .map(item => ({
             name: item.name,
             price: PRODUCT_PRICES[item.name],
-            quantity: item.quantity
+            quantity: Number(item.quantity)
         }));
 }
 
@@ -513,7 +542,7 @@ const total = items.reduce(
 );
 
 function money(value) {
-    return "RM " + value.toFixed(2);
+    return "RM " + Number(value).toFixed(2);
 }
 
 // ======================================
@@ -522,16 +551,22 @@ function money(value) {
 
 function displaySummary() {
 
-    const container = document.getElementById("order-summary");
+    const container =
+        document.getElementById("order-summary");
+
     container.replaceChildren();
 
     if (!checkoutData || items.length === 0) {
+
         const empty = document.createElement("p");
+
         empty.textContent =
             "No checkout details found. Please return to the menu.";
+
         container.appendChild(empty);
 
         document.getElementById("confirm-btn").disabled = true;
+
         return;
     }
 
@@ -551,11 +586,13 @@ function displaySummary() {
         info.append(name, qty);
 
         const price = document.createElement("span");
+
         price.textContent = money(
             item.price * item.quantity
         );
 
         row.append(info, price);
+
         container.appendChild(row);
     });
 
@@ -564,7 +601,7 @@ function displaySummary() {
 }
 
 // ======================================
-// SWITCH PAYMENT METHOD
+// SHOW SELECTED PAYMENT METHOD
 // ======================================
 
 function showPaymentMethod() {
@@ -574,10 +611,16 @@ function showPaymentMethod() {
     ).value;
 
     document.getElementById("qr-section")
-        .classList.toggle("hidden", selected !== "QR Payment");
+        .classList.toggle(
+            "hidden",
+            selected !== "QR Payment"
+        );
 
     document.getElementById("cash-section")
-        .classList.toggle("hidden", selected !== "Cash at Counter");
+        .classList.toggle(
+            "hidden",
+            selected !== "Cash at Counter"
+        );
 }
 
 // ======================================
@@ -588,10 +631,16 @@ async function callPaymentPHP(data, proofFile) {
 
     const formData = new FormData();
 
-    formData.append("paymentData", JSON.stringify(data));
+    formData.append(
+        "paymentData",
+        JSON.stringify(data)
+    );
 
     if (proofFile) {
-        formData.append("paymentProof", proofFile);
+        formData.append(
+            "paymentProof",
+            proofFile
+        );
     }
 
     const response = await fetch("payment.php", {
@@ -625,41 +674,26 @@ async function confirmOrder() {
         return;
     }
 
-    const errorBox = document.getElementById("payment-error");
+    const errorBox =
+        document.getElementById("payment-error");
+
     errorBox.classList.remove("show");
 
+    // SELECT PAYMENT METHOD
     const method = document.querySelector(
         'input[name="paymentMethod"]:checked'
     ).value;
 
-const proofFile = null;
 
-    if (proofFile) {
-        const allowedTypes = [
-            "image/png",
-            "image/jpeg",
-            "image/webp"
-        ];
+    const proofFile = null;
 
-        if (!allowedTypes.includes(proofFile.type)) {
-            errorBox.textContent =
-                "Please upload a PNG, JPG or WebP image.";
-            errorBox.classList.add("show");
-            return;
-        }
+    // PAYMENT STATUS
+    const paymentStatus =
+        method === "QR Payment"
+            ? "Pending Verification"
+            : "Pending Payment";
 
-        if (proofFile.size > 5 * 1024 * 1024) {
-            errorBox.textContent =
-                "Receipt image must be 5MB or smaller.";
-            errorBox.classList.add("show");
-            return;
-        }
-    }
-
-    const paymentStatus = method === "QR Payment"
-        ? "Pending Verification"
-        : "Pending Payment";
-
+    // PREPARE PAYMENT DATA
     const paymentData = {
         ...checkoutData,
         items: items,
@@ -667,27 +701,31 @@ const proofFile = null;
         paymentMethod: method,
         paymentStatus: paymentStatus,
         demoMode: true,
-        proofSelected: Boolean(proofFile)
+        proofSelected: false
     };
 
-    const button = document.getElementById("confirm-btn");
+    const button =
+        document.getElementById("confirm-btn");
+
     button.disabled = true;
     button.textContent = "Processing...";
 
-    // FRONTEND DEMO DATA
+    // FRONTEND RECEIPT DATA
     let receiptData = {
         ...paymentData,
         orderStatus: "Demo Order",
-        backendConfirmed: false
+        backendConfirmed: false,
+        submittedAt: new Date().toISOString()
     };
 
+    // TRY PHP CONNECTION
     try {
+
         const result = await callPaymentPHP(
             paymentData,
             proofFile
         );
 
-        
         receiptData.backendConfirmed = true;
 
         if (result.orderId) {
@@ -695,18 +733,46 @@ const proofFile = null;
         }
 
     } catch (error) {
+
         console.warn(
             "PHP unavailable. Continuing frontend demo:",
             error
         );
     }
 
-    sessionStorage.setItem(
-        "cozyBakeReceipt",
-        JSON.stringify(receiptData)
-    );
+    // SAVE RECEIPT
+    try {
 
-    window.location.href = "receipt.html";
+        sessionStorage.setItem(
+            "cozyBakeReceipt",
+            JSON.stringify(receiptData)
+        );
+
+
+
+        localStorage.removeItem("cozyBakeCart");
+
+        // Clear old checkout data
+        sessionStorage.removeItem("cozyBakeCheckout");
+
+        // Clear old demo order number
+        sessionStorage.removeItem("cozyBakeDemoOrderNumber");
+
+        // GO TO RECEIPT PAGE
+        window.location.href = "receipt.html";
+
+    } catch (error) {
+
+        errorBox.textContent =
+            "Unable to complete demo order. Please try again.";
+
+        errorBox.classList.add("show");
+
+        button.disabled = false;
+        button.textContent = "Confirm Order →";
+
+        console.error(error);
+    }
 }
 
 // ======================================
