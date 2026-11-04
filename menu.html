@@ -1,25 +1,36 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cozy Bake | Menu</title>
+    <title>Cozy Bake | Our Menu</title>
 
     <style>
+        :root {
+            --cream: #FAF8F5;
+            --brown: #3D281B;
+            --accent: #B58D6D;
+            --soft: #F1E7DF;
+            --line: #E4D1C2;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
-            background-color: #FAF8F5;
+            background: var(--cream);
+            color: var(--brown);
             font-family: Arial, sans-serif;
-            color: #3D281B;
         }
 
         button {
             font-family: inherit;
+            cursor: pointer;
         }
 
-        /* CART BUTTON */
         .cart-header {
             display: flex;
             justify-content: flex-end;
@@ -27,221 +38,328 @@
         }
 
         .cart-box {
-            background-color: #F1E7DF;
-            color: #3D281B;
+            background: var(--soft);
+            color: var(--brown);
             border: none;
             padding: 15px 25px;
             border-radius: 15px;
             font-size: 15px;
             font-weight: bold;
-            cursor: pointer;
         }
 
         .cart-box:hover {
-            background-color: #E4D1C2;
+            background: var(--line);
         }
 
-        /* MENU HEADER */
         .menu-header {
             text-align: center;
-            padding: 40px 20px 60px;
+            padding: 35px 20px;
         }
 
         .menu-header h1 {
             font-family: Georgia, serif;
-            font-size: 75px;
-            color: #3D281B;
+            font-size: clamp(42px, 7vw, 75px);
             margin: 15px 0;
         }
 
         .menu-header p {
-            color: #B58D6D;
-            font-size: 14px;
+            color: var(--accent);
+            font-size: 15px;
         }
 
-        /* CATEGORIES */
         .categories {
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
-            gap: 10px;
-            background-color: #F1E7DF;
-            width: fit-content;
-            max-width: 90%;
-            margin: 0 auto 50px;
-            padding: 8px;
-            border-radius: 20px;
+            gap: 12px;
+            background: var(--soft);
+            padding: 18px;
+            margin: 0 6% 35px;
+            border-radius: 15px;
         }
 
         .categories button {
-            background: transparent;
             border: none;
-            padding: 15px 25px;
-            border-radius: 15px;
-            color: #3D281B;
-            font-weight: bold;
-            cursor: pointer;
+            background: transparent;
+            color: var(--brown);
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 15px;
         }
 
-        .categories button.active {
-            background-color: #B58D6D;
+        .categories button.active,
+        .categories button:hover {
+            background: var(--accent);
             color: white;
         }
 
-        /* PRODUCTS */
-        .products {
+        .product-container {
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 35px;
-            padding: 20px 6% 70px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 28px;
+            max-width: 1250px;
+            margin: auto;
+            padding: 15px 6% 60px;
         }
 
         .product-card {
-            min-width: 0;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(61, 40, 27, 0.07);
+            transition: transform 0.2s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
         }
 
         .product-image {
             position: relative;
+            height: 240px;
+            overflow: hidden;
+            cursor: pointer;
         }
 
         .product-image img {
             width: 100%;
-            height: 350px;
+            height: 100%;
             object-fit: cover;
-            border-radius: 20px;
+            transition: transform 0.3s;
+        }
+
+        .product-image:hover img {
+            transform: scale(1.05);
         }
 
         .badge {
             position: absolute;
             top: 15px;
             left: 15px;
-            background-color: #B58D6D;
+            background: var(--accent);
             color: white;
-            padding: 10px 15px;
+            padding: 8px 12px;
             border-radius: 20px;
             font-size: 11px;
             font-weight: bold;
         }
 
-        .product-card h3 {
-            font-family: Georgia, serif;
-            font-size: 23px;
-            margin-bottom: 10px;
+        .product-details {
+            padding: 22px;
+        }
+
+        .product-details h3 {
+            font-size: 20px;
+            margin: 0 0 12px;
         }
 
         .description {
-            color: #795B4D;
-            font-size: 14px;
-            line-height: 1.6;
+            color: #806B5D;
+            font-size: 13px;
+            line-height: 1.7;
             min-height: 65px;
         }
 
+        .category-label {
+            color: var(--accent);
+            font-size: 13px;
+        }
+
         .price {
-            color: #B58D6D;
             font-size: 20px;
+            margin: 15px 0;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .quick-view-btn,
+        .add-to-cart {
+            border: none;
+            border-radius: 12px;
+            padding: 13px 12px;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .quick-view-btn {
+            flex: 1;
+            background: var(--soft);
+            color: var(--brown);
         }
 
         .add-to-cart {
-            background-color: #B58D6D;
+            flex: 1;
+            background: var(--accent);
             color: white;
-            border: none;
-            padding: 14px 25px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
+        }
+
+        .quick-view-btn:hover {
+            background: var(--line);
         }
 
         .add-to-cart:hover {
-            background-color: #8B684D;
+            background: #987356;
         }
 
-        /* SHOPPING CART POPUP */
-        .cart-overlay {
+        .back-home {
+            display: block;
+            width: fit-content;
+            margin: 0 auto 55px;
+            padding: 15px 30px;
+            background: var(--brown);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+        }
+
+        /* POPUP BACKGROUND */
+        .modal {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.45);
             z-index: 1000;
+            background: rgba(0, 0, 0, 0.55);
             justify-content: center;
             align-items: center;
-            padding: 15px;
-            box-sizing: border-box;
-        }
-
-        .cart-overlay.show {
-            display: flex;
-        }
-
-        .cart-panel {
-            background-color: #FAF8F5;
-            width: 100%;
-            max-width: 500px;
-            max-height: 85vh;
+            padding: 20px;
             overflow-y: auto;
-            padding: 25px;
-            border-radius: 20px;
-            box-sizing: border-box;
         }
 
-        .cart-top {
+        .modal.show {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
 
-        .cart-top h2 {
-            font-family: Georgia, serif;
+        .modal-content {
+            position: relative;
+            background: white;
+            border-radius: 22px;
+            padding: 28px;
+            width: 100%;
+            max-width: 650px;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
-        .close-cart {
-            background: transparent;
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: var(--soft);
             border: none;
-            font-size: 28px;
-            cursor: pointer;
-            color: #3D281B;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            font-size: 23px;
+            z-index: 2;
+        }
+
+        /* QUICK VIEW */
+        .quick-view-content {
+            max-width: 520px;
+        }
+
+        .quick-view-content img {
+            width: 100%;
+            height: 260px;
+            object-fit: cover;
+            border-radius: 15px;
+        }
+
+        .quick-view-content h2 {
+            margin-bottom: 10px;
+        }
+
+        .quick-view-description {
+            color: #806B5D;
+            line-height: 1.7;
+            font-size: 14px;
+        }
+
+        .quick-view-price {
+            font-size: 23px;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin: 20px 0;
+        }
+
+        .quantity-control button,
+        .cart-quantity button {
+            background: var(--soft);
+            border: none;
+            border-radius: 8px;
+            width: 35px;
+            height: 35px;
+            font-size: 20px;
+        }
+
+        .quantity-control span {
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .quick-add-btn,
+        .checkout-btn {
+            width: 100%;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        /* CART */
+        .cart-content {
+            max-width: 560px;
+        }
+
+        .cart-content h2 {
+            text-align: center;
         }
 
         .cart-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 15px;
-            border-bottom: 1px solid #E4D1C2;
+            gap: 12px;
             padding: 18px 0;
+            border-bottom: 1px solid var(--line);
         }
 
-        .cart-item-name {
-            font-weight: bold;
-            margin-bottom: 8px;
+        .cart-item-info {
+            flex: 1;
         }
 
-        .cart-item-price {
-            color: #B58D6D;
-            font-size: 14px;
+        .cart-item-info h4 {
+            margin: 0 0 8px;
         }
 
-        .quantity-controls {
+        .cart-item-info p {
+            margin: 0;
+            color: var(--accent);
+        }
+
+        .cart-quantity {
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-top: 10px;
-        }
-
-        .quantity-controls button {
-            background-color: #F1E7DF;
-            border: none;
-            border-radius: 7px;
-            padding: 7px 12px;
-            cursor: pointer;
         }
 
         .remove-btn {
             background: none;
             border: none;
-            color: #B24B4B;
-            cursor: pointer;
+            color: #B14F4F;
+            font-size: 12px;
             margin-top: 10px;
             padding: 0;
         }
@@ -249,367 +367,305 @@
         .cart-total {
             display: flex;
             justify-content: space-between;
-            font-size: 20px;
+            font-size: 21px;
             font-weight: bold;
             margin: 25px 0;
         }
 
-        .checkout-btn {
-            width: 100%;
-            background-color: #B58D6D;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            padding: 15px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .checkout-btn:hover {
-            background-color: #8B684D;
-        }
-
         .empty-cart {
             text-align: center;
-            color: #795B4D;
-            padding: 35px 0;
+            padding: 30px 0;
+            color: #806B5D;
         }
 
         @media (max-width: 900px) {
-            .products {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
+            .product-container {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
         @media (max-width: 600px) {
-            .products {
+            .product-container {
                 grid-template-columns: 1fr;
             }
 
-            .menu-header h1 {
-                font-size: 45px;
+            .product-actions {
+                flex-direction: column;
             }
 
-            .product-image img {
-                height: 300px;
+            .cart-item {
+                align-items: flex-start;
+            }
+
+            .modal-content {
+                padding: 20px;
             }
         }
-        /* RETURN TO HOME BUTTON */
-.back-home {
-    display: inline-block;
-    margin: 25px 0 0 6%;
-    padding: 12px 20px;
-    background-color: #F1E7DF;
-    color: #3D281B;
-    text-decoration: none;
-    border-radius: 12px;
-    font-size: 14px;
-    font-weight: bold;
-    transition: 0.3s;
-}
-
-.back-home:hover {
-    background-color: #B58D6D;
-    color: white;
-}
     </style>
 </head>
 
 <body>
 
-    <a href="index.html" class="back-home">
-    ← Return to Home
-</a>
-
     <!-- CART BUTTON -->
     <div class="cart-header">
-        <button type="button" class="cart-box" id="open-cart">
-            🛒 Cart (<span id="cart-count">0</span>)
+        <button class="cart-box" onclick="openCart()">
+            🛒 My Cart (<span id="cart-count">0</span>)
         </button>
     </div>
 
     <!-- MENU HEADER -->
-    <section class="menu-header">
-        <p>COZY BAKE</p>
-        <h1>Our Fresh Bakes</h1>
-        <p>
-            Discover cakes, pastries, cookies and everyday
-            comforts baked fresh in our kitchens.
-        </p>
-    </section>
+    <div class="menu-header">
+        <p>FRESHLY BAKED WITH LOVE</p>
+        <h1>Our Menu</h1>
+        <p>Discover your favourite sweet treats at Cozy Bake.</p>
+    </div>
 
     <!-- CATEGORIES -->
     <div class="categories">
-        <button class="active" onclick="filterProducts('All', this)">
+        <button class="active"
+                onclick="filterProducts('All', this)">
             All
         </button>
+
         <button onclick="filterProducts('Cakes', this)">
             Cakes
         </button>
+
         <button onclick="filterProducts('Pastries', this)">
             Pastries
         </button>
+
         <button onclick="filterProducts('Cookies', this)">
             Cookies
         </button>
     </div>
 
-    <!-- PRODUCTS -->
-    <div class="products">
+    <!-- PRODUCT LIST -->
+    <div class="product-container" id="product-container"></div>
 
-        <!-- STRAWBERRY CLOUD CAKE -->
-        <div class="product-card" data-category="Cakes">
-            <div class="product-image">
-                <img src="strawberrycloudcake.jpg"
-                     alt="Strawberry Cloud Cake">
-                <span class="badge">BEST SELLER</span>
+    <a href="index.html" class="back-home">
+        ← Return to Home
+    </a>
+
+    <!-- QUICK VIEW POPUP -->
+    <div class="modal" id="quick-view-modal"
+         onclick="closeQuickView(event)">
+
+        <div class="modal-content quick-view-content">
+
+            <button class="close-modal"
+                    onclick="closeQuickView()">
+                ×
+            </button>
+
+            <img id="quick-image" src="" alt="Product">
+
+            <h2 id="quick-name"></h2>
+
+            <p class="category-label" id="quick-category"></p>
+
+            <p class="quick-view-description"
+               id="quick-description"></p>
+
+            <p class="quick-view-price" id="quick-price"></p>
+
+            <div class="quantity-control">
+                <strong>Quantity:</strong>
+
+                <button onclick="changeQuickQuantity(-1)">−</button>
+
+                <span id="quick-quantity">1</span>
+
+                <button onclick="changeQuickQuantity(1)">+</button>
             </div>
 
-            <h3>Strawberry Cloud Cake</h3>
-            <p class="description">
-                A light and fluffy cake layered with fresh
-                strawberries and whipped cream, perfect
-                for any celebration.
-            </p>
-            <p>Cakes</p>
-            <h4 class="price">RM 58.90</h4>
-
-            <button class="add-to-cart"
-                onclick="addToCart('Strawberry Cloud Cake', 58.90)">
+            <button class="quick-add-btn"
+                    onclick="addQuickViewToCart()"
+                    id="quick-add-button">
                 🛒 Add to Cart
             </button>
+
         </div>
-
-        <!-- MORNING CROISSANT -->
-        <div class="product-card" data-category="Pastries">
-            <div class="product-image">
-                <img src="morningcroissant.jpg"
-                     alt="Morning Croissant">
-            </div>
-
-            <h3>Morning Croissant</h3>
-            <p class="description">
-                A buttery and flaky croissant, perfect
-                for a morning treat or breakfast on the go.
-            </p>
-            <p>Pastries</p>
-            <h4 class="price">RM 8.90</h4>
-
-            <button class="add-to-cart"
-                onclick="addToCart('Morning Croissant', 8.90)">
-                🛒 Add to Cart
-            </button>
-        </div>
-
-        <!-- MACARON -->
-        <div class="product-card" data-category="Pastries">
-            <div class="product-image">
-                <img src="macaron.jpg" alt="Macaron">
-            </div>
-
-            <h3>Macaron</h3>
-            <p class="description">
-                A delicate and colorful French pastry made
-                with almond flour, sugar, and egg whites.
-            </p>
-            <p>Pastries</p>
-            <h4 class="price">RM 18.90</h4>
-
-            <button class="add-to-cart"
-                onclick="addToCart('Macaron', 18.90)">
-                🛒 Add to Cart
-            </button>
-        </div>
-
-        <!-- CREAMPUFF STRAWBERRY -->
-        <div class="product-card" data-category="Pastries">
-            <div class="product-image">
-                <img src="creampuff.jpg"
-                     alt="Creampuff Strawberry">
-            </div>
-
-            <h3>Creampuff Strawberry</h3>
-            <p class="description">
-                Creampuff custard with filling of fresh
-                strawberries, whipped cream and icing sugar on top.
-            </p>
-            <p>Pastries</p>
-            <h4 class="price">RM 15.50</h4>
-
-            <button class="add-to-cart"
-                onclick="addToCart('Creampuff Strawberry', 15.50)">
-                🛒 Add to Cart
-            </button>
-        </div>
-
-        <!-- STRAWBERRY CHEESE CAKE -->
-        <div class="product-card" data-category="Cakes">
-            <div class="product-image">
-                <img src="strawberrycheesecake.jpg"
-                     alt="Strawberry Cheese Cake">
-            </div>
-
-            <h3>Strawberry Cheese Cake</h3>
-            <p class="description">
-                A rich and creamy cheesecake topped with
-                fresh strawberries and a buttery graham cracker crust.
-            </p>
-            <p>Cakes</p>
-            <h4 class="price">RM 79.90</h4>
-
-            <button class="add-to-cart"
-                onclick="addToCart('Strawberry Cheese Cake', 79.90)">
-                🛒 Add to Cart
-            </button>
-        </div>
-
-        <!-- CHEESY KUNAFA PISTACHIO -->
-        <div class="product-card" data-category="Pastries">
-            <div class="product-image">
-                <img src="kunafa.jpg"
-                     alt="Cheesy Kunafa Pistachio">
-            </div>
-
-            <h3>Cheesy Kunafa Pistachio</h3>
-            <p class="description">
-                A Middle Eastern dessert made with shredded
-                phyllo dough, filled with a sweet cheese mixture,
-                and topped with crushed pistachios.
-            </p>
-            <p>Pastries</p>
-            <h4 class="price">RM 16.90</h4>
-
-            <button class="add-to-cart"
-                onclick="addToCart('Cheesy Kunafa Pistachio', 16.90)">
-                🛒 Add to Cart
-            </button>
-        </div>
-
-         <!-- CHOCOLATE CHIP -->
-        <div class="product-card" data-category="Cookies">
-            <div class="product-image">
-                <img src="chocolatechip.jpg"
-                     alt="Chocolate Chip Cookies">
-            </div>
-
-            <h3>Chocolate Chip Cookies</h3>
-            <p class="description">
-                Classic chocolate chip cookies made with real butter and high-quality chocolate chips.
-            </p>
-            <p>Cookies</p>
-            <h4 class="price">RM 6.90</h4>
-
-            <button class="add-to-cart"
-                onclick="addToCart('Chocolate Chip Cookies', 6.90)">
-                🛒 Add to Cart
-            </button>
-        </div>
-         <!-- Redvelvet Cookies -->
-        <div class="product-card" data-category="Cookies">
-            <div class="product-image">
-                <img src="redvelvet.jpg"
-                     alt="Redvelvet Cookies">
-            </div>
-
-            <h3>Redvelvet Cookies</h3>
-            <p class="description">
-                Moist and delicious red velvet cookies with a hint of cocoa flavor.
-            </p>
-            <p>Cookies</p>
-            <h4 class="price">RM 7.90</h4>
-
-            <button class="add-to-cart"
-                onclick="addToCart('Redvelvet Cookies', 7.90)">
-                🛒 Add to Cart
-            </button>
-        </div>
-         <!-- Dark Chocolate Cookies -->
-        <div class="product-card" data-category="Cookies">
-            <div class="product-image">
-                <img src="darkchocolate.jpg"
-                     alt="Dark Chocolate Cookies">
-            </div>
-
-            <h3>Dark Chocolate Cookies</h3>
-            <p class="description">
-                Rich and decadent cookies made with premium dark chocolate chips.
-            </p>
-            <p>Cookies</p>
-            <h4 class="price">RM 7.90</h4>
-
-            <button class="add-to-cart"
-                onclick="addToCart('Dark Chocolate Cookies', 7.90)">
-                🛒 Add to Cart
-            </button>
-        </div>
-
-         <!-- BLUEBERRY COOKIES -->
-        <div class="product-card" data-category="Cookies">
-            <div class="product-image">
-                <img src="blueberry.jpg"
-                     alt="Blueberry Cookies">
-            </div>
-
-            <h3>Blueberry Cookies</h3>
-            <p class="description">
-                Fresh and flavorful cookies made with real blueberries.
-            </p>
-            <p>Cookies</p>
-            <h4 class="price">RM 7.90</h4>
-
-            <button class="add-to-cart"
-                onclick="addToCart('Blueberry Cookies', 7.90)"> 
-                🛒 Add to Cart
-            </button>
-        </div>
-
     </div>
 
-    <!-- SHOPPING CART POPUP -->
-    <div class="cart-overlay" id="cart-overlay">
-        <div class="cart-panel" role="dialog"
-             aria-modal="true" aria-label="Shopping Cart">
+    <!-- CART POPUP -->
+    <div class="modal" id="cart-modal"
+         onclick="closeCart(event)">
 
-            <div class="cart-top">
-                <h2>🛒 Your Cart</h2>
-                <button class="close-cart" id="close-cart"
-                        aria-label="Close cart">
-                    &times;
-                </button>
-            </div>
+        <div class="modal-content cart-content">
+
+            <button class="close-modal"
+                    onclick="closeCart()">
+                ×
+            </button>
+
+            <h2>🛒 Your Shopping Cart</h2>
 
             <div id="cart-items"></div>
 
             <div class="cart-total">
-                <span>Total</span>
+                <span>Total:</span>
                 <span id="cart-total">RM 0.00</span>
             </div>
 
-            <button class="checkout-btn" id="checkout-btn">
+            <button class="checkout-btn"
+                    onclick="goToCheckout()">
                 Proceed to Checkout
             </button>
 
         </div>
     </div>
 
-    <!-- JAVASCRIPT -->
     <script>
-        // LOAD CART
-        let cart;
+        // ======================================
+        // PRODUCT DATA
+        // ======================================
+
+        const products = [
+            {
+                name: "Strawberry Cloud Cake",
+                price: 58.90,
+                category: "Cakes",
+                image: "strawberrycloudcake.jpg",
+                description: "A light and fluffy cake layered with fresh strawberries and whipped cream, perfect for any celebration.",
+                bestseller: true
+            },
+            {
+                name: "Morning Croissant",
+                price: 8.90,
+                category: "Pastries",
+                image: "morningcroissant.jpg",
+                description: "A golden, buttery and flaky croissant, freshly baked for a delightful morning."
+            },
+            {
+                name: "Macaron",
+                price: 18.90,
+                category: "Pastries",
+                image: "macaron.jpg",
+                description: "Delicate French macarons with a crispy shell and a soft, delicious filling."
+            },
+            {
+                name: "Creampuff Strawberry",
+                price: 15.50,
+                category: "Pastries",
+                image: "creampuff.jpg",
+                description: "Soft cream puffs filled with smooth cream and sweet strawberry flavour."
+            },
+            {
+                name: "Strawberry Cheese Cake",
+                price: 79.90,
+                category: "Cakes",
+                image: "strawberrycheesecake.jpg",
+                description: "Rich and creamy cheesecake topped with fresh strawberries."
+            },
+            {
+                name: "Cheesy Kunafa Pistachio",
+                price: 16.90,
+                category: "Pastries",
+                image: "kunafa.jpg",
+                description: "Crispy kunafa with creamy cheese and a delicious pistachio topping."
+            },
+            {
+                name: "Chocolate Chip Cookies",
+                price: 6.90,
+                category: "Cookies",
+                image: "chocolatechip.jpg",
+                description: "Classic cookies filled with chocolate chips and baked to perfection."
+            },
+            {
+                name: "Redvelvet Cookies",
+                price: 7.90,
+                category: "Cookies",
+                image: "redvelvet.jpg",
+                description: "Soft red velvet cookies with a rich and delightful flavour."
+            },
+            {
+                name: "Dark Chocolate Cookies",
+                price: 7.90,
+                category: "Cookies",
+                image: "darkchocolate.jpg",
+                description: "Rich dark chocolate cookies for every chocolate lover."
+            },
+            {
+                name: "Blueberry Cookies",
+                price: 7.90,
+                category: "Cookies",
+                image: "blueberry.jpg",
+                description: "Sweet and delicious cookies with a delightful blueberry flavour."
+            }
+        ];
+
+        // ======================================
+        // PHP CONNECTION
+        // ======================================
+
+        const PHP_API = {
+            add: "addtocart.php",
+            update: "updatecart.php",
+            remove: "removecart.php"
+        };
+
+        async function callCartPHP(endpoint, data) {
+            const response = await fetch(endpoint, {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) {
+                throw new Error("PHP request failed");
+            }
+
+            const result = await response.json();
+
+            if (result.success !== true) {
+                throw new Error(
+                    result.message || "Cart operation failed"
+                );
+            }
+
+            return result;
+        }
+
+        async function syncCartWithPHP(endpoint, data) {
+            try {
+                await callCartPHP(endpoint, data);
+                console.log("PHP cart sync successful");
+            } catch (error) {
+                console.warn(
+                    "PHP not connected or sync failed:",
+                    error
+                );
+            }
+        }
+
+        // ======================================
+        // SHOPPING CART
+        // ======================================
+
+        let cart = [];
 
         try {
-            cart = JSON.parse(
+            const savedCart = JSON.parse(
                 localStorage.getItem("cozyBakeCart") || "[]"
             );
 
-            if (!Array.isArray(cart)) {
-                cart = [];
+            if (Array.isArray(savedCart)) {
+                cart = savedCart.filter(item =>
+                    item &&
+                    typeof item.name === "string" &&
+                    Number.isFinite(item.price) &&
+                    Number.isInteger(item.quantity) &&
+                    item.quantity > 0
+                );
             }
         } catch (error) {
             cart = [];
         }
 
-        // SAVE CART
         function saveCart() {
             localStorage.setItem(
                 "cozyBakeCart",
@@ -620,180 +676,384 @@
             renderCart();
         }
 
-        // UPDATE CART COUNT
         function updateCartCount() {
-            let count = cart.reduce(function(total, item) {
-                return total + item.quantity;
-            }, 0);
+            const count = cart.reduce(
+                (total, item) => total + item.quantity,
+                0
+            );
 
-            document.getElementById("cart-count").textContent = count;
+            document.getElementById("cart-count")
+                .textContent = count;
         }
 
-        // ADD TO CART
-        function addToCart(productName, price) {
-            let existing = cart.find(function(item) {
-                return item.name === productName;
-            });
+        function addToCart(productName, price, quantity = 1) {
+            const product = products.find(
+                item => item.name === productName
+            );
+
+            if (!product) {
+                return;
+            }
+
+            const existing = cart.find(
+                item => item.name === productName
+            );
 
             if (existing) {
-                existing.quantity++;
+                existing.quantity += quantity;
             } else {
                 cart.push({
                     name: productName,
-                    price: price,
-                    quantity: 1
+                    price: product.price,
+                    quantity: quantity
                 });
             }
 
             saveCart();
             openCart();
+
+            // CALL PHP
+            syncCartWithPHP(PHP_API.add, {
+                name: productName,
+                price: product.price,
+                quantity: quantity
+            });
         }
 
-        // OPEN CART
-        function openCart() {
-            renderCart();
-            document.getElementById("cart-overlay")
-                .classList.add("show");
-        }
-
-        // CLOSE CART
-        function closeCart() {
-            document.getElementById("cart-overlay")
-                .classList.remove("show");
-        }
-
-        // CHANGE QUANTITY
         function changeQuantity(index, amount) {
-            cart[index].quantity += amount;
-
-            if (cart[index].quantity <= 0) {
-                cart.splice(index, 1);
+            if (!cart[index]) {
+                return;
             }
 
+            const item = cart[index];
+            const newQuantity = item.quantity + amount;
+
+            if (newQuantity <= 0) {
+                removeItem(index);
+                return;
+            }
+
+            item.quantity = newQuantity;
+
             saveCart();
+
+            // CALL PHP
+            syncCartWithPHP(PHP_API.update, {
+                name: item.name,
+                quantity: newQuantity
+            });
         }
 
-        // REMOVE PRODUCT
         function removeItem(index) {
+            if (!cart[index]) {
+                return;
+            }
+
+            const itemName = cart[index].name;
+
             cart.splice(index, 1);
+
             saveCart();
+
+            // CALL PHP
+            syncCartWithPHP(PHP_API.remove, {
+                name: itemName
+            });
         }
 
-        // DISPLAY CART
         function renderCart() {
-            const container = document.getElementById("cart-items");
-            const totalElement = document.getElementById("cart-total");
+            const cartItems = document.getElementById("cart-items");
+            const cartTotal = document.getElementById("cart-total");
 
-            container.innerHTML = "";
+            cartItems.innerHTML = "";
 
             let total = 0;
 
             if (cart.length === 0) {
-                container.innerHTML =
-                    '<p class="empty-cart">Your cart is empty 🛒</p>';
+                cartItems.innerHTML =
+                    '<p class="empty-cart">Your cart is empty.</p>';
             }
 
-            cart.forEach(function(item, index) {
-                let subtotal = item.price * item.quantity;
+            cart.forEach((item, index) => {
+                const subtotal = item.price * item.quantity;
                 total += subtotal;
 
-                let row = document.createElement("div");
-                row.className = "cart-item";
+                const cartItem = document.createElement("div");
+                cartItem.className = "cart-item";
 
-                let details = document.createElement("div");
+                const info = document.createElement("div");
+                info.className = "cart-item-info";
 
-                let name = document.createElement("div");
-                name.className = "cart-item-name";
+                const name = document.createElement("h4");
                 name.textContent = item.name;
 
-                let price = document.createElement("div");
-                price.className = "cart-item-price";
+                const price = document.createElement("p");
                 price.textContent =
                     "RM " + item.price.toFixed(2) + " each";
 
-                let controls = document.createElement("div");
-                controls.className = "quantity-controls";
-
-                let minus = document.createElement("button");
-                minus.textContent = "−";
-                minus.onclick = function() {
-                    changeQuantity(index, -1);
-                };
-
-                let quantity = document.createElement("span");
-                quantity.textContent = item.quantity;
-
-                let plus = document.createElement("button");
-                plus.textContent = "+";
-                plus.onclick = function() {
-                    changeQuantity(index, 1);
-                };
-
-                controls.append(minus, quantity, plus);
-
-                let remove = document.createElement("button");
+                const remove = document.createElement("button");
                 remove.className = "remove-btn";
                 remove.textContent = "Remove";
-                remove.onclick = function() {
-                    removeItem(index);
-                };
+                remove.onclick = () => removeItem(index);
 
-                details.append(name, price, controls, remove);
+                info.append(name, price, remove);
 
-                let subtotalElement = document.createElement("strong");
-                subtotalElement.textContent =
-                    "RM " + subtotal.toFixed(2);
+                const quantityBox = document.createElement("div");
+                quantityBox.className = "cart-quantity";
 
-                row.append(details, subtotalElement);
-                container.appendChild(row);
+                const minus = document.createElement("button");
+                minus.textContent = "−";
+                minus.onclick = () => changeQuantity(index, -1);
+
+                const quantity = document.createElement("span");
+                quantity.textContent = item.quantity;
+
+                const plus = document.createElement("button");
+                plus.textContent = "+";
+                plus.onclick = () => changeQuantity(index, 1);
+
+                quantityBox.append(minus, quantity, plus);
+
+                cartItem.append(info, quantityBox);
+                cartItems.appendChild(cartItem);
             });
 
-            totalElement.textContent = "RM " + total.toFixed(2);
+            cartTotal.textContent = "RM " + total.toFixed(2);
         }
 
-        // FILTER PRODUCTS
-        function filterProducts(category, clickedButton) {
-            document.querySelectorAll(".product-card")
-                .forEach(function(product) {
-                    product.style.display =
-                        category === "All" ||
-                        product.dataset.category === category
-                            ? "block"
-                            : "none";
-                });
+        function openCart() {
+            renderCart();
 
+            document.getElementById("quick-view-modal")
+                .classList.remove("show");
+
+            document.getElementById("cart-modal")
+                .classList.add("show");
+        }
+
+        function closeCart(event) {
+            if (
+                !event ||
+                event.target.id === "cart-modal"
+            ) {
+                document.getElementById("cart-modal")
+                    .classList.remove("show");
+            }
+        }
+
+        function goToCheckout() {
+            if (cart.length === 0) {
+                alert("Your cart is empty. Please add a product first.");
+                return;
+            }
+
+            saveCart();
+            window.location.href = "checkout.html";
+        }
+
+        // ======================================
+        // DISPLAY PRODUCTS
+        // ======================================
+
+        function displayProducts() {
+            const container = document.getElementById(
+                "product-container"
+            );
+
+            container.innerHTML = "";
+
+            products.forEach((product, index) => {
+                const card = document.createElement("div");
+                card.className = "product-card";
+                card.dataset.category = product.category;
+
+                const imageBox = document.createElement("div");
+                imageBox.className = "product-image";
+                imageBox.onclick = () => openQuickView(index);
+
+                const image = document.createElement("img");
+                image.src = product.image;
+                image.alt = product.name;
+
+                imageBox.appendChild(image);
+
+                if (product.bestseller) {
+                    const badge = document.createElement("span");
+                    badge.className = "badge";
+                    badge.textContent = "BEST SELLER";
+                    imageBox.appendChild(badge);
+                }
+
+                const details = document.createElement("div");
+                details.className = "product-details";
+
+                const name = document.createElement("h3");
+                name.textContent = product.name;
+
+                const description = document.createElement("p");
+                description.className = "description";
+                description.textContent = product.description;
+
+                const category = document.createElement("p");
+                category.className = "category-label";
+                category.textContent = product.category;
+
+                const price = document.createElement("h4");
+                price.className = "price";
+                price.textContent =
+                    "RM " + product.price.toFixed(2);
+
+                const actions = document.createElement("div");
+                actions.className = "product-actions";
+
+                const quickButton = document.createElement("button");
+                quickButton.className = "quick-view-btn";
+                quickButton.textContent = "👁 Quick View";
+                quickButton.onclick = () => openQuickView(index);
+
+                const cartButton = document.createElement("button");
+                cartButton.className = "add-to-cart";
+                cartButton.textContent = "🛒 Add to Cart";
+                cartButton.onclick = () => {
+                    addToCart(product.name, product.price);
+                };
+
+                actions.append(quickButton, cartButton);
+
+                details.append(
+                    name,
+                    description,
+                    category,
+                    price,
+                    actions
+                );
+
+                card.append(imageBox, details);
+                container.appendChild(card);
+            });
+        }
+
+        // ======================================
+        // CATEGORY FILTER
+        // ======================================
+
+        function filterProducts(category, clickedButton) {
             document.querySelectorAll(".categories button")
-                .forEach(function(button) {
+                .forEach(button => {
                     button.classList.remove("active");
                 });
 
             clickedButton.classList.add("active");
+
+            document.querySelectorAll(".product-card")
+                .forEach(card => {
+                    if (
+                        category === "All" ||
+                        card.dataset.category === category
+                    ) {
+                        card.style.display = "block";
+                    } else {
+                        card.style.display = "none";
+                    }
+                });
         }
 
-        // CONNECT CART BUTTONS
-        document.getElementById("open-cart")
-            .addEventListener("click", openCart);
+        // ======================================
+        // QUICK VIEW PRODUCT
+        // ======================================
 
-        document.getElementById("close-cart")
-            .addEventListener("click", closeCart);
+        let selectedProduct = null;
+        let quickQuantity = 1;
 
-        document.getElementById("cart-overlay")
-            .addEventListener("click", function(event) {
-                if (event.target === this) {
-                    closeCart();
-                }
-            });
+        function openQuickView(index) {
+            selectedProduct = products[index];
+            quickQuantity = 1;
 
-        document.getElementById("checkout-btn")
-            .addEventListener("click", function() {
-                if (cart.length === 0) {
-                    alert("Your cart is empty!");
-                } else {
-                    alert("Checkout page is coming soon!");
-                }
-            });
+            document.getElementById("quick-image").src =
+                selectedProduct.image;
 
+            document.getElementById("quick-image").alt =
+                selectedProduct.name;
+
+            document.getElementById("quick-name").textContent =
+                selectedProduct.name;
+
+            document.getElementById("quick-category").textContent =
+                selectedProduct.category;
+
+            document.getElementById("quick-description").textContent =
+                selectedProduct.description;
+
+            document.getElementById("quick-quantity").textContent =
+                quickQuantity;
+
+            updateQuickPrice();
+
+            document.getElementById("quick-view-modal")
+                .classList.add("show");
+        }
+
+        function updateQuickPrice() {
+            if (!selectedProduct) {
+                return;
+            }
+
+            const total = selectedProduct.price * quickQuantity;
+
+            document.getElementById("quick-price").textContent =
+                "RM " + selectedProduct.price.toFixed(2) + " each";
+
+            document.getElementById("quick-add-button").textContent =
+                "🛒 Add to Cart — RM " + total.toFixed(2);
+        }
+
+        function changeQuickQuantity(amount) {
+            quickQuantity = Math.max(
+                1,
+                quickQuantity + amount
+            );
+
+            document.getElementById("quick-quantity").textContent =
+                quickQuantity;
+
+            updateQuickPrice();
+        }
+
+        function addQuickViewToCart() {
+            if (!selectedProduct) {
+                return;
+            }
+
+            addToCart(
+                selectedProduct.name,
+                selectedProduct.price,
+                quickQuantity
+            );
+        }
+
+        function closeQuickView(event) {
+            if (
+                !event ||
+                event.target.id === "quick-view-modal"
+            ) {
+                document.getElementById("quick-view-modal")
+                    .classList.remove("show");
+            }
+        }
+
+       
+        document.addEventListener("keydown", function(event) {
+            if (event.key === "Escape") {
+                closeQuickView();
+                closeCart();
+            }
+        });
+
+        // ======================================
         // INITIALIZE
+        // ======================================
+
+        displayProducts();
         updateCartCount();
         renderCart();
 
