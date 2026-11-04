@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cozy Bake | Checkout</title>
+
+<style>
+:root {
+    --bg: #FAF8F5;
+    --ink: #3D281B;
+    --accent: #B58D6D;
+    --soft: #F1E7DF;
+    --line: #E4D1C2;
+    --muted: #806B5D;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: Arial, sans-serif;
+}
+
+button, input, select, textarea {
+    font: inherit;
+}
+
+button { cursor: pointer; }
+a { color: inherit; }
+
+.topbar {
+    padding: 22px 5%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: white;
+    border-bottom: 1px solid var(--line);
+}
+
+.brand {
+    font: 700 27px Georgia, serif;
+    text-decoration: none;
+}
+
+.back {
+    font-size: 14px;
+    text-decoration: none;
+    color: var(--muted);
+}
+
+.page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 35px 22px 75px;
+}
+
+.eyebrow {
+    text-align: center;
+    color: var(--accent);
+    letter-spacing: 2px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.heading {
+    text-align: center;
+    font: 700 50px Georgia, serif;
+    margin: 10px 0;
+}
+
+.sub {
+    text-align: center;
+    color: var(--muted);
+    margin-bottom: 27px;
+}
+
+/* CHECKOUT PROGRESS */
+.steps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 34px;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #9D8D82;
+    font-size: 13px;
+}
+
+.dot {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: white;
+}
+
+.step.done,
+.step.current {
+    color: var(--ink);
+    font-weight: bold;
+}
+
+.step.done .dot,
+.step.current .dot {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+}
+
+.connector {
+    width: 36px;
+    height: 1px;
+    background: var(--line);
+}
+
+/* PAGE LAYOUT */
+.layout {
+    display: grid;
+    grid-template-columns: 1.35fr 0.9fr;
+    gap: 25px;
+    align-items: start;
+}
+
+.left {
+    display: grid;
+    gap: 22px;
+}
+
+.panel {
+    background: white;
+    border: 1px solid #F0E7E0;
+    border-radius: 20px;
+    padding: 27px;
+    box-shadow: 0 8px 24px rgba(61,40,27,0.035);
+}
+
+.panel h2 {
+    font: 700 22px Georgia, serif;
+    margin: 0 0 8px;
+}
+
+.section-intro {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 22px;
+    line-height: 1.6;
+}
+
+/* FORM */
+.field-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 17px;
+}
+
+.field.full {
+    grid-column: 1 / -1;
+}
+
+.field label {
+    display: block;
+    font-weight: bold;
+    font-size: 13px;
+    margin-bottom: 9px;
+}
+
+.field input,
+.field select,
+.field textarea {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    padding: 13px 14px;
+    background: white;
+    color: var(--ink);
+    outline: none;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(181,141,109,0.13);
+}
+
+.field textarea {
+    resize: vertical;
+    min-height: 95px;
+}
+
+/* PICKUP / DINE-IN */
+.choice-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 13px;
+    margin-bottom: 20px;
+}
+
+.choice {
+    border: 1px solid var(--line);
+    border-radius: 13px;
+    padding: 18px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.choice:has(input:checked) {
+    background: #FBF4EE;
+    border: 2px solid var(--accent);
+    padding: 17px 15px;
+}
+
+.choice input {
+    accent-color: var(--accent);
+}
+
+.choice strong {
+    display: block;
+    font-size: 14px;
+}
+
+.choice small {
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+/* ORDER SUMMARY */
+.summary {
+    position: sticky;
+    top: 20px;
+}
+
+.summary-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.summary-head h2 { margin: 0; }
+
+.edit {
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: bold;
+}
+
+.order-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid #F0E7E0;
+}
+
+.order-img {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 10px;
+    background: var(--soft);
+    flex-shrink: 0;
+}
+
+.item-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.item-name {
+    font-size: 14px;
+    font-weight: bold;
+    margin: 0 0 6px;
+}
+
+.item-qty {
+    font-size: 12px;
+    color: var(--muted);
+    margin: 0;
+}
+
+.item-price {
+    font-size: 13px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.totals {
+    padding: 20px 0 12px;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 13px;
+    font-size: 14px;
+}
+
+.total-row.muted {
+    color: var(--muted);
+}
+
+.grand {
+    border-top: 1px solid var(--line);
+    padding-top: 17px;
+    margin-top: 12px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.pay-btn {
+    width: 100%;
+    border: none;
+    background: var(--accent);
+    color: white;
+    padding: 17px;
+    border-radius: 12px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.pay-btn:hover { background: #987356; }
+
+.pay-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.note {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+    text-align: center;
+    margin-top: 15px;
+}
+
+.empty {
+    color: var(--muted);
+    font-size: 14px;
+    padding: 15px 0;
+}
+
+.message {
+    display: none;
+    color: #A13E3E;
+    font-size: 13px;
+    margin-top: 12px;
+}
+
+.message.show { display: block; }
+
+/* RESPONSIVE */
+@media (max-width: 800px) {
+    .layout { grid-template-columns: 1fr; }
+    .summary { position: static; }
+    .page { padding: 26px 15px 50px; }
+    .panel { padding: 20px; }
+}
+
+@media (max-width: 480px) {
+    .field-grid { grid-template-columns: 1fr; }
+    .field.full { grid-column: auto; }
+    .choice-grid { grid-template-columns: 1fr; }
+    .connector { width: 12px; }
+    .steps { gap: 6px; }
+    .step { font-size: 11px; }
+    .topbar { padding: 17px; }
+    .heading { font-size: 38px; }
+}
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+    <a class="brand" href="index.html">Cozy Bake</a>
+    <a class="back" href="menu.html">← Back to Menu</a>
+</header>
+
+<main class="page">
+
+    <p class="eyebrow">ALMOST THERE</p>
+    <h1 class="heading">Checkout</h1>
+    <p class="sub">
+        Just a few details before your sweet treats are ready.
+    </p>
+
+    <!-- PROGRESS BAR -->
+    <div class="steps">
+        <span class="step done">
+            <span class="dot">✓</span> Cart
+        </span>
+
+        <span class="connector"></span>
+
+        <span class="step current">
+            <span class="dot">2</span> Checkout
+        </span>
+
+        <span class="connector"></span>
+
+        <span class="step">
+            <span class="dot">3</span> Payment
+        </span>
+
+        <span class="connector"></span>
+
+        <span class="step">
+            <span class="dot">4</span> Receipt
+        </span>
+    </div>
+
+    <div class="layout">
+
+        <!-- LEFT SIDE -->
+        <form class="left" id="checkout-form">
+
+            <!-- CUSTOMER INFORMATION -->
+            <section class="panel">
+
+                <h2>01. Customer Information</h2>
+
+                <p class="section-intro">
+                    Let us know how to contact you about your order.
+                </p>
+
+                <div class="field-grid">
+
+                    <div class="field full">
+                        <label for="customer-name">Name *</label>
+                        <input
+                            id="customer-name"
+                            name="customerName"
+                            placeholder="Enter your name"
+                            autocomplete="name"
+                            maxlength="120"
+                            required>
+                    </div>
+
+                    <div class="field">
+                        <label for="customer-phone">Phone Number *</label>
+                        <input
+                            id="customer-phone"
+                            name="customerPhone"
+                            type="tel"
+                            placeholder="e.g. 0123456789"
+                            autocomplete="tel"
+                            maxlength="13"
+                            required>
+                    </div>
+
+                    <div class="field">
+                        <label for="customer-email">Email Address *</label>
+                        <input
+                            id="customer-email"
+                            name="customerEmail"
+                            type="email"
+                            placeholder="you@example.com"
+                            autocomplete="email"
+                            maxlength="50"
+                            required>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ORDER DETAILS -->
+            <section class="panel">
+
+                <h2>02. Order Details</h2>
+
+                <p class="section-intro">
+                    Choose how and when you would like to enjoy your order.
+                </p>
+
+                <div class="choice-grid">
+
+                    <label class="choice">
+                        <input
+                            type="radio"
+                            name="orderType"
+                            value="Self-Pickup"
+                            checked>
+
+                        <span>
+                            <strong>🛍️ Self-Pickup</strong>
+                            <small>Collect your order in store</small>
+                        </span>
+                    </label>
+
+                    <label class="choice">
+                        <input
+                            type="radio"
+                            name="orderType"
+                            value="Dine-In">
+
+                        <span>
+                            <strong>☕ Dine-In</strong>
+                            <small>Enjoy your treats with us</small>
+                        </span>
+                    </label>
+
+                </div>
+
+                <div class="field-grid">
+
+                    <div class="field full">
+                        <label for="outlet">Select Outlet *</label>
+
+                        <select id="outlet" name="outlet" required>
+                            <option value="">Choose an outlet</option>
+                            <option>Kangar Jaya Mall</option>
+                            <option>Aman Central</option>
+                            <option>Queensbay Mall</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="order-date">Preferred Date *</label>
+                        <input
+                            type="date"
+                            id="order-date"
+                            name="orderDate"
+                            min="2026-01-01"
+                            max="2030-12-31"
+                            required>
+                    </div>
+
+                    <div class="field">
+                        <label for="order-time">Preferred Time *</label>
+                        <input
+                            type="time"
+                            id="order-time"
+                            name="orderTime"
+                            required>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- SPECIAL INSTRUCTIONS -->
+            <section class="panel">
+
+                <h2>03. Special Instructions</h2>
+
+                <p class="section-intro">
+                    Have a request? Tell us here (optional).
+                    Requests depend on bakery availability.
+                </p>
+
+                <div class="field">
+                    <label for="special-instructions">
+                        Order Notes
+                    </label>
+
+                    <textarea
+                        id="special-instructions"
+                        name="specialInstructions"
+                        maxlength="500"
+                        placeholder="e.g. Please prepare a birthday message card..."></textarea>
+                </div>
+
+            </section>
+
+        </form>
+
+        <!-- RIGHT SIDE: ORDER SUMMARY -->
+        <aside class="panel summary">
+
+            <div class="summary-head">
+                <h2>Your Order</h2>
+                <a href="menu.html" class="edit">Edit Cart</a>
+            </div>
+
+            <div id="order-items"></div>
+
+            <div class="totals">
+
+                <div class="total-row muted">
+                    <span>Subtotal</span>
+                    <span id="subtotal">RM 0.00</span>
+                </div>
+
+                <div class="total-row muted">
+                    <span>Pickup / Dine-In</span>
+                    <span>Free</span>
+                </div>
+
+                <div class="total-row grand">
+                    <span>Total</span>
+                    <span id="total">RM 0.00</span>
+                </div>
+
+            </div>
+
+            <button
+                class="pay-btn"
+                id="payment-btn"
+                type="submit"
+                form="checkout-form">
+                Proceed to Payment →
+            </button>
+
+            <p id="checkout-error"
+               class="message"
+               role="alert"></p>
+
+        </aside>
+
+    </div>
+</main>
+
+<script>
+
+// =====================================
+// PRODUCT IMAGES
+// =====================================
+
+const PRODUCT_IMAGES = {
+    "Strawberry Cloud Cake": "strawberrycloudcake.jpg",
+    "Morning Croissant": "morningcroissant.jpg",
+    "Macaron": "macaron.jpg",
+    "Creampuff Strawberry": "creampuff.jpg",
+    "Strawberry Cheese Cake": "strawberrycheesecake.jpg",
+    "Cheesy Kunafa Pistachio": "kunafa.jpg",
+    "Chocolate Chip Cookies": "chocolatechip.jpg",
+    "Redvelvet Cookies": "redvelvet.jpg",
+    "Dark Chocolate Cookies": "darkchocolate.jpg",
+    "Blueberry Cookies": "blueberry.jpg"
+};
+
+// =====================================
+// PRODUCT PRICES
+// =====================================
+
+const PRODUCT_PRICES = {
+    "Strawberry Cloud Cake": 58.90,
+    "Morning Croissant": 8.90,
+    "Macaron": 18.90,
+    "Creampuff Strawberry": 15.50,
+    "Strawberry Cheese Cake": 79.90,
+    "Cheesy Kunafa Pistachio": 16.90,
+    "Chocolate Chip Cookies": 6.90,
+    "Redvelvet Cookies": 7.90,
+    "Dark Chocolate Cookies": 7.90,
+    "Blueberry Cookies": 7.90
+};
+
+// =====================================
+// GET CART FROM MENU.HTML
+// =====================================
+
+let cart = [];
+
+try {
+    const saved = JSON.parse(
+        localStorage.getItem("cozyBakeCart") || "[]"
+    );
+
+    if (Array.isArray(saved)) {
+        cart = saved
+            .filter(item =>
+                item &&
+                Object.hasOwn(PRODUCT_PRICES, item.name) &&
+                Number.isInteger(item.quantity) &&
+                item.quantity > 0
+            )
+            .map(item => ({
+                name: item.name,
+                price: PRODUCT_PRICES[item.name],
+                quantity: item.quantity
+            }));
+    }
+
+} catch (error) {
+    console.warn("Could not read cart:", error);
+}
+
+function money(value) {
+    return "RM " + value.toFixed(2);
+}
+
+// =====================================
+// DISPLAY ORDER SUMMARY
+// =====================================
+
+function renderOrder() {
+
+    const holder = document.getElementById("order-items");
+    holder.replaceChildren();
+
+    if (cart.length === 0) {
+
+        const empty = document.createElement("p");
+        empty.className = "empty";
+        empty.textContent =
+            "Your cart is empty. Please return to the menu to add products.";
+
+        holder.appendChild(empty);
+
+        document.getElementById("payment-btn").disabled = true;
+
+    } else {
+
+        cart.forEach(item => {
+
+            const row = document.createElement("div");
+            row.className = "order-item";
+
+            const image = document.createElement("img");
+            image.className = "order-img";
+            image.src = PRODUCT_IMAGES[item.name];
+            image.alt = item.name;
+
+            const main = document.createElement("div");
+            main.className = "item-main";
+
+            const name = document.createElement("p");
+            name.className = "item-name";
+            name.textContent = item.name;
+
+            const quantity = document.createElement("p");
+            quantity.className = "item-qty";
+            quantity.textContent =
+                "Qty: " + item.quantity +
+                " × " + money(item.price);
+
+            main.append(name, quantity);
+
+            const price = document.createElement("span");
+            price.className = "item-price";
+            price.textContent = money(
+                item.price * item.quantity
+            );
+
+            row.append(image, main, price);
+            holder.appendChild(row);
+
+        });
+    }
+
+    const total = cart.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0
+    );
+
+    document.getElementById("subtotal").textContent = money(total);
+    document.getElementById("total").textContent = money(total);
+
+    return total;
+}
+
+const total = renderOrder();
+
+// =====================================
+// CALL CHECKOUT.PHP
+// =====================================
+
+async function callCheckoutPHP(data) {
+
+    const response = await fetch("checkout.php", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+        throw new Error("Checkout PHP request failed");
+    }
+
+    const result = await response.json();
+
+    if (result.success !== true) {
+        throw new Error(
+            result.message || "Checkout rejected"
+        );
+    }
+
+    return result;
+}
+
+// =====================================
+// PROCEED TO PAYMENT
+// =====================================
+
+document.getElementById("checkout-form")
+    .addEventListener("submit", async function(event) {
+
+        event.preventDefault();
+
+        const error = document.getElementById("checkout-error");
+        error.classList.remove("show");
+
+        if (cart.length === 0) {
+            error.textContent = "Your cart is empty.";
+            error.classList.add("show");
+            return;
+        }
+
+        const date = document.getElementById("order-date").value;
+        const time = document.getElementById("order-time").value;
+
+        const data = {
+            customerName: document.getElementById("customer-name").value.trim(),
+
+            customerPhone: document.getElementById("customer-phone").value.trim(),
+
+            customerEmail: document.getElementById("customer-email").value.trim(),
+
+            orderType: document.querySelector(
+                'input[name="orderType"]:checked'
+            ).value,
+
+            outlet: document.getElementById("outlet").value,
+
+            orderDate: date,
+
+            orderTime: time,
+
+            specialInstructions: document.getElementById(
+                "special-instructions"
+            ).value.trim(),
+
+            items: cart,
+
+            total: Number(total.toFixed(2))
+        };
+
+        // SAVE FOR PAYMENT.HTML
+        sessionStorage.setItem(
+            "cozyBakeCheckout",
+            JSON.stringify(data)
+        );
+
+        const button = document.getElementById("payment-btn");
+        button.disabled = true;
+        button.textContent = "Processing...";
+
+        try {
+            const result = await callCheckoutPHP(data);
+
+            if (result.checkoutId) {
+                data.checkoutId = result.checkoutId;
+
+                sessionStorage.setItem(
+                    "cozyBakeCheckout",
+                    JSON.stringify(data)
+                );
+            }
+
+        } catch (error) {
+            console.warn(
+                "PHP not connected or checkout sync failed. Frontend demo continues:",
+                error
+            );
+        }
+
+        window.location.href = "payment.html";
+    });
+
+</script>
+
+</body>
+</html>
