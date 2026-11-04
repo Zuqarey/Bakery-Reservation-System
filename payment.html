@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cozy Bake | Payment</title>
+
+<style>
+
+    .payment-qr {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 10px;
+}
+:root {
+    --cream: #FAF8F5;
+    --brown: #3D281B;
+    --accent: #B58D6D;
+    --soft: #F1E7DF;
+    --line: #E4D1C2;
+    --muted: #806B5D;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background: var(--cream);
+    color: var(--brown);
+    font-family: Arial, sans-serif;
+}
+
+button, input { font: inherit; }
+button { cursor: pointer; }
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 22px 6%;
+    background: white;
+    border-bottom: 1px solid var(--line);
+}
+
+.brand {
+    font: bold 28px Georgia, serif;
+    color: var(--brown);
+    text-decoration: none;
+}
+
+.back {
+    color: var(--muted);
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.container {
+    max-width: 1150px;
+    margin: auto;
+    padding: 40px 20px 70px;
+}
+
+.heading {
+    text-align: center;
+    font: bold 48px Georgia, serif;
+    margin: 10px 0;
+}
+
+.subtitle {
+    text-align: center;
+    color: var(--muted);
+    margin-bottom: 30px;
+}
+
+.steps {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 35px;
+    flex-wrap: wrap;
+}
+
+.step {
+    font-size: 13px;
+    color: #A18D7E;
+}
+
+.step.done,
+.step.active {
+    color: var(--brown);
+    font-weight: bold;
+}
+
+.step.active {
+    background: var(--soft);
+    padding: 10px 16px;
+    border-radius: 25px;
+}
+
+.arrow { color: var(--accent); }
+
+.layout {
+    display: grid;
+    grid-template-columns: 1.3fr 0.9fr;
+    gap: 25px;
+    align-items: start;
+}
+
+.card {
+    background: white;
+    border-radius: 20px;
+    padding: 28px;
+    border: 1px solid #F0E7E0;
+    box-shadow: 0 8px 25px rgba(61,40,27,0.04);
+}
+
+.card h2 {
+    font: bold 23px Georgia, serif;
+    margin: 0 0 12px;
+}
+
+.description {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.7;
+}
+
+.methods {
+    display: grid;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.method {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border: 1px solid var(--line);
+    padding: 20px;
+    border-radius: 14px;
+    cursor: pointer;
+}
+
+.method:has(input:checked) {
+    background: #FBF4EE;
+    border: 2px solid var(--accent);
+    padding: 19px;
+}
+
+.method input {
+    accent-color: var(--accent);
+}
+
+.method strong {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.method small {
+    color: var(--muted);
+}
+
+.payment-details {
+    background: var(--cream);
+    border-radius: 15px;
+    padding: 25px;
+    margin-top: 25px;
+}
+
+.qr-placeholder {
+    width: 210px;
+    height: 210px;
+    margin: 20px auto;
+    border: 3px dashed var(--accent);
+    border-radius: 12px;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.qr-icon {
+    font-size: 75px;
+}
+
+.qr-placeholder strong {
+    font-size: 13px;
+    text-align: center;
+    color: #A13E3E;
+}
+
+.demo-warning {
+    color: #A13E3E;
+    font-size: 13px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.upload-label {
+    display: block;
+    margin: 20px 0 10px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.upload-input {
+    width: 100%;
+    padding: 12px;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+}
+
+.cash-icon {
+    font-size: 55px;
+    text-align: center;
+}
+
+.cash-title {
+    text-align: center;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.cash-text {
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.hidden { display: none; }
+
+.summary {
+    position: sticky;
+    top: 20px;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 14px;
+}
+
+.summary-item small {
+    display: block;
+    color: var(--muted);
+    margin-top: 6px;
+}
+
+.summary-total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 21px;
+    font-weight: bold;
+    margin: 25px 0;
+}
+
+.confirm-btn {
+    width: 100%;
+    padding: 17px;
+    border: none;
+    background: var(--accent);
+    color: white;
+    border-radius: 12px;
+    font-weight: bold;
+}
+
+.confirm-btn:hover {
+    background: #987356;
+}
+
+.confirm-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.secure-note {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.7;
+    margin-top: 15px;
+}
+
+.error {
+    display: none;
+    color: #A13E3E;
+    font-size: 13px;
+    margin-top: 15px;
+}
+
+.error.show { display: block; }
+
+@media(max-width: 800px) {
+    .layout { grid-template-columns: 1fr; }
+    .summary { position: static; }
+}
+
+@media(max-width: 500px) {
+    .heading { font-size: 36px; }
+    .card { padding: 20px; }
+    .steps { gap: 6px; }
+    .step { font-size: 11px; }
+}
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+    <a href="index.html" class="brand">Cozy Bake</a>
+    <a href="checkout.html" class="back">← Back to Checkout</a>
+</header>
+
+<main class="container">
+
+    <h1 class="heading">Payment</h1>
+
+    <p class="subtitle">
+        Choose your preferred payment method.
+    </p>
+
+    <!-- PROGRESS -->
+    <div class="steps">
+        <span class="step done">✓ Cart</span>
+        <span class="arrow">→</span>
+        <span class="step done">✓ Checkout</span>
+        <span class="arrow">→</span>
+        <span class="step active">3 Payment</span>
+        <span class="arrow">→</span>
+        <span class="step">4 Receipt</span>
+    </div>
+
+    <div class="layout">
+
+        <!-- PAYMENT METHODS -->
+        <section class="card">
+
+            <h2>Choose Payment Method</h2>
+
+            <p class="description">
+                Select how you would like to pay for your
+                delicious treats.
+            </p>
+
+            <div class="methods">
+
+                <label class="method">
+                    <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="QR Payment"
+                        checked
+                        onchange="showPaymentMethod()">
+
+                    <span>
+                        <strong>📱 QR Payment</strong>
+                        <small>Scan QR code to pay</small>
+                    </span>
+                </label>
+
+                <label class="method">
+                    <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="Cash at Counter"
+                        onchange="showPaymentMethod()">
+
+                    <span>
+                        <strong>💵 Cash at Counter</strong>
+                        <small>Pay when you arrive</small>
+                    </span>
+                </label>
+
+            </div>
+
+            <!-- QR PAYMENT -->
+            <div id="qr-section" class="payment-details">
+
+                <h2 style="text-align:center;">
+                    QR Payment
+                </h2>
+
+                <p class="description" style="text-align:center;">
+                    This is a demonstration QR section
+                    for the Cozy Bake project.
+                </p>
+
+              <div class="qr-placeholder">
+    <img src="paymentqr.jpeg"
+         alt="QR Payment"
+         class="payment-qr">
+</div>
+
+               <p class="description" style="text-align:center;">
+    Scan the QR code to make your payment.
+    Please upload your payment receipt
+    after completing the transaction.
+</p>
+
+
+            <!-- CASH PAYMENT -->
+            <div id="cash-section"
+                 class="payment-details hidden">
+
+                <div class="cash-icon">💵</div>
+
+                <h3 class="cash-title">
+                    Pay at Counter
+                </h3>
+
+                <p class="cash-text">
+                    Your order will be placed with payment
+                    pending. Please pay at the selected
+                    Cozy Bake outlet when you arrive.
+                </p>
+
+            </div>
+
+        </section>
+
+        <!-- ORDER SUMMARY -->
+        <aside class="card summary">
+
+            <h2>Order Summary</h2>
+
+            <div id="order-summary"></div>
+
+            <div class="summary-total">
+                <span>Total</span>
+                <span id="payment-total">RM 0.00</span>
+            </div>
+
+            <button
+                class="confirm-btn"
+                id="confirm-btn"
+                onclick="confirmOrder()">
+                Confirm Order →
+            </button>
+
+            <p id="payment-error"
+               class="error"
+               role="alert"></p>
+
+            <p class="secure-note">
+                Demo payment only. No real payment
+                will be processed on this page.
+            </p>
+
+        </aside>
+
+    </div>
+
+</main>
+
+<script>
+
+// ======================================
+// GET CHECKOUT DATA
+// ======================================
+
+let checkoutData = null;
+
+try {
+    checkoutData = JSON.parse(
+        sessionStorage.getItem("cozyBakeCheckout") || "null"
+    );
+} catch (error) {
+    checkoutData = null;
+}
+
+const PRODUCT_PRICES = {
+    "Strawberry Cloud Cake": 58.90,
+    "Morning Croissant": 8.90,
+    "Macaron": 18.90,
+    "Creampuff Strawberry": 15.50,
+    "Strawberry Cheese Cake": 79.90,
+    "Cheesy Kunafa Pistachio": 16.90,
+    "Chocolate Chip Cookies": 6.90,
+    "Redvelvet Cookies": 7.90,
+    "Dark Chocolate Cookies": 7.90,
+    "Blueberry Cookies": 7.90
+};
+
+let items = [];
+
+if (checkoutData && Array.isArray(checkoutData.items)) {
+    items = checkoutData.items
+        .filter(item =>
+            item &&
+            Object.hasOwn(PRODUCT_PRICES, item.name) &&
+            Number.isInteger(item.quantity) &&
+            item.quantity > 0
+        )
+        .map(item => ({
+            name: item.name,
+            price: PRODUCT_PRICES[item.name],
+            quantity: item.quantity
+        }));
+}
+
+const total = items.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+);
+
+function money(value) {
+    return "RM " + value.toFixed(2);
+}
+
+// ======================================
+// DISPLAY ORDER SUMMARY
+// ======================================
+
+function displaySummary() {
+
+    const container = document.getElementById("order-summary");
+    container.replaceChildren();
+
+    if (!checkoutData || items.length === 0) {
+        const empty = document.createElement("p");
+        empty.textContent =
+            "No checkout details found. Please return to the menu.";
+        container.appendChild(empty);
+
+        document.getElementById("confirm-btn").disabled = true;
+        return;
+    }
+
+    items.forEach(item => {
+
+        const row = document.createElement("div");
+        row.className = "summary-item";
+
+        const info = document.createElement("div");
+
+        const name = document.createElement("strong");
+        name.textContent = item.name;
+
+        const qty = document.createElement("small");
+        qty.textContent = "Quantity: " + item.quantity;
+
+        info.append(name, qty);
+
+        const price = document.createElement("span");
+        price.textContent = money(
+            item.price * item.quantity
+        );
+
+        row.append(info, price);
+        container.appendChild(row);
+    });
+
+    document.getElementById("payment-total").textContent =
+        money(total);
+}
+
+// ======================================
+// SWITCH PAYMENT METHOD
+// ======================================
+
+function showPaymentMethod() {
+
+    const selected = document.querySelector(
+        'input[name="paymentMethod"]:checked'
+    ).value;
+
+    document.getElementById("qr-section")
+        .classList.toggle("hidden", selected !== "QR Payment");
+
+    document.getElementById("cash-section")
+        .classList.toggle("hidden", selected !== "Cash at Counter");
+}
+
+// ======================================
+// PHP CONNECTION
+// ======================================
+
+async function callPaymentPHP(data, proofFile) {
+
+    const formData = new FormData();
+
+    formData.append("paymentData", JSON.stringify(data));
+
+    if (proofFile) {
+        formData.append("paymentProof", proofFile);
+    }
+
+    const response = await fetch("payment.php", {
+        method: "POST",
+        credentials: "same-origin",
+        body: formData
+    });
+
+    if (!response.ok) {
+        throw new Error("Payment PHP request failed");
+    }
+
+    const result = await response.json();
+
+    if (result.success !== true) {
+        throw new Error(
+            result.message || "Order submission failed"
+        );
+    }
+
+    return result;
+}
+
+// ======================================
+// CONFIRM ORDER
+// ======================================
+
+async function confirmOrder() {
+
+    if (!checkoutData || items.length === 0) {
+        return;
+    }
+
+    const errorBox = document.getElementById("payment-error");
+    errorBox.classList.remove("show");
+
+    const method = document.querySelector(
+        'input[name="paymentMethod"]:checked'
+    ).value;
+
+    const proofInput = document.getElementById("payment-proof");
+    const proofFile = method === "QR Payment"
+        ? proofInput.files[0] || null
+        : null;
+
+    if (proofFile) {
+        const allowedTypes = [
+            "image/png",
+            "image/jpeg",
+            "image/webp"
+        ];
+
+        if (!allowedTypes.includes(proofFile.type)) {
+            errorBox.textContent =
+                "Please upload a PNG, JPG or WebP image.";
+            errorBox.classList.add("show");
+            return;
+        }
+
+        if (proofFile.size > 5 * 1024 * 1024) {
+            errorBox.textContent =
+                "Receipt image must be 5MB or smaller.";
+            errorBox.classList.add("show");
+            return;
+        }
+    }
+
+    const paymentStatus = method === "QR Payment"
+        ? "Pending Verification"
+        : "Pending Payment";
+
+    const paymentData = {
+        ...checkoutData,
+        items: items,
+        total: Number(total.toFixed(2)),
+        paymentMethod: method,
+        paymentStatus: paymentStatus,
+        demoMode: true,
+        proofSelected: Boolean(proofFile)
+    };
+
+    const button = document.getElementById("confirm-btn");
+    button.disabled = true;
+    button.textContent = "Processing...";
+
+    // FRONTEND DEMO DATA
+    let receiptData = {
+        ...paymentData,
+        orderStatus: "Demo Order",
+        backendConfirmed: false
+    };
+
+    try {
+        const result = await callPaymentPHP(
+            paymentData,
+            proofFile
+        );
+
+        
+        receiptData.backendConfirmed = true;
+
+        if (result.orderId) {
+            receiptData.orderId = result.orderId;
+        }
+
+    } catch (error) {
+        console.warn(
+            "PHP unavailable. Continuing frontend demo:",
+            error
+        );
+    }
+
+    sessionStorage.setItem(
+        "cozyBakeReceipt",
+        JSON.stringify(receiptData)
+    );
+
+    window.location.href = "receipt.html";
+}
+
+// ======================================
+// INITIALIZE
+// ======================================
+
+displaySummary();
+showPaymentMethod();
+
+</script>
+
+</body>
+</html>
