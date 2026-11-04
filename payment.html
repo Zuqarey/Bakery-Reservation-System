@@ -383,29 +383,29 @@ button { cursor: pointer; }
             </div>
 
             <!-- QR PAYMENT -->
-            <div id="qr-section" class="payment-details">
+            <!-- QR PAYMENT -->
+<div id="qr-section" class="payment-details">
 
-                <h2 style="text-align:center;">
-                    QR Payment
-                </h2>
+    <h2 style="text-align:center;">
+        QR Payment
+    </h2>
 
-                <p class="description" style="text-align:center;">
-                    This is a demonstration QR section
-                    for the Cozy Bake project.
-                </p>
+    <p class="description" style="text-align:center;">
+        Scan the QR code below.
+        This is for demonstration purposes only.
+    </p>
 
-              <div class="qr-placeholder">
-    <img src="paymentqr.jpeg"
-         alt="QR Payment"
-         class="payment-qr">
+    <div class="qr-placeholder">
+        <img src="paymentqr.jpeg"
+             alt="Cozy Bake QR Payment"
+             class="payment-qr">
+    </div>
+
+    <p class="demo-warning">
+        DEMO ONLY 
+    </p>
+
 </div>
-
-               <p class="description" style="text-align:center;">
-    Scan the QR code to make your payment.
-    Please upload your payment receipt
-    after completing the transaction.
-</p>
-
 
             <!-- CASH PAYMENT -->
             <div id="cash-section"
@@ -632,10 +632,7 @@ async function confirmOrder() {
         'input[name="paymentMethod"]:checked'
     ).value;
 
-    const proofInput = document.getElementById("payment-proof");
-    const proofFile = method === "QR Payment"
-        ? proofInput.files[0] || null
-        : null;
+const proofFile = null;
 
     if (proofFile) {
         const allowedTypes = [
