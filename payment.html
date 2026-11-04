@@ -411,11 +411,6 @@ button {
                         class="payment-qr">
                 </div>
 
-                <p class="demo-warning">
-                    DEMO ONLY — No real payment required.
-                    Please do not transfer money.
-                </p>
-
             </div>
 
             <!-- CASH PAYMENT SECTION -->
@@ -684,7 +679,7 @@ async function confirmOrder() {
         'input[name="paymentMethod"]:checked'
     ).value;
 
-
+    // NO UPLOAD REQUIRED FOR DEMO
     const proofFile = null;
 
     // PAYMENT STATUS
@@ -748,7 +743,9 @@ async function confirmOrder() {
             JSON.stringify(receiptData)
         );
 
-
+        // ======================================
+        // CLEAR CART AFTER ORDER SUBMISSION
+        // ======================================
 
         localStorage.removeItem("cozyBakeCart");
 
