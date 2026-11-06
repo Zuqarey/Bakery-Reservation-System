@@ -247,20 +247,20 @@
       </div>
 
       
-      <form onsubmit="event.preventDefault(); alert('Log masuk Staff berjaya!');">
+      <form action="staff_login.php" method="POST">
         <div class="form-group">
           <label class="form-label">Full Name</label>
-          <input type="text" class="form-input" placeholder="Your name" required>
+          <input type="text" name="name" class="form-input" placeholder="Your name">
         </div>
 
         <div class="form-group">
           <label class="form-label">Email</label>
-          <input type="email" class="form-input" placeholder="staff@cozybake.com" value="staff@cozybake.com" required>
+          <input type="email" name="email" class="form-input" placeholder="staff@cozybake.com" value="staff@cozybake.com" required>
         </div>
 
         <div class="form-group">
           <label class="form-label">Password</label>
-          <input type="password" class="form-input" placeholder="••••••••" required>
+          <input type="password" name="password" class="form-input" placeholder="••••••••" required>
         </div>
 
         <button type="submit" class="submit-btn">Log In As Staff</button>

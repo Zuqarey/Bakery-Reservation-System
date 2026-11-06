@@ -310,9 +310,24 @@
 
         function handleLogout() {
             if (confirm("Are you sure you want to log out from Staff Portal?")) {
-                alert("Logged out successfully.");
+                window.location.href = 'staff_logout.php';
             }
         }
+
+        async function loadDashboardStats() {
+            try {
+                const res = await fetch('get_dashboard_data.php');
+                const data = await res.json();
+                if (data.success && data.staffName) {
+                    const nameEl = document.getElementById('user-display-name');
+                    if (nameEl) nameEl.textContent = data.staffName;
+                }
+            } catch (e) {
+                console.warn("Memaparkan mod pratonton lalai:", e);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', loadDashboardStats);
 
         // Mobile Menu Functionality
         const mobileMenuBtn = document.getElementById('mobile-menu-btn');
