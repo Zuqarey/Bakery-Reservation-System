@@ -1,0 +1,963 @@
+<?php
+require_once 'db.php';
+
+$alert_msg = "";
+$alert_type = "";
+
+// 1. ADD PRODUCT
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_product'])) {
+    $name = trim($_POST['name']);
+    $category = trim($_POST['category']);
+    $price = floatval($_POST['price']);
+    $description = trim($_POST['description']);
+    $stock = intval($_POST['stock']); 
+    
+    $image_filename = "default.jpg"; 
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        $file_name = basename($_FILES['image']['name']);
+        if (move_uploaded_file($_FILES['image']['tmp_name'], $file_name)) {
+            $image_filename = $file_name;
+        }
+    }
+
+    $stmt = $conn->prepare("INSERT INTO menu (name, category, price, description, image) VALUES (?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssdss", $name, $category, $price, $description, $image_filename);
+    if ($stmt->execute()) {
+        $alert_msg = "New menu item added successfully!";
+        $alert_type = "success";
+    }
+    $stmt->close();
+}
+
+// 2. UPDATE (EDIT) PRODUCT
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_product'])) {
+    $id = intval($_POST['edit_id']);
+    $name = trim($_POST['name']);
+    $category = trim($_POST['category']);
+    $price = floatval($_POST['price']);
+    $description = trim($_POST['description']);
+    
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        $file_name = basename($_FILES['image']['name']);
+        if (move_uploaded_file($_FILES['image']['tmp_name'], $file_name)) {
+            $stmt = $conn->prepare("UPDATE menu SET name=?, category=?, price=?, description=?, image=? WHERE id=?");
+            $stmt->bind_param("ssdssi", $name, $category, $price, $description, $file_name, $id);
+            $stmt->execute();
+            $stmt->close();
+        }
+    } else {
+        $stmt = $conn->prepare("UPDATE menu SET name=?, category=?, price=?, description=? WHERE id=?");
+        $stmt->bind_param("ssdsi", $name, $category, $price, $description, $id);
+        $stmt->execute();
+        $stmt->close();
+    }
+    
+    $alert_msg = "Menu item updated successfully!";
+    $alert_type = "success";
+}
+
+// 3. REMOVE PRODUCT
+if (isset($_GET['delete_id'])) {
+    $delete_id = intval($_GET['delete_id']);
+    $stmt = $conn->prepare("DELETE FROM menu WHERE id = ?");
+    $stmt->bind_param("i", $delete_id);
+    if ($stmt->execute()) {
+        header("Location: admin.php?deleted=1");
+        exit();
+    }
+    $stmt->close();
+}
+
+if (isset($_GET['deleted'])) {
+    $alert_msg = "Menu item removed from database.";
+    $alert_type = "error";
+}
+
+// 4. FETCH ALL MENU ITEMS
+$menu_result = $conn->query("SELECT * FROM menu ORDER BY id DESC");
+$products = [];
+if ($menu_result) {
+    while ($row = $menu_result->fetch_assoc()) {
+        $products[] = [
+            'id' => $row['id'],
+            'name' => $row['name'],
+            'category' => $row['category'],
+            'price' => floatval($row['price']),
+            'description' => $row['description'],
+            'stock' => 15, // Default display stock
+            'image' => !empty($row['image']) ? $row['image'] : 'default.jpg'
+        ];
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cozy Bake — Admin Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@400;500;600;700&family=Oswald:wght@500;600&family=Pacifico&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-cream: #F5EDE3;
+      --surface-white: #FFFFFF;
+      --header-cream: #FDFBF7;
+      --espresso: #5C2C16;
+      --espresso-dark: #3E1C0C;
+      --caramel: #B58E6B;
+      --orange-accent: #EB9E55;
+      --text-dark: #2C1A11;
+      --text-muted: #8C7A6B;
+      --border-soft: #EFE6DC;
+      --badge-green-bg: #DCECE3;
+      --badge-green-text: #286646;
+      --badge-orange-bg: #FDE5CE;
+      --badge-orange-text: #9C5116;
+      --badge-yellow-bg: #FDF3C7;
+      --badge-yellow-text: #8A6508;
+      --badge-red-bg: #FADBD8;
+      --badge-red-text: #922B21;
+      --shadow-card: 0 6px 20px rgba(92, 44, 22, 0.05);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background-color: var(--bg-cream);
+      color: var(--text-dark);
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* --- EXPANDABLE SIDEBAR --- */
+    .sidebar {
+      width: 68px; background: linear-gradient(180deg, #5A351D 0%, #432512 50%, #5A351D 100%);
+      color: #F5EDE3; display: flex; flex-direction: column; justify-content: space-between;
+      padding: 20px 12px; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100;
+      transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; box-shadow: 4px 0 24px rgba(0,0,0,0.18);
+    }
+    .sidebar:hover { width: 230px; }
+    .brand-row { display: flex; align-items: center; gap: 14px; padding: 6px 10px; white-space: nowrap; }
+    .brand-icon { min-width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+    .brand-text { font-weight: 600; font-size: 16px; opacity: 0; transition: opacity 0.2s; }
+    .sidebar:hover .brand-text, .sidebar:hover .portal-info, .sidebar:hover .nav-label { opacity: 1; }
+    .portal-info { padding: 16px 10px 8px; opacity: 0; transition: opacity 0.2s; white-space: nowrap; }
+    .portal-info small { display: block; font-size: 10px; letter-spacing: 1.4px; color: #D2B49C; text-transform: uppercase; }
+    .portal-info strong { font-size: 15px; color: #FFF; }
+    .nav-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 14px; padding: 12px; border-radius: 12px; cursor: pointer;
+      color: #E6D7C8; text-decoration: none; white-space: nowrap; transition: background 0.2s, color 0.2s;
+    }
+    .nav-item:hover, .nav-item.active { background: rgba(255, 255, 255, 0.16); color: #FFFFFF; }
+    .nav-icon { min-width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; }
+    .nav-label { font-size: 14px; font-weight: 500; opacity: 0; transition: opacity 0.2s; }
+
+    /* --- MAIN WORKSPACE --- */
+    .main-wrapper { margin-left: 68px; flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .top-header {
+      background: var(--header-cream); height: 76px; padding: 0 38px; display: flex;
+      align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-soft); position: sticky; top: 0; z-index: 50;
+    }
+    .header-title h2 { font-family: 'Oswald', sans-serif; font-size: 18px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--text-dark); }
+    .header-title p { font-size: 12px; color: var(--text-muted); }
+    .header-actions { display: flex; align-items: center; gap: 14px; position: relative; }
+    
+    .bell-btn {
+      width: 40px; height: 40px; border-radius: 50%; background: #F3E6D8; border: none;
+      cursor: pointer; position: relative; display: flex; align-items: center; justify-content: center;
+      color: var(--espresso);
+    }
+    .bell-badge {
+      position: absolute; top: -2px; right: -2px; background: #A93226; color: #FFF;
+      font-size: 10px; font-weight: 700; width: 17px; height: 17px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .avatar-circle { width: 38px; height: 38px; border-radius: 50%; background: var(--espresso); color: #FFF; font-weight: 600; font-size: 15px; display: flex; align-items: center; justify-content: center; }
+
+    /* --- NOTIFICATION POPOVER --- */
+    .notif-popover {
+      position: absolute; top: 54px; right: 0; width: 340px; background: #FDFBF7;
+      border-radius: 18px; box-shadow: 0 14px 36px rgba(44, 26, 17, 0.16);
+      border: 1px solid var(--border-soft); padding: 20px; display: none; z-index: 200;
+    }
+    .notif-popover.open { display: block; }
+    .notif-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px; }
+    .notif-header small { display: block; font-size: 10px; letter-spacing: 1.2px; color: #A05A2C; font-weight: 700; text-transform: uppercase; }
+    .notif-header h4 { font-family: 'Instrument Serif', serif; font-size: 22px; font-weight: 400; }
+    .notif-item { display: flex; gap: 12px; padding: 12px 0; border-top: 1px solid var(--border-soft); cursor: pointer; }
+    .notif-icon { width: 36px; height: 36px; border-radius: 10px; background: #F4E7D7; display: flex; align-items: center; justify-content: center; color: var(--espresso); flex-shrink: 0; }
+    .notif-body h5 { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+    .notif-body p { font-size: 11.5px; color: var(--text-muted); line-height: 1.35; }
+
+    /* --- PAGE CONTENT AREA --- */
+    .content-container { padding: 32px 38px 60px; max-width: 1400px; width: 100%; }
+    .page-section { display: none; animation: fadeIn 0.22s ease; }
+    .page-section.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #9C5116; margin-bottom: 4px; }
+    .script-heading { font-family: 'Pacifico', cursive; font-size: 38px; font-weight: 400; color: #3B1D0E; margin-bottom: 6px; line-height: 1.2; }
+    .page-subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 26px; }
+
+    /* --- KPI & CARDS --- */
+    .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 28px; }
+    .kpi-card { background: var(--surface-white); border-radius: 20px; padding: 22px 24px; box-shadow: var(--shadow-card); display: flex; flex-direction: column; justify-content: space-between; min-height: 132px; }
+    .kpi-card.orange { background: var(--orange-accent); color: #2C1A11; }
+    .kpi-card.espresso { background: var(--espresso); color: #FFFFFF; }
+    .kpi-label { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; opacity: 0.85; }
+    .kpi-value { font-size: 30px; font-weight: 700; margin: 8px 0 4px; }
+    .kpi-sub { font-size: 12px; opacity: 0.75; }
+    .split-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 22px; }
+    .white-card { background: var(--surface-white); border-radius: 22px; padding: 26px 28px; box-shadow: var(--shadow-card); }
+    .card-header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+    .card-title { font-family: 'Oswald', sans-serif; font-size: 17px; letter-spacing: 0.5px; text-transform: uppercase; color: var(--text-dark); }
+
+    /* --- TABLES --- */
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th { text-align: left; font-size: 10.5px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-muted); padding: 10px 8px; border-bottom: 1px solid var(--border-soft); }
+    .data-table td { padding: 16px 8px; font-size: 14px; border-bottom: 1px solid var(--border-soft); vertical-align: middle; }
+
+    /* --- BADGES, PILLS & BUTTONS --- */
+    .status-pill { display: inline-block; padding: 5px 14px; border-radius: 999px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; }
+    .pill-green { background: var(--badge-green-bg); color: var(--badge-green-text); }
+    .pill-orange { background: var(--badge-orange-bg); color: var(--badge-orange-text); }
+    .pill-yellow { background: var(--badge-yellow-bg); color: var(--badge-yellow-text); }
+    .pill-red { background: var(--badge-red-bg); color: var(--badge-red-text); }
+    .toolbar-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 20px; }
+    .pill-group { display: flex; gap: 10px; flex-wrap: wrap; }
+    .filter-pill { padding: 10px 20px; border-radius: 999px; border: none; background: var(--surface-white); color: var(--text-dark); font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+    .filter-pill.active { background: var(--espresso); color: #FFFFFF; }
+    
+    .btn-primary { background: var(--caramel); color: #FFF; border: none; padding: 11px 22px; border-radius: 999px; font-size: 12.5px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; cursor: pointer; transition: background 0.2s; }
+    .btn-primary:hover { background: var(--espresso); }
+    .btn-soft { background: #EFE5D8; color: var(--text-dark); border: none; padding: 7px 14px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; cursor: pointer; transition: background 0.2s; }
+    .btn-danger-outline { background: transparent; color: #A93226; border: 1px solid #E6B0AA; padding: 7px 14px; border-radius: 999px; font-size: 11px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-block; }
+    .btn-danger-outline:hover { background: var(--badge-red-bg); }
+
+    /* --- CATALOG ROW --- */
+    .catalog-list { display: flex; flex-direction: column; gap: 14px; }
+    .catalog-item { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border: 1px solid var(--border-soft); border-radius: 18px; background: #FFFFFF; }
+    .catalog-left { display: flex; align-items: center; gap: 16px; }
+    .product-meta h4 { font-size: 15px; font-weight: 700; }
+    .product-meta p { font-size: 12.5px; color: var(--text-muted); margin-bottom:4px; }
+    .catalog-right { display: flex; align-items: center; gap: 12px; }
+    .price-tag { font-weight: 700; font-size: 15px; color: var(--espresso); min-width: 65px; text-align: right; margin-right: 10px; }
+
+    /* --- MODALS & FORMS --- */
+    .alert-banner { padding: 12px 16px; border-radius: 10px; margin-bottom: 18px; font-size: 0.9rem; font-weight: 600; }
+    .alert-success { background: var(--badge-green-bg); color: var(--badge-green-text); }
+    .alert-error { background: var(--badge-red-bg); color: var(--badge-red-text); }
+    
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(32, 18, 10, 0.55); display: none; align-items: center; justify-content: center; z-index: 300; }
+    .modal-backdrop.open { display: flex; }
+    .cozy-modal { width: 460px; background: #FDFBF7; border-radius: 22px; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,0.3); }
+    .cozy-modal-header { background: var(--caramel); color: #FFF; padding: 22px 26px; display: flex; justify-content: space-between; align-items: center; }
+    .cozy-modal-header small { display: block; font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase; opacity: 0.9; }
+    .cozy-modal-header h3 { font-family: 'Instrument Serif', serif; font-size: 28px; font-weight: 400; }
+    .modal-close { width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.4); background: transparent; color: #FFF; cursor: pointer; }
+    
+    .cozy-modal-body { padding: 24px 26px; display: flex; flex-direction: column; gap: 14px; }
+    .form-group label { display: block; font-size: 10.5px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 6px; color: var(--text-dark); }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid #DFD3C6; background: #FFF; font-family: 'DM Sans', sans-serif; font-size: 14px;
+    }
+    .form-group textarea { resize: vertical; }
+
+    @media (max-width: 1024px) {
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .split-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar">
+    <div>
+      <div class="brand-row">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
+            <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+          </svg>
+        </div>
+        <span class="brand-text">Cozy Bake</span>
+      </div>
+      <div class="portal-info">
+        <small>ADMIN PORTAL</small>
+        <strong>reed (Admin)</strong>
+      </div>
+      <ul class="nav-list">
+        <li>
+          <a class="nav-item active" onclick="switchTab('overview', 'EXECUTIVE OVERVIEW', this)">
+            <span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg></span>
+            <span class="nav-label">Executive Overview</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-item" onclick="switchTab('catalog', 'MENU & CATALOG', this)">
+            <span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></span>
+            <span class="nav-label">Menu Catalog</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-item" onclick="switchTab('users', 'STAFF & USERS', this)">
+            <span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+            <span class="nav-label">Staff & Users</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-item" onclick="switchTab('reports', 'FINANCIAL REPORTS', this)">
+            <span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>
+            <span class="nav-label">Orders & Reports</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+    <ul class="nav-list">
+      <li>
+        <a class="nav-item" href="index.html">
+          <span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span>
+          <span class="nav-label">Log out</span>
+        </a>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-wrapper">
+    <header class="top-header">
+      <div class="header-title">
+        <h2 id="topHeaderTitle">EXECUTIVE OVERVIEW</h2>
+        <p>Cozy Bake administration</p>
+      </div>
+      <div class="header-actions">
+        <!-- NOTIFICATION BUTTON -->
+        <button class="bell-btn" onclick="toggleNotifications()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="bell-badge">3</span>
+        </button>
+        <div class="avatar-circle">r</div>
+
+        <!-- NOTIFICATION POPOVER -->
+        <div class="notif-popover" id="notifPopover">
+          <div class="notif-header">
+            <div>
+              <small>NOTIFICATION CENTRE</small>
+              <h4>Admin alerts</h4>
+            </div>
+          </div>
+          <div class="notif-item">
+            <div class="notif-icon">💰</div>
+            <div class="notif-body">
+              <h5>Daily revenue target reached</h5>
+              <p>Today's sales crossed $1,420.00 (+18% vs yesterday) · 10 min ago</p>
+            </div>
+          </div>
+          <div class="notif-item">
+            <div class="notif-icon">📦</div>
+            <div class="notif-body">
+              <h5>Low stock alert: Country Rolls</h5>
+              <p>Only 4 units remaining in Stock room · 22 min ago</p>
+            </div>
+          </div>
+          <div class="notif-item">
+            <div class="notif-icon">👩‍🍳</div>
+            <div class="notif-body">
+              <h5>New staff account verified</h5>
+              <p>Syara joined as Senior Pastry Baker · 1 hr ago</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </header>
+
+    <main class="content-container">
+      <?php if (!empty($alert_msg)): ?>
+        <div class="alert-banner <?php echo $alert_type === 'success' ? 'alert-success' : 'alert-error'; ?>">
+          <?php echo htmlspecialchars($alert_msg); ?>
+        </div>
+      <?php endif; ?>
+
+      <!-- TAB 1: OVERVIEW -->
+      <section id="tab-overview" class="page-section active">
+        <div class="eyebrow">ADMINISTRATION DASHBOARD</div>
+        <h1 class="script-heading">Hello, reed</h1>
+        <p class="page-subtitle">Here is your bakery's financial performance, catalog health, and staff overview today.</p>
+
+        <div class="kpi-grid">
+          <div class="kpi-card orange">
+            <span class="kpi-label">TODAY'S REVENUE</span>
+            <div class="kpi-value">$1,428.50</div>
+            <span class="kpi-sub">+18.4% from yesterday</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">TOTAL ORDERS TODAY</span>
+            <div class="kpi-value">42</div>
+            <span class="kpi-sub">35 completed · 7 active</span>
+          </div>
+          <div class="kpi-card espresso">
+            <span class="kpi-label">ACTIVE MENU ITEMS</span>
+            <div class="kpi-value" id="kpiMenuCount"><?php echo count($products); ?></div>
+            <span class="kpi-sub">Loaded from MySQL Database</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">ACTIVE TEAM MEMBERS</span>
+            <div class="kpi-value" id="kpiStaffCount">5</div>
+            <span class="kpi-sub">4 staff · 1 administrator</span>
+          </div>
+        </div>
+
+        <div class="split-grid">
+          <div class="white-card">
+            <div class="card-header-bar">
+              <h3 class="card-title">RECENT REVENUE TRANSACTIONS</h3>
+              <button class="btn-soft" onclick="switchTab('reports', 'FINANCIAL REPORTS', document.querySelectorAll('.nav-item')[3])">VIEW ALL REPORTS</button>
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ORDER ID</th>
+                  <th>CUSTOMER</th>
+                  <th>CHANNEL</th>
+                  <th>AMOUNT</th>
+                  <th>STATUS</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>#CB-1052</strong></td>
+                  <td>Priya Patel</td>
+                  <td>Pickup</td>
+                  <td><strong>$22.00</strong></td>
+                  <td><span class="status-pill pill-green">PAID ONLINE</span></td>
+                </tr>
+                <tr>
+                  <td><strong>#DI-3013</strong></td>
+                  <td>Table 5</td>
+                  <td>Dine-In</td>
+                  <td><strong>$100.50</strong></td>
+                  <td><span class="status-pill pill-orange">ORDERED</span></td>
+                </tr>
+                <tr>
+                  <td><strong>#CB-1051</strong></td>
+                  <td>Ruby Chen</td>
+                  <td>Pickup</td>
+                  <td><strong>$43.00</strong></td>
+                  <td><span class="status-pill pill-green">PAID ONLINE</span></td>
+                </tr>
+                <tr>
+                  <td><strong>#CB-1050</strong></td>
+                  <td>Sofia Reyes</td>
+                  <td>Pickup</td>
+                  <td><strong>$48.50</strong></td>
+                  <td><span class="status-pill pill-green">PAID ONLINE</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="white-card">
+            <div class="card-header-bar">
+              <h3 class="card-title">BEST SELLERS THIS WEEK</h3>
+            </div>
+            <table class="data-table">
+              <tbody>
+                <tr>
+                  <td><strong>1. Morning Croissant</strong><br><small style="color:var(--text-muted)">Viennoiserie · 142 sold</small></td>
+                  <td style="text-align:right; color:#286646; font-weight:700;">$639.00</td>
+                </tr>
+                <tr>
+                  <td><strong>2. Strawberry Cloud</strong><br><small style="color:var(--text-muted)">Cake · 88 sold</small></td>
+                  <td style="text-align:right; color:#286646; font-weight:700;">$748.00</td>
+                </tr>
+                <tr>
+                  <td><strong>3. Pistachio Stack</strong><br><small style="color:var(--text-muted)">Sweets · 74 sold</small></td>
+                  <td style="text-align:right; color:#286646; font-weight:700;">$518.00</td>
+                </tr>
+                <tr>
+                  <td><strong>4. Sourdough Loaf</strong><br><small style="color:var(--text-muted)">Bread · 65 sold</small></td>
+                  <td style="text-align:right; color:#286646; font-weight:700;">$455.00</td>
+                </tr>
+              </tbody>
+            </table>
+            <div style="margin-top: 18px;">
+              <button class="btn-soft" onclick="switchTab('catalog', 'MENU & CATALOG', document.querySelectorAll('.nav-item')[1])">MANAGE MENU CATALOG</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: MENU CATALOG -->
+      <section id="tab-catalog" class="page-section">
+        <div class="eyebrow">MENU & PRODUCT MANAGEMENT</div>
+        <h1 class="script-heading">Bakery catalog</h1>
+        <p class="page-subtitle">Add, edit descriptions, or remove discontinued menu items.</p>
+
+        <div class="toolbar-row">
+          <div class="pill-group">
+            <button class="filter-pill active" onclick="filterCatalog('All', this)">ALL ITEMS</button>
+            <button class="filter-pill" onclick="filterCatalog('Cake', this)">CAKES</button>
+            <button class="filter-pill" onclick="filterCatalog('Pastry', this)">PASTRY</button>
+            <button class="filter-pill" onclick="filterCatalog('Dessert', this)">DESSERTS</button>
+            <button class="filter-pill" onclick="filterCatalog('Cookie', this)">COOKIES</button>
+          </div>
+          <button class="btn-primary" onclick="openModal('productModal')">+ ADD NEW PRODUCT</button>
+        </div>
+
+        <div class="white-card">
+          <div class="card-header-bar">
+            <h3 class="card-title">STOREFRONT PRODUCT CATALOG</h3>
+          </div>
+          <div class="catalog-list" id="catalogList">
+            <!-- Populated via Javascript -->
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: STAFF -->
+      <section id="tab-users" class="page-section">
+        <div class="eyebrow">ACCESS & ROLE MANAGEMENT</div>
+        <h1 class="script-heading">Team & customers</h1>
+        <p class="page-subtitle">Manage kitchen staff permissions, register new employees, and view customer accounts.</p>
+
+        <div class="toolbar-row">
+          <div class="pill-group">
+            <button class="filter-pill active" id="btnShowStaff" onclick="toggleUserView('staff')">STAFF ACCOUNTS · 5</button>
+            <button class="filter-pill" id="btnShowCustomers" onclick="toggleUserView('customers')">REGISTERED CUSTOMERS · 4</button>
+          </div>
+          <button class="btn-primary" onclick="openModal('staffModal')">+ ADD STAFF MEMBER</button>
+        </div>
+
+        <div class="white-card">
+          <div class="card-header-bar">
+            <h3 class="card-title" id="userTableHeading">BAKERY STAFF DIRECTORY</h3>
+          </div>
+          <table class="data-table" id="staffTable">
+            <thead>
+              <tr>
+                <th>STAFF ID</th>
+                <th>FULL NAME</th>
+                <th>EMAIL</th>
+                <th>ROLE</th>
+                <th>STATUS</th>
+                <th>ACTION</th>
+              </tr>
+            </thead>
+            <tbody id="staffTableBody">
+              <!-- Staff populated via JS -->
+            </tbody>
+          </table>
+
+          <table class="data-table" id="customerTable" style="display:none;">
+            <thead>
+              <tr>
+                <th>CUSTOMER</th>
+                <th>EMAIL</th>
+                <th>TOTAL ORDERS</th>
+                <th>TOTAL SPENT</th>
+                <th>LOYALTY TIER</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Priya Patel</strong></td>
+                <td>priya.patel@email.com</td>
+                <td>14 orders</td>
+                <td><strong>$312.00</strong></td>
+                <td><span class="status-pill pill-green">GOLD MEMBER</span></td>
+              </tr>
+              <tr>
+                <td><strong>Ruby Chen</strong></td>
+                <td>ruby.chen@email.com</td>
+                <td>9 orders</td>
+                <td><strong>$218.50</strong></td>
+                <td><span class="status-pill pill-orange">SILVER MEMBER</span></td>
+              </tr>
+              <tr>
+                <td><strong>Sofia Reyes</strong></td>
+                <td>sofia.r@email.com</td>
+                <td>6 orders</td>
+                <td><strong>$145.00</strong></td>
+                <td><span class="status-pill pill-yellow">REGULAR</span></td>
+              </tr>
+              <tr>
+                <td><strong>Liam Carter</strong></td>
+                <td>liam.carter@email.com</td>
+                <td>3 orders</td>
+                <td><strong>$79.00</strong></td>
+                <td><span class="status-pill pill-yellow">REGULAR</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 4: FINANCIAL REPORTS -->
+      <section id="tab-reports" class="page-section">
+        <div class="eyebrow">ACCOUNTING & ORDER ARCHIVE</div>
+        <h1 class="script-heading">Financial reports</h1>
+        <p class="page-subtitle">Audit all pickup, online, and dine-in orders or export monthly revenue summaries.</p>
+
+        <div class="toolbar-row">
+          <div class="pill-group">
+            <button class="filter-pill active">OCTOBER 2026</button>
+            <button class="filter-pill" onclick="alert('Filtered by Pickup Orders')">PICKUP ORDERS</button>
+            <button class="filter-pill" onclick="alert('Filtered by Dine-In Tables')">DINE-IN TABLES</button>
+          </div>
+          <button class="btn-primary" onclick="window.print()">EXPORT / PRINT REPORT</button>
+        </div>
+
+        <div class="white-card">
+          <div class="card-header-bar">
+            <h3 class="card-title">MASTER ORDER LEDGER</h3>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ORDER ID</th>
+                <th>DATE & TIME</th>
+                <th>CUSTOMER / TABLE</th>
+                <th>ITEMS SUMMARY</th>
+                <th>CHANNEL</th>
+                <th>TOTAL</th>
+                <th>STATUS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>#CB-1052</strong></td>
+                <td>Oct 26 · 11:42 AM</td>
+                <td>Priya Patel</td>
+                <td>1× Rainbow Donut Box</td>
+                <td>Pickup</td>
+                <td><strong>$22.00</strong></td>
+                <td><span class="status-pill pill-green">READY</span></td>
+              </tr>
+              <tr>
+                <td><strong>#CB-1051</strong></td>
+                <td>Oct 26 · 11:20 AM</td>
+                <td>Ruby Chen</td>
+                <td>Chocolate Layer Cake, Sourdough Loaf</td>
+                <td>Pickup</td>
+                <td><strong>$43.00</strong></td>
+                <td><span class="status-pill pill-orange">NEW</span></td>
+              </tr>
+              <tr>
+                <td><strong>#DI-3013</strong></td>
+                <td>Oct 26 · 11:05 AM</td>
+                <td>Table 5</td>
+                <td>Afternoon Tea Set ×3, Matcha Latte ×3</td>
+                <td>Dine-In</td>
+                <td><strong>$100.50</strong></td>
+                <td><span class="status-pill pill-yellow">PREPARING</span></td>
+              </tr>
+              <tr>
+                <td><strong>#CB-1045</strong></td>
+                <td>Oct 26 · 09:30 AM</td>
+                <td>Ethan Davis</td>
+                <td>2× Morning Croissant, 1× Pistachio Stack</td>
+                <td>Pickup</td>
+                <td><strong>$34.00</strong></td>
+                <td><span class="status-pill pill-green">COMPLETED</span></td>
+              </tr>
+              <tr>
+                <td><strong>#CB-1044</strong></td>
+                <td>Oct 26 · 09:12 AM</td>
+                <td>Harper Bell</td>
+                <td>Custom Birthday Cake (8 in)</td>
+                <td>Pickup</td>
+                <td><strong>$36.00</strong></td>
+                <td><span class="status-pill pill-green">COMPLETED</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MODAL 1: ADD NEW PRODUCT -->
+  <div class="modal-backdrop" id="productModal">
+    <div class="cozy-modal">
+      <div class="cozy-modal-header">
+        <div>
+          <small>COZY BAKE ADMIN</small>
+          <h3>Add new bakery item</h3>
+        </div>
+        <button type="button" class="modal-close" onclick="closeModal('productModal')">✕</button>
+      </div>
+      <form action="admin.php" method="POST" enctype="multipart/form-data" class="cozy-modal-body">
+        <div class="form-group">
+          <label>PRODUCT NAME</label>
+          <input type="text" name="name" required />
+        </div>
+        <div class="form-group">
+          <label>CATEGORY</label>
+          <select name="category" required>
+            <option value="Cake">Cake</option>
+            <option value="Pastry">Pastry</option>
+            <option value="Cookie">Cookie</option>
+            <option value="Dessert">Dessert</option>
+            <option value="Bread">Bread</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>UNIT PRICE ($)</label>
+          <input type="number" step="0.50" name="price" required />
+        </div>
+        <div class="form-group">
+          <label>DESCRIPTION</label>
+          <textarea name="description" rows="3" required></textarea>
+        </div>
+        <div class="form-group">
+          <label>INITIAL STOCK</label>
+          <input type="number" name="stock" placeholder="15" required />
+        </div>
+        <div class="form-group">
+          <label>PRODUCT IMAGE</label>
+          <input type="file" name="image" accept="image/*" required />
+        </div>
+        <button type="submit" name="add_product" class="btn-primary" style="width:100%; margin-top:8px;">SAVE PRODUCT TO MENU</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 2: EDIT PRODUCT -->
+  <div class="modal-backdrop" id="editProductModal">
+    <div class="cozy-modal">
+      <div class="cozy-modal-header">
+        <div>
+          <small>COZY BAKE ADMIN</small>
+          <h3>Edit Menu Item</h3>
+        </div>
+        <button type="button" class="modal-close" onclick="closeModal('editProductModal')">✕</button>
+      </div>
+      <form action="admin.php" method="POST" enctype="multipart/form-data" class="cozy-modal-body">
+        <input type="hidden" name="edit_id" id="edit_id" />
+        <div class="form-group">
+          <label>PRODUCT NAME</label>
+          <input type="text" name="name" id="edit_name" required />
+        </div>
+        <div class="form-group">
+          <label>CATEGORY</label>
+          <select name="category" id="edit_category" required>
+            <option value="Cake">Cake</option>
+            <option value="Pastry">Pastry</option>
+            <option value="Cookie">Cookie</option>
+            <option value="Dessert">Dessert</option>
+            <option value="Bread">Bread</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>UNIT PRICE ($)</label>
+          <input type="number" step="0.01" name="price" id="edit_price" required />
+        </div>
+        <div class="form-group">
+          <label>DESCRIPTION</label>
+          <textarea name="description" id="edit_description" rows="3" required></textarea>
+        </div>
+        <div class="form-group">
+          <label>UPDATE IMAGE (Leave blank to keep current image)</label>
+          <input type="file" name="image" accept="image/*" />
+        </div>
+        <button type="submit" name="update_product" class="btn-primary" style="width:100%; margin-top:8px;">SAVE CHANGES</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 3: ADD STAFF -->
+  <div class="modal-backdrop" id="staffModal">
+    <div class="cozy-modal">
+      <div class="cozy-modal-header">
+        <div>
+          <small>COZY BAKE TEAM</small>
+          <h3>Register staff account</h3>
+        </div>
+        <button type="button" class="modal-close" onclick="closeModal('staffModal')">✕</button>
+      </div>
+      <div class="cozy-modal-body">
+        <div class="form-group">
+          <label>FULL NAME</label>
+          <input type="text" id="staffName" placeholder="e.g. Ahmad Danial" />
+        </div>
+        <div class="form-group">
+          <label>WORK EMAIL</label>
+          <input type="email" id="staffEmail" placeholder="danial@cozybake.com" />
+        </div>
+        <div class="form-group">
+          <label>ASSIGNED ROLE</label>
+          <select id="staffRole">
+            <option value="Head Baker">Head Baker (Staff)</option>
+            <option value="Pastry Chef">Pastry Chef (Staff)</option>
+            <option value="Cashier & Front Desk">Cashier & Front Desk (Staff)</option>
+            <option value="Administrator">Administrator</option>
+          </select>
+        </div>
+        <button type="button" class="btn-primary" style="width:100%; margin-top:8px;" onclick="addStaff()">CREATE STAFF ACCOUNT</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- PHP DATA ---
+    let products = <?php echo json_encode($products); ?>;
+    let currentFilter = 'All';
+
+    // --- STAFF DATA ---
+    let staffList = [
+      { id: "ST-01", name: "Reed (You)", email: "admin@cozybake.com", role: "Administrator", status: "ACTIVE" },
+      { id: "ST-02", name: "Syara", email: "syara@cozybake.com", role: "Senior Pastry Baker", status: "ACTIVE" },
+      { id: "ST-03", name: "Haziq Aiman", email: "haziq@cozybake.com", role: "Head Baker", status: "ACTIVE" },
+      { id: "ST-04", name: "Nadia Sofia", email: "nadia@cozybake.com", role: "Barista & Front Desk", status: "ACTIVE" },
+      { id: "ST-05", name: "Lucas Tan", email: "lucas@cozybake.com", role: "Kitchen Prep", status: "ON LEAVE" }
+    ];
+
+    // --- CATALOG FUNCTIONS ---
+    function renderCatalog() {
+      const container = document.getElementById('catalogList');
+      container.innerHTML = '';
+
+      const filtered = currentFilter === 'All'
+        ? products
+        : products.filter(p => p.category.toLowerCase() === currentFilter.toLowerCase());
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<p style="padding: 20px; text-align: center; color: var(--text-muted);">No products found.</p>';
+        return;
+      }
+
+      filtered.forEach(item => {
+        container.innerHTML += `
+          <div class="catalog-item">
+            <div class="catalog-left">
+              <img src="${item.image}" alt="${item.name}" style="width: 54px; height: 54px; border-radius: 12px; object-fit: cover; border: 1px solid var(--border-soft);" />
+              <div class="product-meta">
+                <h4>${item.name}</h4>
+                <p style="color:var(--text-muted); font-size:11px; margin-top:2px;">${item.category} • ${item.description}</p>
+              </div>
+            </div>
+            <div class="catalog-right">
+              <span class="price-tag">RM ${item.price.toFixed(2)}</span>
+              <button class="btn-soft" onclick="openEditModal(${item.id})">EDIT</button>
+              <a href="admin.php?delete_id=${item.id}" class="btn-danger-outline" onclick="return confirm('Remove ${item.name} from database?');">REMOVE</a>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function filterCatalog(cat, btn) {
+      currentFilter = cat;
+      document.querySelectorAll('#tab-catalog .filter-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderCatalog();
+    }
+
+    function openEditModal(id) {
+      const item = products.find(p => parseInt(p.id) === parseInt(id));
+      if(item) {
+        document.getElementById('edit_id').value = item.id;
+        document.getElementById('edit_name').value = item.name;
+        document.getElementById('edit_category').value = item.category;
+        document.getElementById('edit_price').value = item.price;
+        document.getElementById('edit_description').value = item.description || '';
+        openModal('editProductModal');
+      }
+    }
+
+    // --- STAFF FUNCTIONS ---
+    function renderStaff() {
+      const tbody = document.getElementById('staffTableBody');
+      tbody.innerHTML = '';
+      staffList.forEach(s => {
+        const pillClass = s.status === 'ACTIVE' ? 'pill-green' : 'pill-yellow';
+        tbody.innerHTML += `
+          <tr>
+            <td><strong>${s.id}</strong></td>
+            <td>${s.name}</td>
+            <td>${s.email}</td>
+            <td>${s.role}</td>
+            <td><span class="status-pill ${pillClass}">${s.status}</span></td>
+            <td><button class="btn-danger-outline" onclick="removeStaff('${s.id}')">REMOVE</button></td>
+          </tr>
+        `;
+      });
+      document.getElementById('kpiStaffCount').textContent = staffList.length;
+    }
+
+    function addStaff() {
+      const name = document.getElementById('staffName').value.trim();
+      const email = document.getElementById('staffEmail').value.trim();
+      const role = document.getElementById('staffRole').value;
+
+      if (!name || !email) {
+        alert('Please enter staff name and email.');
+        return;
+      }
+
+      staffList.push({
+        id: 'ST-0' + (staffList.length + 1), name, email, role, status: 'ACTIVE'
+      });
+
+      closeModal('staffModal');
+      renderStaff();
+    }
+
+    function removeStaff(id) {
+      if (id === 'ST-01') {
+        alert('You cannot remove the primary Administrator account.');
+        return;
+      }
+      staffList = staffList.filter(s => s.id !== id);
+      renderStaff();
+    }
+
+    function toggleUserView(view) {
+      const staffTable = document.getElementById('staffTable');
+      const customerTable = document.getElementById('customerTable');
+      const btnStaff = document.getElementById('btnShowStaff');
+      const btnCust = document.getElementById('btnShowCustomers');
+      const heading = document.getElementById('userTableHeading');
+
+      if (view === 'staff') {
+        staffTable.style.display = 'table';
+        customerTable.style.display = 'none';
+        btnStaff.classList.add('active');
+        btnCust.classList.remove('active');
+        heading.textContent = 'BAKERY STAFF DIRECTORY';
+      } else {
+        staffTable.style.display = 'none';
+        customerTable.style.display = 'table';
+        btnCust.classList.add('active');
+        btnStaff.classList.remove('active');
+        heading.textContent = 'REGISTERED CUSTOMER ACCOUNTS';
+      }
+    }
+
+    // --- NAVIGATION & UTILS ---
+    function switchTab(tabId, headerText, navEl) {
+      document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
+      document.getElementById('tab-' + tabId).classList.add('active');
+      document.getElementById('topHeaderTitle').textContent = headerText;
+      document.querySelectorAll('.sidebar .nav-item').forEach(el => el.classList.remove('active'));
+      if (navEl) navEl.classList.add('active');
+    }
+
+    function toggleNotifications() {
+      document.getElementById('notifPopover').classList.toggle('open');
+    }
+
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+    // Init
+    renderCatalog();
+    renderStaff();
+  </script>
+</body>
+</html>
