@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cozy Bake - New Orders</title>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      --wood: #3a2214;
+      --bg: #f4ede4;
+      --accent: #e89849;
+      --border: #eeded1;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { display: flex; height: 100vh; background: var(--bg); color: #3d2b1f; overflow: hidden; }
+    
+    /* Sidebar */
+    .sidebar { width: 75px; background: linear-gradient(180deg, #422717, #29150a); display: flex; flex-direction: column; align-items: center; padding: 20px 0; gap: 20px; z-index: 10; }
+    .nav-btn { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.6); cursor: pointer; }
+    .nav-btn.active, .nav-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+    .logout { margin-top: auto; }
+
+    /* Main Layout */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    header { height: 70px; display: flex; justify-content: space-between; align-items: center; padding: 0 32px; border-bottom: 1px solid rgba(0,0,0,0.04); }
+    .content { flex: 1; padding: 24px 32px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+    
+    /* Typography & Components */
+    .title { font-family: 'Caveat', cursive; font-size: 3rem; color: var(--wood); line-height: 1; }
+    .filters { display: flex; gap: 10px; flex-wrap: wrap; }
+    .pill { padding: 8px 18px; border-radius: 20px; background: #fff; border: 1px solid var(--border); font-weight: 700; font-size: 0.8rem; cursor: pointer; }
+    .pill.active { background: var(--wood); color: #fff; border-color: var(--wood); }
+    
+    /* Grid & Cards */
+    .grid { display: grid; grid-template-columns: 1fr 400px; gap: 24px; align-items: start; }
+    .card { background: #fff; border-radius: 14px; padding: 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border: 2px solid transparent; margin-bottom: 10px; }
+    .card.selected { border-color: var(--accent); box-shadow: 0 4px 12px rgba(232,152,73,0.15); }
+    
+    /* Status Badge & Note */
+    .badge-new { padding: 4px 10px; border-radius: 10px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; background: #fde8d7; color: #b86527; }
+    .kitchen-note { background-color: #fff8d6; border-radius: 14px; padding: 14px 18px; margin: 16px 0; }
+    
+    /* Progress Tracker */
+    .progress-tracker { display: flex; gap: 6px; margin: 15px 0 6px; }
+    .progress-step { flex: 1; height: 6px; background-color: #e6ded7; border-radius: 4px; }
+    .progress-step.fill { background-color: var(--accent); }
+
+    /* Detail Panel */
+    .panel { background: #fff; border-radius: 20px; padding: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); position: sticky; top: 0; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+    .info-box { background: #fbf6f0; padding: 10px; border-radius: 10px; }
+    .info-box span { display: block; font-size: 0.65rem; color: #8c7a6b; font-weight: 800; text-transform: uppercase; }
+    .btn-action { width: 100%; padding: 14px; background: #a87b5b; color: white; border: none; border-radius: 12px; font-weight: 800; text-transform: uppercase; cursor: pointer; margin-top: 15px; }
+    .btn-action:hover { background: #91694d; }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div style="color:#fff; margin-bottom:15px;"><i data-lucide="leaf" size="24"></i></div>
+    <div class="nav-btn"><i data-lucide="layout-grid" size="20"></i></div>
+    <div class="nav-btn"><i data-lucide="box" size="20"></i></div>
+    <div class="nav-btn active"><i data-lucide="receipt" size="20"></i></div>
+    <div class="nav-btn"><i data-lucide="wheat" size="20"></i></div>
+    <div class="nav-btn"><i data-lucide="calendar" size="20"></i></div>
+    <div class="nav-btn"><i data-lucide="map-pin" size="20"></i></div>
+    <div class="nav-btn logout"><i data-lucide="log-out" size="20"></i></div>
+  </aside>
+
+  <!-- Main Container -->
+  <div class="main">
+    <header>
+      <div>
+        <h1 style="font-size:1.1rem; font-weight:800; text-transform:uppercase;">Orders</h1>
+        <p style="font-size:0.8rem; color:#8c7a6b;">Cozy Bake management</p>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div style="position:relative; width:38px; height:38px; background:#ebdcd0; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+          <i data-lucide="bell" size="18"></i>
+          <span style="position:absolute; top:-2px; right:-2px; background:#c0392b; color:#fff; font-size:0.6rem; width:15px; height:15px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700;">3</span>
+        </div>
+        <div style="width:38px; height:38px; background:var(--wood); color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700;">n</div>
+      </div>
+    </header>
+
+    <div class="content">
+      <div>
+        <span style="font-size:0.75rem; font-weight:800; color:#9a6845; letter-spacing:1px; text-transform:uppercase;">Order Management</span>
+        <div class="title">New orders</div>
+        <p style="font-size:0.88rem; color:#8c7a6b; margin-top:4px;">Pick an order to see everything the kitchen needs to know.</p>
+      </div>
+
+      <div class="filters">
+        <button class="pill">ALL · 10</button>
+        <button class="pill active">NEW · 3</button>
+        <button class="pill">PREPARING · 2</button>
+        <button class="pill">READY · 2</button>
+        <button class="pill">COMPLETED · 3</button>
+      </div>
+
+      <div class="grid">
+        <!-- New Orders List -->
+        <div>
+          <div class="card selected">
+            <div style="display:flex; gap:12px; align-items:center;">
+              <div style="width:40px; height:40px; background:#f7ebe1; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#9a6845;"><i data-lucide="receipt" size="18"></i></div>
+              <div>
+                <h4 style="font-size:0.95rem; font-weight:700;">#CB-1051 <span style="font-size:0.75rem; color:#8c7a6b; font-weight:500;">11:20 AM</span></h4>
+                <div style="font-size:0.85rem; color:#555;">Ruby Chen</div>
+                <div style="font-size:0.78rem; color:#8c7a6b;">Chocolate Layer Cake, Sourdough Loaf</div>
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-weight:700;">$43.00</div>
+              <span class="badge-new">NEW</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <div style="display:flex; gap:12px; align-items:center;">
+              <div style="width:40px; height:40px; background:#f7ebe1; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#9a6845;"><i data-lucide="receipt" size="18"></i></div>
+              <div>
+                <h4 style="font-size:0.95rem; font-weight:700;">#CB-1050 <span style="font-size:0.75rem; color:#8c7a6b; font-weight:500;">10:58 AM</span></h4>
+                <div style="font-size:0.85rem; color:#555;">Sofia Reyes</div>
+                <div style="font-size:0.78rem; color:#8c7a6b;">2 Berry Tarts, 3 Fresh Scones</div>
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-weight:700;">$48.50</div>
+              <span class="badge-new">NEW</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detail Panel -->
+        <div class="panel">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+              <span style="font-size:0.68rem; font-weight:800; color:#8c7a6b; text-transform:uppercase;">Order Details</span>
+              <div class="title" style="font-size:2.4rem;">#CB-1051</div>
+            </div>
+            <span class="badge-new">NEW</span>
+          </div>
+
+          <div class="info-grid">
+            <div class="info-box"><span>Customer</span><b>Ruby Chen</b></div>
+            <div class="info-box"><span>Placed At</span><b>11:20 AM</b></div>
+            <div class="info-box"><span>Channel</span><b>Pickup</b></div>
+            <div class="info-box"><span>Payment</span><b>Paid online</b></div>
+          </div>
+
+          <div style="border-top:1px dashed var(--border); padding-top:12px; font-size:0.9rem;">
+            <div style="font-size:0.72rem; font-weight:800; color:#9a6845; text-transform:uppercase; margin-bottom:8px;">Items</div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span>1 × Chocolate Layer Cake</span><span>$32.00</span></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span>1 × Sourdough Loaf</span><span>$11.00</span></div>
+            <div style="display:flex; justify-content:space-between; font-weight:700; font-size:1.05rem; margin-top:10px; border-top:1px solid var(--border); padding-top:10px;">
+              <span>Total</span><span>$43.00</span>
+            </div>
+          </div>
+
+          <!-- Kitchen Note -->
+          <div class="kitchen-note">
+            <div style="font-size:0.72rem; font-weight:800; letter-spacing:1px; color:#9a6845; text-transform:uppercase; margin-bottom:4px;">Kitchen Note</div>
+            <div style="font-size:0.88rem; color:#554433;">Slice the sourdough, please.</div>
+          </div>
+
+          <!-- Progress Tracker (1/4 steps filled for New) -->
+          <div class="progress-tracker">
+            <div class="progress-step fill"></div>
+            <div class="progress-step"></div>
+            <div class="progress-step"></div>
+            <div class="progress-step"></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:0.65rem; font-weight:700; color:#8c7a6b; text-transform:uppercase; margin-bottom:15px;">
+            <span>New</span><span>Preparing</span><span>Ready</span><span>Completed</span>
+          </div>
+
+          <button class="btn-action">Move to Preparing</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="position:fixed; bottom:24px; right:24px; width:36px; height:36px; background:#29150a; color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; cursor:pointer;">?</div>
+
+  <script>lucide.createIcons();</script>
+</body>
+</html>
