@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Schedule — Cozy Bake</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600&family=Pacifico&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --brown: #67351f;
+      --dark-brown: #452719;
+      --orange: #a74f22;
+      --cream: #f5eade;
+      --header: #fffaf4;
+      --muted: #987765;
+      --white: #fff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--dark-brown);
+      font-family: "Quicksand", sans-serif;
+      background:
+        repeating-linear-gradient(
+          2deg,
+          rgba(41, 19, 10, .12) 0 2px,
+          transparent 2px 12px
+        ),
+        linear-gradient(90deg, #64371f, #754329 50%, #60321e);
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 90px minmax(0, 1fr);
+      margin-top: 40px;
+      min-height: calc(100vh - 40px);
+    }
+
+    /* Wooden navigation */
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: calc(100vh - 40px);
+      min-height: 650px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #fff8ef;
+      background:
+        repeating-linear-gradient(
+          4deg,
+          rgba(44, 20, 10, .18) 0 3px,
+          transparent 3px 13px
+        ),
+        linear-gradient(90deg, #5d321e, #77452a 50%, #63351f);
+      border-right: 1px solid rgba(255,255,255,.1);
+      z-index: 10;
+    }
+
+    .logo {
+      width: 52px;
+      height: 52px;
+      margin-top: 28px;
+      display: grid;
+      place-items: center;
+      color: #fffaf4;
+    }
+
+    .logo svg {
+      width: 32px;
+      height: 32px;
+    }
+
+    .nav-group {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .nav-group.primary {
+      margin-top: 130px;
+    }
+
+    .nav-group.secondary {
+      margin-top: 56px;
+    }
+
+    .nav-link {
+      width: 64px;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      color: rgba(255, 248, 239, .82);
+      text-decoration: none;
+      border-radius: 18px;
+      transition: background .2s, color .2s;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      color: #fff;
+      background: rgba(255, 245, 232, .19);
+    }
+
+    .nav-link svg {
+      width: 26px;
+      height: 26px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.7;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .nav-bottom {
+      margin-top: auto;
+      margin-bottom: 10px;
+    }
+
+    /* Main area */
+    .main {
+      min-width: 0;
+      margin-right: 16px;
+      background: var(--cream);
+    }
+
+    .topbar {
+      height: 100px;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      background: var(--header);
+      border-bottom: 1px solid #e7d2c1;
+    }
+
+    .brand-title {
+      font-family: "Oswald", sans-serif;
+      font-size: 21px;
+      font-weight: 600;
+      letter-spacing: .3px;
+      text-transform: uppercase;
+    }
+
+    .brand-subtitle {
+      margin-top: 3px;
+      color: #9c7b68;
+      font-size: 15px;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .icon-button,
+    .avatar {
+      width: 51px;
+      height: 51px;
+      display: grid;
+      place-items: center;
+      border: 0;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .icon-button {
+      position: relative;
+      color: var(--brown);
+      background: #f2dfcc;
+    }
+
+    .icon-button svg {
+      width: 21px;
+      height: 21px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.6;
+    }
+
+    .notification-count {
+      position: absolute;
+      top: -4px;
+      right: -5px;
+      width: 20px;
+      height: 20px;
+      display: grid;
+      place-items: center;
+      border: 2px solid var(--header);
+      border-radius: 50%;
+      background: #d84d36;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .avatar {
+      color: #f6c38f;
+      background: var(--brown);
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .content {
+      min-height: calc(100vh - 140px);
+      padding: 50px 50px 44px;
+      background: var(--cream);
+    }
+
+    .eyebrow {
+      margin: 0 0 2px;
+      color: var(--orange);
+      font-family: "Oswald", sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      color: #402319;
+      font-family: "Pacifico", cursive;
+      font-size: clamp(43px, 5vw, 67px);
+      font-weight: 400;
+      line-height: 1.25;
+    }
+
+    .intro {
+      margin: 0;
+      color: #8f705f;
+      font-size: 17px;
+      letter-spacing: .1px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin: 35px 0 26px;
+    }
+
+    .tab {
+      min-height: 51px;
+      padding: 0 25px;
+      border: 0;
+      border-radius: 28px;
+      color: #743c25;
+      background: #fff;
+      cursor: pointer;
+      font-size: 19px;
+      letter-spacing: .6px;
+      transition: background .2s, color .2s;
+    }
+
+    .tab.active {
+      color: #fff;
+      background: var(--brown);
+    }
+
+    .table-head,
+    .schedule-row {
+      display: grid;
+      grid-template-columns: 8.5% 11.5% 10.5% 25% minmax(210px, 1fr) 15%;
+      align-items: center;
+    }
+
+    .table-head {
+      padding: 0 26px 12px;
+      color: #927461;
+      font-family: "Oswald", sans-serif;
+      font-size: 12px;
+      letter-spacing: 1.7px;
+      text-transform: uppercase;
+    }
+
+    .schedule-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .schedule-row {
+      min-height: 71px;
+      padding: 0 25px;
+      border-radius: 30px;
+      background: #fff;
+      box-shadow: 0 2px 3px rgba(73, 43, 25, .12);
+      color: #201512;
+      font-size: 19px;
+      transition: background .2s, transform .2s;
+    }
+
+    .schedule-row:hover {
+      background: #fff8f1;
+      transform: translateY(-1px);
+    }
+
+    .day,
+    .time {
+      font-weight: 700;
+    }
+
+    .time {
+      color: #9d431b;
+      white-space: nowrap;
+    }
+
+    .customer {
+      color: #211713;
+    }
+
+    .order {
+      color: #8e6a57;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .type-cell {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .badge {
+      padding: 7px 16px;
+      border-radius: 20px;
+      color: #76533e;
+      background: #f0e6dc;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .badge.birthday {
+      color: #8a4b00;
+      background: #ffe0a8;
+    }
+
+    .badge.wedding {
+      color: #b02d47;
+      background: #fbd6dc;
+    }
+
+    .row-toggle {
+      width: 25px;
+      height: 30px;
+      border: 0;
+      color: #9d6e52;
+      background: transparent;
+      cursor: pointer;
+      font-size: 15px;
+      transition: transform .2s;
+    }
+
+    .schedule-row.expanded .row-toggle {
+      transform: rotate(180deg);
+    }
+
+    .row-details {
+      display: none;
+      grid-column: 1 / -1;
+      margin: -3px 0 17px;
+      padding: 14px 0 0;
+      border-top: 1px solid #f0e3d8;
+      color: #8e6a57;
+      font-size: 14px;
+    }
+
+    .schedule-row.expanded {
+      padding-top: 18px;
+      padding-bottom: 0;
+      border-radius: 25px;
+    }
+
+    .schedule-row.expanded .row-details {
+      display: block;
+    }
+
+    .help-button {
+      position: fixed;
+      right: 12px;
+      bottom: 10px;
+      z-index: 20;
+      width: 43px;
+      height: 43px;
+      border: 2px solid #777;
+      border-radius: 50%;
+      color: #fff;
+      background: #252525;
+      box-shadow: 0 2px 6px #0005;
+      cursor: pointer;
+      font-size: 24px;
+      font-weight: 400;
+    }
+
+    @media (max-width: 1050px) {
+      .content {
+        padding-right: 30px;
+        padding-left: 30px;
+      }
+
+      .table-head,
+      .schedule-row {
+        grid-template-columns: 8% 11% 13% 23% minmax(160px, 1fr) 17%;
+      }
+
+      .schedule-row {
+        padding-right: 18px;
+        padding-left: 18px;
+        font-size: 16px;
+      }
+
+      .badge {
+        padding: 7px 11px;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .app {
+        grid-template-columns: 64px minmax(0, 1fr);
+      }
+
+      .sidebar {
+        min-height: 600px;
+      }
+
+      .nav-link {
+        width: 52px;
+      }
+
+      .main {
+        margin-right: 0;
+      }
+
+      .topbar {
+        height: 82px;
+        padding: 0 18px;
+      }
+
+      .content {
+        padding: 34px 18px;
+      }
+
+      .brand-subtitle {
+        font-size: 12px;
+      }
+
+      .icon-button,
+      .avatar {
+        width: 43px;
+        height: 43px;
+      }
+
+      .tabs {
+        margin-top: 27px;
+      }
+
+      .tab {
+        min-height: 45px;
+        padding: 0 16px;
+        font-size: 15px;
+      }
+
+      .table-head {
+        display: none;
+      }
+
+      .schedule-row {
+        grid-template-columns: 1fr auto;
+        gap: 8px 10px;
+        padding: 16px 18px;
+        border-radius: 22px;
+        font-size: 15px;
+      }
+
+      .day::after {
+        content: " · ";
+        color: #a88975;
+      }
+
+      .date {
+        grid-column: 1;
+        grid-row: 1;
+        margin-left: 44px;
+        color: #8e6a57;
+      }
+
+      .day {
+        grid-column: 1;
+        grid-row: 1;
+      }
+
+      .time {
+        grid-column: 2;
+        grid-row: 1;
+      }
+
+      .customer {
+        grid-column: 1;
+      }
+
+      .order {
+        grid-column: 1 / -1;
+        white-space: normal;
+      }
+
+      .type-cell {
+        grid-column: 1 / -1;
+      }
+
+      .row-toggle {
+        margin-left: auto;
+      }
+
+      .schedule-row.expanded {
+        padding-bottom: 0;
+      }
+
+      .row-details {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 430px) {
+      .app {
+        grid-template-columns: 54px minmax(0, 1fr);
+      }
+
+      .sidebar {
+        min-height: 560px;
+      }
+
+      .logo {
+        width: 44px;
+      }
+
+      .nav-link {
+        width: 46px;
+        height: 52px;
+      }
+
+      .nav-link svg {
+        width: 23px;
+      }
+
+      .brand-title {
+        font-size: 17px;
+      }
+
+      .top-actions {
+        gap: 8px;
+      }
+
+      h1 {
+        font-size: 43px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar" aria-label="Main navigation">
+      <div class="logo" aria-label="Cozy Bake">
+        <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 25C5 11 13 5 28 5c0 15-7 23-21 23" />
+          <path d="M7 25 22 10" />
+        </svg>
+      </div>
+
+      <nav class="nav-group primary">
+        <a class="nav-link" href="#" aria-label="Dashboard">
+          <svg viewBox="0 0 24 24"><rect x="2.5" y="2.5" width="8" height="8" rx="1.5"/><rect x="13.5" y="2.5" width="8" height="8" rx="1.5"/><rect x="2.5" y="13.5" width="8" height="8" rx="1.5"/><rect x="13.5" y="13.5" width="8" height="8" rx="1.5"/></svg>
+        </a>
+        <a class="nav-link" href="#" aria-label="Products">
+          <svg viewBox="0 0 24 24"><path d="m12 2 9 5-9 5-9-5 9-5Z"/><path d="M3 7v10l9 5 9-5V7M12 12v10"/></svg>
+        </a>
+        <a class="nav-link" href="#" aria-label="Orders">
+          <svg viewBox="0 0 24 24"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2V2Z"/><path d="M9 7h6M9 11h6"/></svg>
+        </a>
+        <a class="nav-link" href="#" aria-label="Menu">
+          <svg viewBox="0 0 24 24"><path d="M3 20C4 8 10 3 21 3c0 12-6 19-18 19"/><path d="m5 20 12-12"/></svg>
+        </a>
+        <a class="nav-link active" href="#" aria-label="Schedule">
+          <svg viewBox="0 0 24 24"><rect x="2.5" y="4.5" width="19" height="17" rx="2"/><path d="M7 2v5M17 2v5M3 9h18M7 13h3M14 13h3M7 17h3"/></svg>
+        </a>
+      </nav>
+
+      <nav class="nav-group secondary">
+        <a class="nav-link" href="#" aria-label="Locations">
+          <svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+        </a>
+      </nav>
+
+      <div class="nav-bottom">
+        <a class="nav-link" href="#" aria-label="Sign out">
+          <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5M15 12H3M14 3h6a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1h-6"/></svg>
+        </a>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="brand-title">Schedule</div>
+          <div class="brand-subtitle">Cozy Bake management</div>
+        </div>
+
+        <div class="top-actions">
+          <button class="icon-button" aria-label="Notifications" title="3 notifications">
+            <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>
+            <span class="notification-count">3</span>
+          </button>
+          <button class="avatar" aria-label="User profile">n</button>
+        </div>
+      </header>
+
+      <section class="content">
+        <p class="eyebrow">Schedule</p>
+        <h1>Pickups &amp; tables</h1>
+        <p class="intro">Plan the week ahead and keep an eye on every table in the room.</p>
+
+        <div class="tabs" role="tablist" aria-label="Schedule type">
+          <button class="tab active" id="pickup-tab" role="tab" aria-selected="true">
+            Pickup · <span id="pickup-count">8</span>
+          </button>
+          <button class="tab" id="dinein-tab" role="tab" aria-selected="false">
+            Dine-in · Live
+          </button>
+        </div>
+
+        <div class="table-head" aria-hidden="true">
+          <span>Day</span>
+          <span>Date</span>
+          <span>Time</span>
+          <span>Customer</span>
+          <span>Order</span>
+          <span>Type</span>
+        </div>
+
+        <div class="schedule-list" id="schedule-list"></div>
+      </section>
+    </main>
+  </div>
+
+  <button class="help-button" aria-label="Help">?</button>
+
+  <script>
+    const pickupOrders = [
+      { day: "Tue", date: "Oct 13", time: "3:00 PM", customer: "Nora Fields", order: "4 Baguettes + 1 Sourdough Loaf", type: "Everyday" },
+      { day: "Wed", date: "Oct 14", time: "10:00 AM", customer: "Hannah Brooks", order: "Chocolate Layer Cake, 8 in", type: "Birthday" },
+      { day: "Sat", date: "Oct 17", time: "11:30 AM", customer: "Daniel & Grace Kim", order: "4-tier vanilla bean wedding cake", type: "Wedding" },
+      { day: "Tue", date: "Oct 20", time: "8:30 AM", customer: "Northwind Co.", order: "3 dozen assorted pastries", type: "Everyday" },
+      { day: "Sat", date: "Oct 24", time: "2:00 PM", customer: "Isabella & Mark Rossi", order: "3-tier lemon & raspberry cake", type: "Wedding" },
+      { day: "Sun", date: "Oct 25", time: "9:30 AM", customer: "Tom Bennett", order: "Strawberry Cloud + candles", type: "Birthday" },
+      { day: "Sat", date: "Oct 31", time: "4:00 PM", customer: "Marcus Lee", order: "24 Halloween cupcakes", type: "Birthday" },
+      { day: "Sat", date: "Nov 7", time: "12:00 PM", customer: "Olivia & Ben Hart", order: "5-tier naked cake with berries", type: "Wedding" }
+    ];
+
+    const tableBookings = [
+      { day: "Tue", date: "Oct 13", time: "9:00 AM", customer: "The Wilson Family", order: "Table for 4 · Window seat", type: "Table" },
+      { day: "Wed", date: "Oct 14", time: "12:30 PM", customer: "Maya Chen", order: "Table for 2 · Birthday note", type: "Birthday" },
+      { day: "Fri", date: "Oct 16", time: "6:00 PM", customer: "The Rivera Party", order: "Table for 6 · Patio", type: "Table" },
+      { day: "Sat", date: "Oct 17", time: "10:30 AM", customer: "Harper & Co.", order: "Table for 3 · Brunch", type: "Table" }
+    ];
+
+    const list = document.getElementById("schedule-list");
+    const pickupTab = document.getElementById("pickup-tab");
+    const dineinTab = document.getElementById("dinein-tab");
+
+    function renderRows(items) {
+      list.innerHTML = items.map((item, index) => {
+        const kind = item.type.toLowerCase();
+        return `
+          <article class="schedule-row" data-row="${index}">
+            <span class="day">${item.day}</span>
+            <span class="date">${item.date}</span>
+            <span class="time">${item.time}</span>
+            <span class="customer">${item.customer}</span>
+            <span class="order">${item.order}</span>
+            <span class="type-cell">
+              <span class="badge ${kind}">${item.type}</span>
+              <button class="row-toggle" aria-label="Show details" aria-expanded="false">▾</button>
+            </span>
+            <div class="row-details">
+              ${item.type === "Table"
+                ? "Reservation confirmed · Please prepare the table before the booking time."
+                : `Order confirmed · ${item.customer} · Ready for pickup at ${item.time}.`}
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      list.querySelectorAll(".row-toggle").forEach(button => {
+        button.addEventListener("click", () => {
+          const row = button.closest(".schedule-row");
+          const isOpen = row.classList.toggle("expanded");
+          button.setAttribute("aria-expanded", isOpen);
+        });
+      });
+    }
+
+    function setActiveTab(activeTab) {
+      const isPickup = activeTab === pickupTab;
+
+      pickupTab.classList.toggle("active", isPickup);
+      dineinTab.classList.toggle("active", !isPickup);
+      pickupTab.setAttribute("aria-selected", isPickup);
+      dineinTab.setAttribute("aria-selected", !isPickup);
+
+      renderRows(isPickup ? pickupOrders : tableBookings);
+    }
+
+    pickupTab.addEventListener("click", () => setActiveTab(pickupTab));
+    dineinTab.addEventListener("click", () => setActiveTab(dineinTab));
+
+    renderRows(pickupOrders);
+  </script>
+</body>
+</html>

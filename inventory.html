@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cozy Bake - Inventory Management</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Pacifico/Caveat for Cozy Script Header, Plus Jakarta Sans for UI -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cozy: {
+                            bg: '#F5EFE6',
+                            card: '#FFFFFF',
+                            wood: '#3D251E',
+                            woodDark: '#2B1914',
+                            woodLight: '#4E3129',
+                            brown: '#4A2810',
+                            accent: '#3E2010',
+                            textDark: '#322521',
+                            textMuted: '#8C7A6B',
+                            greenBg: '#EAF4E8',
+                            greenText: '#4A7C43',
+                            redBg: '#FCEBEA',
+                            redText: '#D9534F',
+                            badgeNotice: '#C86B4D',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        script: ['Caveat', 'cursive'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar styling for slick look */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F5EFE6;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D5C8B8;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #B5A493;
+        }
+        
+        /* Sidebar dark wooden background simulation */
+        .wood-sidebar {
+            background-color: #382219;
+            background-image: linear-gradient(180deg, #42291E 0%, #2A1710 100%),
+                              radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 0.05) 0%, rgba(0, 0, 0, 0.4) 100%);
+            background-blend-mode: overlay;
+        }
+
+        /* Glass effect for active sidebar icon */
+        .active-nav-icon {
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.1), 0 4px 12px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        /* Product image shadow */
+        .img-shadow {
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        }
+    </style>
+</head>
+<body class="bg-cozy-bg font-sans text-cozy-textDark min-h-screen flex flex-col md:flex-row antialiased selection:bg-cozy-brown selection:text-white">
+
+    <!-- LEFT NAVIGATION SIDEBAR -->
+    <aside class="w-full md:w-20 wood-sidebar md:min-h-screen flex md:flex-col justify-between items-center py-4 px-3 md:py-6 border-r border-cozy-woodDark/50 shrink-0 z-30 sticky top-0 md:h-screen">
+        <!-- Top Leaf Logo -->
+        <div class="flex flex-col items-center">
+            <button class="w-12 h-12 flex items-center justify-center text-white/90 hover:text-white transition-all transform hover:scale-105">
+                <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24">
+                    <path d="M17,8C8,10 59,16.17 3.82,21.34L5.23,22.75C10.4,17.58 16.58,16 18.58,7M21,3C21,3 13,3 8,8C6,10 5,13 5,13C5,13 8,12 10,10C15,5 21,3 21,3Z"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Middle Navigation Icons -->
+        <nav class="flex md:flex-col items-center space-x-2 md:space-x-0 md:space-y-4 my-auto">
+            <button title="Dashboard" class="w-11 h-11 rounded-xl text-white/60 hover:text-white hover:bg-white/10 flex items-center justify-center transition-all">
+                <i class="fa-solid fa-border-all text-lg"></i>
+            </button>
+
+            <!-- Active Icon: Stock Room -->
+            <button title="Stock Room (Active)" class="w-11 h-11 rounded-xl text-white active-nav-icon flex items-center justify-center transition-all">
+                <i class="fa-solid fa-cube text-lg"></i>
+            </button>
+
+            <button title="Orders & Reports" class="w-11 h-11 rounded-xl text-white/60 hover:text-white hover:bg-white/10 flex items-center justify-center transition-all">
+                <i class="fa-solid fa-receipt text-lg"></i>
+            </button>
+
+            <button title="Products & Menu" class="w-11 h-11 rounded-xl text-white/60 hover:text-white hover:bg-white/10 flex items-center justify-center transition-all">
+                <i class="fa-solid fa-leaf text-lg"></i>
+            </button>
+
+            <button title="Schedule & Deliveries" class="w-11 h-11 rounded-xl text-white/60 hover:text-white hover:bg-white/10 flex items-center justify-center transition-all">
+                <i class="fa-regular fa-calendar-days text-lg"></i>
+            </button>
+
+            <button title="Locations" class="w-11 h-11 rounded-xl text-white/60 hover:text-white hover:bg-white/10 flex items-center justify-center transition-all">
+                <i class="fa-solid fa-location-dot text-lg"></i>
+            </button>
+        </nav>
+
+        <!-- Bottom Logout / Settings Icon -->
+        <div class="flex flex-col items-center">
+            <button title="Logout" class="w-11 h-11 rounded-xl text-white/50 hover:text-white hover:bg-white/10 flex items-center justify-center transition-all">
+                <i class="fa-solid fa-arrow-right-from-bracket text-lg"></i>
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN DASHBOARD CONTENT AREA -->
+    <main class="flex-1 flex flex-col min-w-0 min-h-screen">
+
+        <!-- TOP BAR / HEADER -->
+        <header class="w-full py-5 px-6 md:px-12 flex justify-between items-center bg-transparent">
+            <div>
+                <h2 class="text-sm font-bold tracking-wider text-cozy-brown uppercase">INVENTORY</h2>
+                <p class="text-xs text-cozy-textMuted font-medium mt-0.5">Cozy Bake management</p>
+            </div>
+
+            <div class="flex items-center space-x-4">
+                <!-- Notifications Bell -->
+                <button title="Notifications" class="relative w-10 h-10 rounded-full bg-[#EFE8DC] hover:bg-[#E5DDCB] flex items-center justify-center text-cozy-brown transition-all">
+                    <i class="fa-regular fa-bell text-base"></i>
+                    <span class="absolute -top-1 -right-1 bg-[#D9534F] text-white text-[10px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center border-2 border-cozy-bg">3</span>
+                </button>
+
+                <!-- User Profile Avatar -->
+                <button title="User Settings" class="w-10 h-10 rounded-full bg-cozy-brown text-white font-extrabold text-sm flex items-center justify-center hover:bg-cozy-wood transition-all shadow-sm">
+                    S
+                </button>
+            </div>
+        </header>
+
+        <!-- CONTENT BODY -->
+        <div class="px-6 md:px-12 pb-12 flex-1 flex flex-col">
+            
+            <!-- SECTION TITLE -->
+            <div class="mt-2 mb-6">
+                <h1 class="font-script text-5xl md:text-6xl text-cozy-brown tracking-wide font-bold leading-none">
+                    Stock room
+                </h1>
+                <p class="text-cozy-textMuted text-sm md:text-base mt-2 font-medium">
+                    Monitor product stock and update quantities as deliveries arrive.
+                </p>
+            </div>
+
+            <!-- INVENTORY CARD CONTAINER -->
+            <div class="bg-cozy-card rounded-3xl p-6 md:p-8 shadow-sm border border-black/5 flex-1 flex flex-col">
+                
+                <!-- HEADER & SEARCH BAR / CATEGORY FILTERS -->
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6 pb-4 border-b border-gray-100">
+                    <div class="flex items-center space-x-3">
+                        <h2 class="text-lg md:text-xl font-extrabold text-cozy-brown tracking-tight uppercase">
+                            Product Inventory
+                        </h2>
+                        <span id="total-count-badge" class="bg-cozy-bg text-cozy-brown text-xs font-bold px-2.5 py-1 rounded-full">
+                            23 items
+                        </span>
+                    </div>
+
+                    <!-- Filters & Search -->
+                    <div class="flex flex-wrap items-center gap-3">
+                        <!-- Search Box -->
+                        <div class="relative flex-1 sm:flex-none sm:w-64">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                            <input type="text" id="search-input" placeholder="Search bakery item..." 
+                                class="w-full pl-9 pr-4 py-2 bg-cozy-bg/60 border border-gray-200/80 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-cozy-brown/40 text-cozy-textDark font-medium transition-all">
+                        </div>
+
+                        <!-- Category Filter Pill -->
+                        <div class="overflow-x-auto max-w-full py-1">
+                            <select id="category-filter" class="bg-cozy-bg/60 border border-gray-200/80 rounded-xl text-sm font-semibold text-cozy-brown py-2 px-3 focus:outline-none focus:ring-2 focus:ring-cozy-brown/40 cursor-pointer">
+                                <option value="ALL">All Categories</option>
+                                <option value="Cake">Cake</option>
+                                <option value="Bread">Bread</option>
+                                <option value="Sweets">Sweets</option>
+                                <option value="Tart">Tart</option>
+                                <option value="Savory">Savory</option>
+                                <option value="Cookies">Cookies</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PRODUCT INVENTORY LIST -->
+                <div id="inventory-list" class="space-y-3 flex-1 overflow-y-auto pr-1">
+                    <!-- Items rendered dynamically via JavaScript -->
+                </div>
+
+                <!-- EMPTY STATE -->
+                <div id="empty-state" class="hidden flex-1 flex flex-col items-center justify-center py-12 text-center">
+                    <i class="fa-solid fa-box-open text-4xl text-cozy-textMuted mb-3 opacity-60"></i>
+                    <p class="text-cozy-textDark font-bold text-base">No bakery items found</p>
+                    <p class="text-cozy-textMuted text-xs mt-1">Try adjusting your search query or filter selection.</p>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FLOATING HELP BUTTON -->
+    <button title="Help & Support" class="fixed bottom-6 right-6 w-10 h-10 bg-cozy-wood text-white rounded-full flex items-center justify-center shadow-lg hover:bg-cozy-brown transition-all transform hover:scale-110 z-40">
+        <i class="fa-solid fa-question text-sm"></i>
+    </button>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Master Product Dataset (Extracted directly from provided screenshot UI)
+        const inventoryData = [
+            { id: 1, name: "Strawberry Cloud", category: "Cake", stock: 8, img: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=150&auto=format&fit=crop&q=80" },
+            { id: 2, name: "Morning Croissant", category: "Savory", stock: 23, img: "https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=150&auto=format&fit=crop&q=80" },
+            { id: 3, name: "Pistachio Stack", category: "Sweets", stock: 14, img: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=150&auto=format&fit=crop&q=80" },
+            { id: 4, name: "Country Rolls", category: "Bread", stock: 4, img: "https://images.unsplash.com/photo-1586444248902-2f64eddc13df?w=150&auto=format&fit=crop&q=80" },
+            { id: 5, name: "Sourdough Loaf", category: "Bread", stock: 12, img: "https://images.unsplash.com/photo-1589367920969-ab8e050bbc04?w=150&auto=format&fit=crop&q=80" },
+            { id: 6, name: "Chocolate Layer Cake", category: "Cake", stock: 6, img: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=150&auto=format&fit=crop&q=80" },
+            { id: 7, name: "French Macarons", category: "Sweets", stock: 20, img: "https://images.unsplash.com/photo-1569864358642-9d1684040f43?w=150&auto=format&fit=crop&q=80" },
+            { id: 8, name: "Berry Tart", category: "Tart", stock: 9, img: "https://images.unsplash.com/photo-1519869325930-281384150729?w=150&auto=format&fit=crop&q=80" },
+            { id: 9, name: "Cheesecake Slice", category: "Cake", stock: 15, img: "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=150&auto=format&fit=crop&q=80" },
+            { id: 10, name: "Baguette", category: "Bread", stock: 18, img: "https://images.unsplash.com/photo-1597079910443-60c43fc4f729?w=150&auto=format&fit=crop&q=80" },
+            { id: 11, name: "Rainbow Donut Box", category: "Sweets", stock: 7, img: "https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?w=150&auto=format&fit=crop&q=80" },
+            { id: 12, name: "Glazed Donut", category: "Sweets", stock: 24, img: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=150&auto=format&fit=crop&q=80" },
+            { id: 13, name: "Fudge Brownies", category: "Sweets", stock: 16, img: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=150&auto=format&fit=crop&q=80" },
+            { id: 14, name: "Apple Pie", category: "Tart", stock: 5, img: "https://images.unsplash.com/photo-1621743478914-cc8a86d7e7b5?w=150&auto=format&fit=crop&q=80" },
+            { id: 15, name: "Fresh Scones", category: "Savory", stock: 14, img: "https://images.unsplash.com/photo-1589119908995-c6837fa14848?w=150&auto=format&fit=crop&q=80" },
+            { id: 16, name: "Choc Chip Cookies", category: "Sweets", stock: 22, img: "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=150&auto=format&fit=crop&q=80" },
+            { id: 17, name: "Chocolate Cupcake", category: "Cake", stock: 19, img: "https://images.unsplash.com/photo-1576618148400-f54bed99fcfd?w=150&auto=format&fit=crop&q=80" },
+            { id: 18, name: "Rustic Boule", category: "Bread", stock: 8, img: "https://images.unsplash.com/photo-1549931319-a545dcf3bc73?w=150&auto=format&fit=crop&q=80" },
+            { id: 19, name: "Salted Caramel Cookies", category: "Cookies", stock: 18, img: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=150&auto=format&fit=crop&q=80" },
+            { id: 20, name: "Dark Chocolate Fudge Cookies", category: "Cookies", stock: 16, img: "https://images.unsplash.com/photo-1618923850107-d1a234d7a73a?w=150&auto=format&fit=crop&q=80" },
+            { id: 21, name: "Blueberry Bliss Cookies", category: "Cookies", stock: 14, img: "https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=150&auto=format&fit=crop&q=80" },
+            { id: 22, name: "Red Velvet with White Chocolate Cookies", category: "Cookies", stock: 15, img: "https://images.unsplash.com/photo-1619149651177-b09092806f1a?w=150&auto=format&fit=crop&q=80" },
+            { id: 23, name: "Matcha Oatmeal Chocolate Chip", category: "Cookies", stock: 13, img: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=150&auto=format&fit=crop&q=80" }
+        ];
+
+        // Threshold for Low Stock Badge
+        const LOW_STOCK_THRESHOLD = 5;
+
+        // Render Inventory Function
+        function renderInventory() {
+            const listContainer = document.getElementById('inventory-list');
+            const emptyState = document.getElementById('empty-state');
+            const searchVal = document.getElementById('search-input').value.toLowerCase().trim();
+            const categoryVal = document.getElementById('category-filter').value;
+
+            // Filter logic
+            const filteredItems = inventoryData.filter(item => {
+                const matchesSearch = item.name.toLowerCase().includes(searchVal) || item.category.toLowerCase().includes(searchVal);
+                const matchesCategory = categoryVal === 'ALL' || item.category === categoryVal;
+                return matchesSearch && matchesCategory;
+            });
+
+            // Update badge total count
+            document.getElementById('total-count-badge').textContent = `${filteredItems.length} items`;
+
+            if (filteredItems.length === 0) {
+                listContainer.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            // Build HTML
+            listContainer.innerHTML = filteredItems.map(item => {
+                const isLowStock = item.stock <= LOW_STOCK_THRESHOLD;
+                const statusBadgeClass = isLowStock 
+                    ? 'bg-[#FCEBEA] text-[#D9534F]' 
+                    : 'bg-[#EAF4E8] text-[#4A7C43]';
+                const statusText = isLowStock ? 'LOW STOCK' : 'IN STOCK';
+
+                return `
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 md:p-4 rounded-2xl border border-gray-200/60 bg-white hover:border-gray-300 transition-all duration-200 gap-4">
+                        <!-- Product Thumbnail & Details -->
+                        <div class="flex items-center space-x-4">
+                            <div class="relative w-14 h-14 md:w-16 md:h-16 rounded-2xl overflow-hidden bg-cozy-bg shrink-0 img-shadow">
+                                <img src="${item.img}" alt="${item.name}" 
+                                     class="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                                     onerror="this.onerror=null; this.src='https://placehold.co/150x150/4A2810/FFFFFF?text=CozyBake';">
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-cozy-textDark text-base md:text-lg leading-snug tracking-tight">
+                                    ${item.name}
+                                </h3>
+                                <p class="text-xs text-cozy-textMuted font-medium mt-0.5">
+                                    ${item.category}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Status Badge & Counter Controls -->
+                        <div class="flex items-center justify-between sm:justify-end space-x-4 md:space-x-6 shrink-0">
+                            <!-- Stock Status Pill -->
+                            <span class="px-3 py-1.5 rounded-full text-[11px] font-extrabold tracking-wider ${statusBadgeClass} transition-colors duration-200 uppercase">
+                                ${statusText}
+                            </span>
+
+                            <!-- Incremental Counter Control -->
+                            <div class="flex items-center space-x-3 bg-white">
+                                <!-- Decrement (-) Button -->
+                                <button onclick="updateQuantity(${item.id}, -1)" 
+                                        title="Decrease quantity"
+                                        class="w-9 h-9 rounded-full border border-gray-200 text-gray-600 hover:border-gray-400 hover:bg-gray-50 flex items-center justify-center transition-all active:scale-95 text-xs">
+                                    <i class="fa-solid fa-minus"></i>
+                                </button>
+
+                                <!-- Quantity Display -->
+                                <span class="w-8 text-center font-bold text-cozy-textDark text-base">
+                                    ${item.stock}
+                                </span>
+
+                                <!-- Increment (+) Button -->
+                                <button onclick="updateQuantity(${item.id}, 1)" 
+                                        title="Increase quantity"
+                                        class="w-9 h-9 rounded-full bg-cozy-brown text-white hover:bg-cozy-accent flex items-center justify-center transition-all active:scale-95 shadow-sm text-xs">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Adjust Stock Quantities
+        function updateQuantity(id, delta) {
+            const item = inventoryData.find(p => p.id === id);
+            if (item) {
+                const newStock = item.stock + delta;
+                if (newStock >= 0) {
+                    item.stock = newStock;
+                    renderInventory();
+                }
+            }
+        }
+
+        // Event Listeners for Filters
+        document.getElementById('search-input').addEventListener('input', renderInventory);
+        document.getElementById('category-filter').addEventListener('change', renderInventory);
+
+        // Initial Page Render
+        window.onload = function() {
+            renderInventory();
+        };
+    </script>
+</body>
+</html>
