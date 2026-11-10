@@ -1,1063 +1,499 @@
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cozy Bake | Our Menu</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cozy Bake | Our Menu</title>
 
-    <style>
-        :root {
-            --cream: #FAF8F5;
-            --brown: #3D281B;
-            --accent: #B58D6D;
-            --soft: #F1E7DF;
-            --line: #E4D1C2;
-        }
+<style>
+:root{
+--bg:#FAF8F5;
+--brown:#3D281B;
+--accent:#B58D6D;
+--soft:#F1E7DF;
+--line:#E4D1C2;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--brown);font-family:Arial}
+button{cursor:pointer;font:inherit;border:0}
 
-        * {
-            box-sizing: border-box;
-        }
+.top{display:flex;justify-content:space-between;align-items:center;padding:25px 6%}
+.welcome{color:var(--accent);font-weight:bold}
+.cart-btn{background:var(--soft);padding:15px 25px;border-radius:15px;font-weight:bold}
 
-        body {
-            margin: 0;
-            background: var(--cream);
-            color: var(--brown);
-            font-family: Arial, sans-serif;
-        }
+header{text-align:center;padding:35px 15px}
+header h1{font:normal clamp(42px,7vw,75px) Georgia;margin:15px}
+header p,.category{color:var(--accent)}
 
-        button {
-            font-family: inherit;
-            cursor: pointer;
-        }
+.filters{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;background:var(--soft);padding:18px;margin:0 6%;border-radius:15px}
+.filters button{background:transparent;padding:12px 20px;border-radius:20px}
+.filters button.active,.filters button:hover{background:var(--accent);color:white}
 
-        .cart-header {
-            display: flex;
-            justify-content: flex-end;
-            padding: 25px 6% 0;
-        }
+.products{display:grid;grid-template-columns:repeat(3,1fr);gap:25px;max-width:1250px;margin:auto;padding:40px 6%}
+.card{background:white;border-radius:18px;overflow:hidden;box-shadow:0 5px 20px #3d281b15}
+.image{height:230px;position:relative;cursor:pointer}
+.image img{width:100%;height:100%;object-fit:cover}
+.badge{position:absolute;top:12px;left:12px;background:var(--accent);color:white;padding:8px;border-radius:15px;font-size:11px}
+.details{padding:20px}
+.description{font-size:13px;color:#806B5D;line-height:1.6;min-height:55px}
+.actions{display:flex;gap:10px;margin-top:15px}
+.btn{background:var(--accent);color:white;padding:13px;border-radius:10px;font-weight:bold;flex:1}
+.light{background:var(--soft);color:var(--brown)}
+.back{display:block;width:max-content;margin:20px auto 55px;padding:15px 25px;background:var(--brown);color:white;text-decoration:none;border-radius:25px}
 
-        .cart-box {
-            background: var(--soft);
-            color: var(--brown);
-            border: none;
-            padding: 15px 25px;
-            border-radius: 15px;
-            font-size: 15px;
-            font-weight: bold;
-        }
+.modal{display:none;position:fixed;inset:0;background:#0009;z-index:1000;align-items:center;justify-content:center;padding:20px}
+.modal.show{display:flex}
+.popup{background:white;border-radius:22px;padding:30px;width:100%;max-width:550px;max-height:90vh;overflow:auto;position:relative}
+.close{position:absolute;right:15px;top:12px;background:var(--soft);border-radius:50%;width:35px;height:35px;font-size:22px}
 
-        .cart-box:hover {
-            background: var(--line);
-        }
+#qimg{width:100%;height:230px;object-fit:cover;border-radius:12px}
+.qty,.cart-row,.total{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:15px 0}
+.qty button{background:var(--soft);padding:9px 15px;border-radius:8px}
+.cart-row{border-bottom:1px solid var(--line);padding:12px 0}
+.total{font-size:20px;font-weight:bold}
 
-        .menu-header {
-            text-align: center;
-            padding: 35px 20px;
-        }
+/* LOGIN DESIGN */
+#login .popup{max-width:840px;padding:0;border-radius:23px;overflow:hidden;background:#FFFDFC}
 
-        .menu-header h1 {
-            font-family: Georgia, serif;
-            font-size: clamp(42px, 7vw, 75px);
-            margin: 15px 0;
-        }
+.login-head{
+background:linear-gradient(110deg,#91675A,#B78F81);
+padding:35px 44px;color:white;position:relative
+}
+.login-head small{font-size:14px;letter-spacing:5px;font-weight:bold}
+.login-head h2{font:normal 48px Georgia,serif;margin:18px 0 0}
+#login .close{
+top:25px;right:25px;width:50px;height:50px;
+background:transparent;border:1px solid white;color:white;font-size:28px
+}
+.login-body{text-align:center;padding:44px}
+.account-icon{
+width:100px;height:100px;background:#E6C9BD;
+border-radius:50%;display:grid;place-items:center;
+margin:0 auto 30px;font-size:45px
+}
+.eyebrow{color:#A9887D;letter-spacing:4px;font-size:13px;font-weight:bold}
+.login-body h3{font:normal 43px Georgia,serif;margin:25px 0}
+.login-body p{color:#A47E70;line-height:1.7}
+.login-actions{display:flex;gap:18px;margin:40px 0 30px}
+.login-actions button{flex:1;padding:20px;border-radius:10px;font-weight:bold}
+.login-actions .btn{background:#B18A7F;color:white}
+.login-actions .light{background:transparent;border:1px solid #DEC9BE;color:#3D281B}
+.guest-link{background:none;color:#A47E70;text-decoration:underline;margin-top:5px}
 
-        .menu-header p {
-            color: var(--accent);
-            font-size: 15px;
-        }
+.form{max-width:420px;margin:auto}
+.form input{
+display:block;width:100%;padding:15px;margin:12px 0;
+border:1px solid var(--line);border-radius:10px
+}
+.form .btn{width:100%}
+.form button:not(.btn){background:none;text-decoration:underline;color:var(--accent)}
 
-        .categories {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 12px;
-            background: var(--soft);
-            padding: 18px;
-            margin: 0 6% 35px;
-            border-radius: 15px;
-        }
+[hidden]{display:none!important}
 
-        .categories button {
-            border: none;
-            background: transparent;
-            color: var(--brown);
-            padding: 12px 25px;
-            border-radius: 25px;
-            font-size: 15px;
-        }
-
-        .categories button.active,
-        .categories button:hover {
-            background: var(--accent);
-            color: white;
-        }
-
-        .product-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 28px;
-            max-width: 1250px;
-            margin: auto;
-            padding: 15px 6% 60px;
-        }
-
-        .product-card {
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 5px 20px rgba(61, 40, 27, 0.07);
-            transition: transform 0.2s;
-        }
-
-        .product-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .product-image {
-            position: relative;
-            height: 240px;
-            overflow: hidden;
-            cursor: pointer;
-        }
-
-        .product-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s;
-        }
-
-        .product-image:hover img {
-            transform: scale(1.05);
-        }
-
-        .badge {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: var(--accent);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: bold;
-        }
-
-        .product-details {
-            padding: 22px;
-        }
-
-        .product-details h3 {
-            font-size: 20px;
-            margin: 0 0 12px;
-        }
-
-        .description {
-            color: #806B5D;
-            font-size: 13px;
-            line-height: 1.7;
-            min-height: 65px;
-        }
-
-        .category-label {
-            color: var(--accent);
-            font-size: 13px;
-        }
-
-        .price {
-            font-size: 20px;
-            margin: 15px 0;
-        }
-
-        .product-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .quick-view-btn,
-        .add-to-cart {
-            border: none;
-            border-radius: 12px;
-            padding: 13px 12px;
-            font-weight: bold;
-            font-size: 13px;
-        }
-
-        .quick-view-btn {
-            flex: 1;
-            background: var(--soft);
-            color: var(--brown);
-        }
-
-        .add-to-cart {
-            flex: 1;
-            background: var(--accent);
-            color: white;
-        }
-
-        .quick-view-btn:hover {
-            background: var(--line);
-        }
-
-        .add-to-cart:hover {
-            background: #987356;
-        }
-
-        .back-home {
-            display: block;
-            width: fit-content;
-            margin: 0 auto 55px;
-            padding: 15px 30px;
-            background: var(--brown);
-            color: white;
-            text-decoration: none;
-            border-radius: 25px;
-        }
-
-        /* POPUP BACKGROUND */
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            z-index: 1000;
-            background: rgba(0, 0, 0, 0.55);
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            overflow-y: auto;
-        }
-
-        .modal.show {
-            display: flex;
-        }
-
-        .modal-content {
-            position: relative;
-            background: white;
-            border-radius: 22px;
-            padding: 28px;
-            width: 100%;
-            max-width: 650px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .close-modal {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            background: var(--soft);
-            border: none;
-            border-radius: 50%;
-            width: 35px;
-            height: 35px;
-            font-size: 23px;
-            z-index: 2;
-        }
-
-        /* QUICK VIEW */
-        .quick-view-content {
-            max-width: 520px;
-        }
-
-        .quick-view-content img {
-            width: 100%;
-            height: 260px;
-            object-fit: cover;
-            border-radius: 15px;
-        }
-
-        .quick-view-content h2 {
-            margin-bottom: 10px;
-        }
-
-        .quick-view-description {
-            color: #806B5D;
-            line-height: 1.7;
-            font-size: 14px;
-        }
-
-        .quick-view-price {
-            font-size: 23px;
-            font-weight: bold;
-            color: var(--accent);
-        }
-
-        .quantity-control {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-            margin: 20px 0;
-        }
-
-        .quantity-control button,
-        .cart-quantity button {
-            background: var(--soft);
-            border: none;
-            border-radius: 8px;
-            width: 35px;
-            height: 35px;
-            font-size: 20px;
-        }
-
-        .quantity-control span {
-            font-weight: bold;
-            font-size: 18px;
-        }
-
-        .quick-add-btn,
-        .checkout-btn {
-            width: 100%;
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            padding: 16px;
-            font-size: 15px;
-            font-weight: bold;
-        }
-
-        /* CART */
-        .cart-content {
-            max-width: 560px;
-        }
-
-        .cart-content h2 {
-            text-align: center;
-        }
-
-        .cart-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            padding: 18px 0;
-            border-bottom: 1px solid var(--line);
-        }
-
-        .cart-item-info {
-            flex: 1;
-        }
-
-        .cart-item-info h4 {
-            margin: 0 0 8px;
-        }
-
-        .cart-item-info p {
-            margin: 0;
-            color: var(--accent);
-        }
-
-        .cart-quantity {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .remove-btn {
-            background: none;
-            border: none;
-            color: #B14F4F;
-            font-size: 12px;
-            margin-top: 10px;
-            padding: 0;
-        }
-
-        .cart-total {
-            display: flex;
-            justify-content: space-between;
-            font-size: 21px;
-            font-weight: bold;
-            margin: 25px 0;
-        }
-
-        .empty-cart {
-            text-align: center;
-            padding: 30px 0;
-            color: #806B5D;
-        }
-
-        @media (max-width: 900px) {
-            .product-container {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 600px) {
-            .product-container {
-                grid-template-columns: 1fr;
-            }
-
-            .product-actions {
-                flex-direction: column;
-            }
-
-            .cart-item {
-                align-items: flex-start;
-            }
-
-            .modal-content {
-                padding: 20px;
-            }
-        }
-    </style>
+@media(max-width:850px){.products{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){
+.products{grid-template-columns:1fr}
+.top{flex-wrap:wrap}
+.actions,.login-actions{flex-direction:column}
+.login-head{padding:30px 25px}
+.login-head h2{font-size:34px}
+.login-body{padding:35px 22px}
+.login-body h3{font-size:32px}
+}
+</style>
 </head>
 
 <body>
 
-    <!-- CART BUTTON -->
-    <div class="cart-header">
-        <button class="cart-box" onclick="openCart()">
-            🛒 My Cart (<span id="cart-count">0</span>)
-        </button>
-    </div>
-
-    <!-- MENU HEADER -->
-    <div class="menu-header">
-        <p>FRESHLY BAKED WITH LOVE</p>
-        <h1>Our Menu</h1>
-        <p>Discover your favourite sweet treats at Cozy Bake.</p>
-    </div>
-
-    <!-- CATEGORIES -->
-    <div class="categories">
-        <button class="active"
-                onclick="filterProducts('All', this)">
-            All
-        </button>
-
-        <button onclick="filterProducts('Cakes', this)">
-            Cakes
-        </button>
-
-        <button onclick="filterProducts('Pastries', this)">
-            Pastries
-        </button>
-
-        <button onclick="filterProducts('Cookies', this)">
-            Cookies
-        </button>
-    </div>
-
-    <!-- PRODUCT LIST -->
-    <div class="product-container" id="product-container"></div>
-
-    <a href="index.html" class="back-home">
-        ← Return to Home
-    </a>
-
-    <!-- QUICK VIEW POPUP -->
-    <div class="modal" id="quick-view-modal"
-         onclick="closeQuickView(event)">
-
-        <div class="modal-content quick-view-content">
-
-            <button class="close-modal"
-                    onclick="closeQuickView()">
-                ×
-            </button>
-
-            <img id="quick-image" src="" alt="Product">
-
-            <h2 id="quick-name"></h2>
-
-            <p class="category-label" id="quick-category"></p>
-
-            <p class="quick-view-description"
-               id="quick-description"></p>
-
-            <p class="quick-view-price" id="quick-price"></p>
-
-            <div class="quantity-control">
-                <strong>Quantity:</strong>
-
-                <button onclick="changeQuickQuantity(-1)">−</button>
-
-                <span id="quick-quantity">1</span>
-
-                <button onclick="changeQuickQuantity(1)">+</button>
-            </div>
-
-            <button class="quick-add-btn"
-                    onclick="addQuickViewToCart()"
-                    id="quick-add-button">
-                🛒 Add to Cart
-            </button>
-
-        </div>
-    </div>
-
-    <!-- CART POPUP -->
-    <div class="modal" id="cart-modal"
-         onclick="closeCart(event)">
-
-        <div class="modal-content cart-content">
-
-            <button class="close-modal"
-                    onclick="closeCart()">
-                ×
-            </button>
-
-            <h2>🛒 Your Shopping Cart</h2>
-
-            <div id="cart-items"></div>
-
-            <div class="cart-total">
-                <span>Total:</span>
-                <span id="cart-total">RM 0.00</span>
-            </div>
-
-            <button class="checkout-btn"
-                    onclick="goToCheckout()">
-                Proceed to Checkout
-            </button>
-
-        </div>
-    </div>
-
-    <script>
-        // ======================================
-        // PRODUCT DATA
-        // ======================================
-
-        const products = [
-            {
-                name: "Strawberry Cloud Cake",
-                price: 58.90,
-                category: "Cakes",
-                image: "strawberrycloudcake.jpg",
-                description: "A light and fluffy cake layered with fresh strawberries and whipped cream, perfect for any celebration.",
-                bestseller: true
-            },
-            {
-                name: "Morning Croissant",
-                price: 8.90,
-                category: "Pastries",
-                image: "morningcroissant.jpg",
-                description: "A golden, buttery and flaky croissant, freshly baked for a delightful morning."
-            },
-            {
-                name: "Macaron",
-                price: 18.90,
-                category: "Pastries",
-                image: "macaron.jpg",
-                description: "Delicate French macarons with a crispy shell and a soft, delicious filling."
-            },
-            {
-                name: "Creampuff Strawberry",
-                price: 15.50,
-                category: "Pastries",
-                image: "creampuff.jpg",
-                description: "Soft cream puffs filled with smooth cream and sweet strawberry flavour."
-            },
-            {
-                name: "Strawberry Cheese Cake",
-                price: 79.90,
-                category: "Cakes",
-                image: "strawberrycheesecake.jpg",
-                description: "Rich and creamy cheesecake topped with fresh strawberries."
-            },
-            {
-                name: "Cheesy Kunafa Pistachio",
-                price: 16.90,
-                category: "Pastries",
-                image: "kunafa.jpg",
-                description: "Crispy kunafa with creamy cheese and a delicious pistachio topping."
-            },
-            {
-                name: "Chocolate Chip Cookies",
-                price: 6.90,
-                category: "Cookies",
-                image: "chocolatechip.jpg",
-                description: "Classic cookies filled with chocolate chips and baked to perfection."
-            },
-            {
-                name: "Redvelvet Cookies",
-                price: 7.90,
-                category: "Cookies",
-                image: "redvelvet.jpg",
-                description: "Soft red velvet cookies with a rich and delightful flavour."
-            },
-            {
-                name: "Dark Chocolate Cookies",
-                price: 7.90,
-                category: "Cookies",
-                image: "darkchocolate.jpg",
-                description: "Rich dark chocolate cookies for every chocolate lover."
-            },
-            {
-                name: "Blueberry Cookies",
-                price: 7.90,
-                category: "Cookies",
-                image: "blueberry.jpg",
-                description: "Sweet and delicious cookies with a delightful blueberry flavour."
-            }
-        ];
-
-        // ======================================
-        // PHP CONNECTION
-        // ======================================
-
-        const PHP_API = {
-            add: "addtocart.php",
-            update: "updatecart.php",
-            remove: "removecart.php"
-        };
-
-        async function callCartPHP(endpoint, data) {
-            const response = await fetch(endpoint, {
-                method: "POST",
-                credentials: "same-origin",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(data)
-            });
-
-            if (!response.ok) {
-                throw new Error("PHP request failed");
-            }
-
-            const result = await response.json();
-
-            if (result.success !== true) {
-                throw new Error(
-                    result.message || "Cart operation failed"
-                );
-            }
-
-            return result;
-        }
-
-        async function syncCartWithPHP(endpoint, data) {
-            try {
-                await callCartPHP(endpoint, data);
-                console.log("PHP cart sync successful");
-            } catch (error) {
-                console.warn(
-                    "PHP not connected or sync failed:",
-                    error
-                );
-            }
-        }
-
-        // ======================================
-        // SHOPPING CART
-        // ======================================
-
-        let cart = [];
-
-        try {
-            const savedCart = JSON.parse(
-                localStorage.getItem("cozyBakeCart") || "[]"
-            );
-
-            if (Array.isArray(savedCart)) {
-                cart = savedCart.filter(item =>
-                    item &&
-                    typeof item.name === "string" &&
-                    Number.isFinite(item.price) &&
-                    Number.isInteger(item.quantity) &&
-                    item.quantity > 0
-                );
-            }
-        } catch (error) {
-            cart = [];
-        }
-
-        function saveCart() {
-            localStorage.setItem(
-                "cozyBakeCart",
-                JSON.stringify(cart)
-            );
-
-            updateCartCount();
-            renderCart();
-        }
-
-        function updateCartCount() {
-            const count = cart.reduce(
-                (total, item) => total + item.quantity,
-                0
-            );
-
-            document.getElementById("cart-count")
-                .textContent = count;
-        }
-
-        function addToCart(productName, price, quantity = 1) {
-            const product = products.find(
-                item => item.name === productName
-            );
-
-            if (!product) {
-                return;
-            }
-
-            const existing = cart.find(
-                item => item.name === productName
-            );
-
-            if (existing) {
-                existing.quantity += quantity;
-            } else {
-                cart.push({
-                    name: productName,
-                    price: product.price,
-                    quantity: quantity
-                });
-            }
-
-            saveCart();
-            openCart();
-
-            // CALL PHP
-            syncCartWithPHP(PHP_API.add, {
-                name: productName,
-                price: product.price,
-                quantity: quantity
-            });
-        }
-
-        function changeQuantity(index, amount) {
-            if (!cart[index]) {
-                return;
-            }
-
-            const item = cart[index];
-            const newQuantity = item.quantity + amount;
-
-            if (newQuantity <= 0) {
-                removeItem(index);
-                return;
-            }
-
-            item.quantity = newQuantity;
-
-            saveCart();
-
-            // CALL PHP
-            syncCartWithPHP(PHP_API.update, {
-                name: item.name,
-                quantity: newQuantity
-            });
-        }
-
-        function removeItem(index) {
-            if (!cart[index]) {
-                return;
-            }
-
-            const itemName = cart[index].name;
-
-            cart.splice(index, 1);
-
-            saveCart();
-
-            // CALL PHP
-            syncCartWithPHP(PHP_API.remove, {
-                name: itemName
-            });
-        }
-
-        function renderCart() {
-            const cartItems = document.getElementById("cart-items");
-            const cartTotal = document.getElementById("cart-total");
-
-            cartItems.innerHTML = "";
-
-            let total = 0;
-
-            if (cart.length === 0) {
-                cartItems.innerHTML =
-                    '<p class="empty-cart">Your cart is empty.</p>';
-            }
-
-            cart.forEach((item, index) => {
-                const subtotal = item.price * item.quantity;
-                total += subtotal;
-
-                const cartItem = document.createElement("div");
-                cartItem.className = "cart-item";
-
-                const info = document.createElement("div");
-                info.className = "cart-item-info";
-
-                const name = document.createElement("h4");
-                name.textContent = item.name;
-
-                const price = document.createElement("p");
-                price.textContent =
-                    "RM " + item.price.toFixed(2) + " each";
-
-                const remove = document.createElement("button");
-                remove.className = "remove-btn";
-                remove.textContent = "Remove";
-                remove.onclick = () => removeItem(index);
-
-                info.append(name, price, remove);
-
-                const quantityBox = document.createElement("div");
-                quantityBox.className = "cart-quantity";
-
-                const minus = document.createElement("button");
-                minus.textContent = "−";
-                minus.onclick = () => changeQuantity(index, -1);
-
-                const quantity = document.createElement("span");
-                quantity.textContent = item.quantity;
-
-                const plus = document.createElement("button");
-                plus.textContent = "+";
-                plus.onclick = () => changeQuantity(index, 1);
-
-                quantityBox.append(minus, quantity, plus);
-
-                cartItem.append(info, quantityBox);
-                cartItems.appendChild(cartItem);
-            });
-
-            cartTotal.textContent = "RM " + total.toFixed(2);
-        }
-
-        function openCart() {
-            renderCart();
-
-            document.getElementById("quick-view-modal")
-                .classList.remove("show");
-
-            document.getElementById("cart-modal")
-                .classList.add("show");
-        }
-
-        function closeCart(event) {
-            if (
-                !event ||
-                event.target.id === "cart-modal"
-            ) {
-                document.getElementById("cart-modal")
-                    .classList.remove("show");
-            }
-        }
-
-        function goToCheckout() {
-            if (cart.length === 0) {
-                alert("Your cart is empty. Please add a product first.");
-                return;
-            }
-
-            saveCart();
-            window.location.href = "checkout.html";
-        }
-
-        // ======================================
-        // DISPLAY PRODUCTS
-        // ======================================
-
-        function displayProducts() {
-            const container = document.getElementById(
-                "product-container"
-            );
-
-            container.innerHTML = "";
-
-            products.forEach((product, index) => {
-                const card = document.createElement("div");
-                card.className = "product-card";
-                card.dataset.category = product.category;
-
-                const imageBox = document.createElement("div");
-                imageBox.className = "product-image";
-                imageBox.onclick = () => openQuickView(index);
-
-                const image = document.createElement("img");
-                image.src = product.image;
-                image.alt = product.name;
-
-                imageBox.appendChild(image);
-
-                if (product.bestseller) {
-                    const badge = document.createElement("span");
-                    badge.className = "badge";
-                    badge.textContent = "BEST SELLER";
-                    imageBox.appendChild(badge);
-                }
-
-                const details = document.createElement("div");
-                details.className = "product-details";
-
-                const name = document.createElement("h3");
-                name.textContent = product.name;
-
-                const description = document.createElement("p");
-                description.className = "description";
-                description.textContent = product.description;
-
-                const category = document.createElement("p");
-                category.className = "category-label";
-                category.textContent = product.category;
-
-                const price = document.createElement("h4");
-                price.className = "price";
-                price.textContent =
-                    "RM " + product.price.toFixed(2);
-
-                const actions = document.createElement("div");
-                actions.className = "product-actions";
-
-                const quickButton = document.createElement("button");
-                quickButton.className = "quick-view-btn";
-                quickButton.textContent = "👁 Quick View";
-                quickButton.onclick = () => openQuickView(index);
-
-                const cartButton = document.createElement("button");
-                cartButton.className = "add-to-cart";
-                cartButton.textContent = "🛒 Add to Cart";
-                cartButton.onclick = () => {
-                    addToCart(product.name, product.price);
-                };
-
-                actions.append(quickButton, cartButton);
-
-                details.append(
-                    name,
-                    description,
-                    category,
-                    price,
-                    actions
-                );
-
-                card.append(imageBox, details);
-                container.appendChild(card);
-            });
-        }
-
-        // ======================================
-        // CATEGORY FILTER
-        // ======================================
-
-        function filterProducts(category, clickedButton) {
-            document.querySelectorAll(".categories button")
-                .forEach(button => {
-                    button.classList.remove("active");
-                });
-
-            clickedButton.classList.add("active");
-
-            document.querySelectorAll(".product-card")
-                .forEach(card => {
-                    if (
-                        category === "All" ||
-                        card.dataset.category === category
-                    ) {
-                        card.style.display = "block";
-                    } else {
-                        card.style.display = "none";
-                    }
-                });
-        }
-
-        // ======================================
-        // QUICK VIEW PRODUCT
-        // ======================================
-
-        let selectedProduct = null;
-        let quickQuantity = 1;
-
-        function openQuickView(index) {
-            selectedProduct = products[index];
-            quickQuantity = 1;
-
-            document.getElementById("quick-image").src =
-                selectedProduct.image;
-
-            document.getElementById("quick-image").alt =
-                selectedProduct.name;
-
-            document.getElementById("quick-name").textContent =
-                selectedProduct.name;
-
-            document.getElementById("quick-category").textContent =
-                selectedProduct.category;
-
-            document.getElementById("quick-description").textContent =
-                selectedProduct.description;
-
-            document.getElementById("quick-quantity").textContent =
-                quickQuantity;
-
-            updateQuickPrice();
-
-            document.getElementById("quick-view-modal")
-                .classList.add("show");
-        }
-
-        function updateQuickPrice() {
-            if (!selectedProduct) {
-                return;
-            }
-
-            const total = selectedProduct.price * quickQuantity;
-
-            document.getElementById("quick-price").textContent =
-                "RM " + selectedProduct.price.toFixed(2) + " each";
-
-            document.getElementById("quick-add-button").textContent =
-                "🛒 Add to Cart — RM " + total.toFixed(2);
-        }
-
-        function changeQuickQuantity(amount) {
-            quickQuantity = Math.max(
-                1,
-                quickQuantity + amount
-            );
-
-            document.getElementById("quick-quantity").textContent =
-                quickQuantity;
-
-            updateQuickPrice();
-        }
-
-        function addQuickViewToCart() {
-            if (!selectedProduct) {
-                return;
-            }
-
-            addToCart(
-                selectedProduct.name,
-                selectedProduct.price,
-                quickQuantity
-            );
-        }
-
-        function closeQuickView(event) {
-            if (
-                !event ||
-                event.target.id === "quick-view-modal"
-            ) {
-                document.getElementById("quick-view-modal")
-                    .classList.remove("show");
-            }
-        }
-
-       
-        document.addEventListener("keydown", function(event) {
-            if (event.key === "Escape") {
-                closeQuickView();
-                closeCart();
-            }
-        });
-
-        // ======================================
-        // INITIALIZE
-        // ======================================
-
-        displayProducts();
-        updateCartCount();
-        renderCart();
-
-    </script>
+<div class="top">
+<strong class="welcome" id="welcome">Welcome to Cozy Bake!</strong>
+<button class="cart-btn" onclick="openModal('cart')">
+🛒 My Cart (<span id="count">0</span>)
+</button>
+</div>
+
+<header>
+<p>FRESHLY BAKED WITH LOVE</p>
+<h1>Our Menu</h1>
+<p>Discover your favourite sweet treats at Cozy Bake.</p>
+</header>
+
+<nav class="filters" id="filters"></nav>
+<div style="text-align:center; margin:20px auto;">
+    <input
+        type="text"
+        id="searchInput"
+        placeholder="🔍 Search your favourite treats..."
+        oninput="searchProducts()"
+        style="
+            width:80%;
+            max-width:500px;
+            padding:15px 20px;
+            border:1px solid #E4D1C2;
+            border-radius:25px;
+            font-size:15px;
+            outline:none;
+            background:white;
+            color:#3D281B;
+        "
+    >
+</div>
+
+<div class="products" id="products"></div>
+
+<a class="back" href="index.html">← Return to Home</a>
+
+<!-- QUICK VIEW -->
+<div class="modal" id="quick">
+<div class="popup">
+<button class="close" onclick="closeModal()">×</button>
+<img id="qimg" alt="Product">
+<h2 id="qname"></h2>
+<p id="qdesc"></p>
+<p id="qcat"></p>
+<h3 id="qprice"></h3>
+<div class="qty">
+<strong>Quantity:</strong>
+<button onclick="changeQuick(-1)">−</button>
+<span id="qnum">1</span>
+<button onclick="changeQuick(1)">+</button>
+</div>
+<button class="btn" id="qadd" onclick="addQuick()">Add to Cart</button>
+</div>
+</div>
+
+<!-- CART -->
+<div class="modal" id="cart">
+<div class="popup">
+<button class="close" onclick="closeModal()">×</button>
+<h2>🛒 Your Shopping Cart</h2>
+<div id="items"></div>
+<div class="total">Total: <span id="total">RM 0.00</span></div>
+<button class="btn" style="width:100%" onclick="checkout()">Proceed to Checkout</button>
+</div>
+</div>
+
+<!-- LOGIN / REGISTER -->
+<div class="modal" id="login">
+<div class="popup">
+
+<div class="login-head">
+<small>COZY BAKE</small>
+<h2>Your Cozy Bake Account</h2>
+<button class="close" onclick="closeModal()">×</button>
+</div>
+
+<div class="login-body">
+
+<div id="choice">
+<div class="account-icon">👤</div>
+
+<div class="eyebrow">BEFORE WE GET STARTED</div>
+
+<h3>Already have an account?</h3>
+
+<p>
+Log in to continue, or create an account to save your orders, receipts and reservations.
+</p>
+
+<div class="login-actions">
+<button class="btn" onclick="panel('loginForm')">YES, LOG IN</button>
+<button class="light" onclick="panel('registerForm')">NO, REGISTER</button>
+</div>
+
+<button class="guest-link" onclick="closeModal()">Continue browsing as guest</button>
+</div>
+
+<form id="loginForm" class="form" action="login.php" method="POST" hidden>
+<h3>Welcome Back!</h3>
+<p>Log in to your Cozy Bake account.</p>
+<input type="email" name="email" placeholder="Email address" required>
+<input type="password" name="password" placeholder="Password" required>
+<button class="btn" type="submit">LOG IN</button>
+<p><button type="button" onclick="panel('registerForm')">Create an account</button></p>
+</form>
+
+<form id="registerForm" class="form" action="signup.php" method="POST" hidden>
+<h3>Create an Account</h3>
+<input type="text" name="name" placeholder="Name" required>
+<input type="email" name="email" placeholder="Email address" required>
+<input type="password" name="password" placeholder="Create password" minlength="6" required>
+<button class="btn" type="submit">REGISTER</button>
+<p><button type="button" onclick="panel('loginForm')">Already have an account?</button></p>
+</form>
+
+</div>
+</div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const rm=n=>"RM "+Number(n).toFixed(2);
+
+const products=[
+["Strawberry Cloud Cake",58.90,"Cakes","strawberrycloudcake.jpg"],
+["Morning Croissant",8.90,"Pastries","morningcroissant.jpg"],
+["Macaron",18.90,"Pastries","macaron.jpg"],
+["Creampuff Strawberry",15.50,"Pastries","creampuff.jpg"],
+["Strawberry Cheese Cake",79.90,"Cakes","strawberrycheesecake.jpg"],
+["Cheesy Kunafa Pistachio",16.90,"Pastries","kunafa.jpg"],
+["Chocolate Chip Cookies",6.90,"Cookies","chocolatechip.jpg"],
+["Redvelvet Cookies",7.90,"Cookies","redvelvet.jpg"],
+["Dark Chocolate Cookies",7.90,"Cookies","darkchocolate.jpg"],
+["Blueberry Cookies",7.90,"Cookies","blueberry.jpg"],
+
+["Harumanis Mango Cake",65.90,"Special","harumaniscake.jpg","Perlis"],
+["Harumanis Cream Puff",16.90,"Special","harumanisc.jpg","Perlis"],
+["Kaya Butter Croissant",12.90,"Special","kayacroissant.jpg","Perlis"],
+["Pineapple Cake",69.90,"Special","pineapple.jpg","Kedah"],
+["Ube Chiffon Cake",55.90,"Special","ubeciffon.jpg","Kedah"],
+["Pandan Coconut Cookies",9.90,"Special","onde.jpg","Kedah"],
+["Dragon Cake",70.90,"Special","dragon.jpg","Penang"],
+["Durian Cake",79.90,"Special","duriancake.jpg","Penang"],
+["Cendol Cheesecake",65.90,"Special","pandancake.jpg","Penang"],
+["Salted Caramel Brownies",7.90,"Special","caramel.jpg","Penang"],
+["Lemon Blueberry Cake",74.90,"Special","lemonblueberry.jpg","Penang"]
+];
+
+let cart=[];
+let customer=null;
+let selected=0;
+let quickQty=1;
+
+try{
+cart=JSON.parse(localStorage.getItem("cozyBakeCart")||"[]");
+if(!Array.isArray(cart))cart=[];
+}catch{cart=[]}
+
+function openModal(id){
+if(id==="cart")renderCart();
+$(id).classList.add("show");
+}
+
+function closeModal(){
+document.querySelectorAll(".modal").forEach(x=>x.classList.remove("show"));
+}
+
+function panel(id){
+["choice","loginForm","registerForm"].forEach(x=>$(x).hidden=x!==id);
+}
+
+function needLogin(){
+if(customer)return false;
+closeModal();
+panel("choice");
+openModal("login");
+return true;
+}
+
+/* CUSTOMER SESSION */
+async function loadCustomer(){
+try{
+const r=await fetch("getcustomer.php",{
+credentials:"same-origin",
+cache:"no-store"
+});
+if(!r.ok)throw Error("Not logged in");
+
+const d=await r.json();
+if(d.loggedIn){
+customer=d;
+$("welcome").textContent="Welcome Back, "+d.customer+"! 🤎";
+}
+}catch(e){
+customer=null;
+$("welcome").textContent="Welcome to Cozy Bake!";
+}
+}
+
+/* PHP CONNECTION */
+async function syncPHP(file,data){
+try{
+const r=await fetch(file,{
+method:"POST",
+credentials:"same-origin",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify(data)
+});
+if(!r.ok)throw Error("PHP error");
+const d=await r.json();
+if(!d.success)throw Error(d.message||"Failed");
+}catch(e){
+console.warn("PHP sync failed:",e);
+}
+}
+
+/* CART */
+function saveCart(){
+localStorage.setItem("cozyBakeCart",JSON.stringify(cart));
+$("count").textContent=cart.reduce((a,b)=>a+b.quantity,0);
+renderCart();
+}
+
+function addToCart(i,qty=1){
+if(needLogin())return;
+
+const p=products[i];
+const item=cart.find(x=>x.name===p[0]);
+
+if(item)item.quantity+=qty;
+else cart.push({
+    name:p[0],
+    price:p[1],
+    quantity:qty,
+    state:p[4] || null
+});
+
+saveCart();
+closeModal();
+openModal("cart");
+
+syncPHP("addtocart.php",{
+name:p[0],price:p[1],quantity:qty
+});
+}
+
+function changeCart(i,n){
+const x=cart[i];
+if(!x)return;
+
+x.quantity+=n;
+if(x.quantity<=0)return removeCart(i);
+
+saveCart();
+syncPHP("updatecart.php",{name:x.name,quantity:x.quantity});
+}
+
+function removeCart(i){
+const [x]=cart.splice(i,1);
+if(!x)return;
+
+saveCart();
+syncPHP("removecart.php",{name:x.name});
+}
+
+function renderCart(){
+$("items").innerHTML=cart.length?cart.map((x,i)=>`
+<div class="cart-row">
+<div>
+<strong>${x.name}</strong>
+<p>${rm(x.price)} each</p>
+<button onclick="removeCart(${i})">Remove</button>
+</div>
+<div class="qty">
+<button onclick="changeCart(${i},-1)">−</button>
+${x.quantity}
+<button onclick="changeCart(${i},1)">+</button>
+</div>
+</div>`).join(""):"Your cart is empty.";
+
+$("total").textContent=rm(cart.reduce((s,x)=>s+x.price*x.quantity,0));
+}
+
+function searchProducts() {
+    const search = document.getElementById("searchInput")
+        .value.toLowerCase().trim();
+
+    document.querySelectorAll(".card").forEach(card => {
+        const name = card.querySelector("h3").textContent.toLowerCase();
+
+        card.style.display = name.includes(search) ? "block" : "none";
+    });
+}
+
+function checkout(){
+if(!cart.length)return alert("Your cart is empty.");
+if(needLogin())return;
+location.href="checkoutt.html";
+}
+
+/* DISPLAY PRODUCTS */
+function displayProducts(){
+$("products").innerHTML=products.map((p,i)=>`
+<div class="card" data-cat="${p[2]}" data-best="${i===0}">
+<div class="image" onclick="quickView(${i})">
+<img src="${p[3]}" alt="${p[0]}">
+${i===0?'<span class="badge">BEST SELLER</span>':""}
+</div>
+<div class="details">
+<h3>${p[0]}</h3>
+<p class="description">${p[4]?"Exclusively available at "+p[4]+" Branch.":"Freshly baked with love at Cozy Bake."}</p>
+<p class="category">${p[2]}</p>
+<h3>${rm(p[1])}</h3>
+<div class="actions">
+<button class="btn light" onclick="quickView(${i})">👁 Quick View</button>
+<button class="btn" onclick="addToCart(${i})">🛒 Add to Cart</button>
+</div>
+</div>
+</div>`).join("");
+}
+
+/* FILTER */
+const categories=["All","Cakes","Pastries","Cookies","Best Seller","Special"];
+
+$("filters").innerHTML=categories.map((x,i)=>
+`<button class="${i===0?"active":""}" onclick="filterProducts('${x}',this)">${x}</button>`
+).join("");
+
+function filterProducts(cat,btn){
+document.querySelectorAll(".filters button").forEach(b=>b.classList.remove("active"));
+btn.classList.add("active");
+
+document.querySelectorAll(".card").forEach(c=>{
+c.style.display=
+cat==="All"||
+c.dataset.cat===cat||
+(cat==="Best Seller"&&c.dataset.best==="true")
+?"block":"none";
+});
+}
+
+/* QUICK VIEW */
+function quickView(i){
+selected=i;
+quickQty=1;
+const p=products[i];
+
+$("qimg").src=p[3];
+$("qname").textContent=p[0];
+$("qcat").textContent=p[2];
+$("qdesc").textContent=p[4]?"Available at "+p[4]+" Branch.":"Freshly baked with love.";
+
+updateQuick();
+openModal("quick");
+}
+
+function updateQuick(){
+const p=products[selected];
+$("qnum").textContent=quickQty;
+$("qprice").textContent=rm(p[1])+" each";
+$("qadd").textContent="🛒 Add to Cart — "+rm(p[1]*quickQty);
+}
+
+function changeQuick(n){
+quickQty=Math.max(1,quickQty+n);
+updateQuick();
+}
+
+function addQuick(){
+addToCart(selected,quickQty);
+}
+
+document.querySelectorAll(".modal").forEach(m=>{
+m.addEventListener("click",e=>{
+if(e.target===m)closeModal();
+});
+});
+
+document.addEventListener("keydown",e=>{
+if(e.key==="Escape")closeModal();
+});
+
+displayProducts();
+saveCart();
+loadCustomer();
+</script>
 
 </body>
 </html>
