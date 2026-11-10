@@ -139,7 +139,7 @@ const read=()=>JSON.parse(localStorage.getItem("cozyBakeBookings")||"[]");
 const email=sessionStorage.getItem("cozyBakeCustomerEmail");
 const name=sessionStorage.getItem("cozyBakeCustomerName");
 
-// LOGIN REQUIRED: Frontend demo login check
+// demo front end je
 if(DEMO_MODE){
  if(!email)location.replace("login.html?redirect=reservation.html");
  else{
@@ -148,7 +148,7 @@ if(DEMO_MODE){
  }
 }
 
-// PHP CONNECTION Get logged-in customer details
+// php connect untuk login
 async function loadCustomer(){
  if(DEMO_MODE)return;
  try{
@@ -195,7 +195,7 @@ function update(){
 ♡ Request: ${d.notes||"None"}`;
 }
 
-// FRONTEND TABLE AVAILABILITY
+// nak check available ke tak seat tu
 function booked(d,id){
  return read().some(b=>
   b.outlet===d.outlet&&b.date===d.date&&
@@ -262,7 +262,7 @@ form.addEventListener("submit",async e=>{
   return;
  }
 
- // PHP CONNECTION Submit reservation to database
+ // php submit reservation ke databased
  try{
   const res=await fetch("reservation.php",{
    method:"POST",
