@@ -170,8 +170,11 @@ localStorage.setItem("cozyBakeCart",JSON.stringify(cart));
 sessionStorage.removeItem("pendingCake");
 sessionStorage.removeItem("pendingAction");
 
-if(action==="checkoutt")location.href="checkoutt.html";
-else alert("Custom cake added to cart!");
+if(action==="checkout"){
+    location.href="checkoutt.html";
+}else{
+    alert("Custom cake added to cart!");
+}
 }catch(e){console.error(e);alert("Unable to add cake. Check addtocart.php.");}
 }
 
