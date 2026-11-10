@@ -2,6 +2,12 @@
 session_start();
 include 'db.php';
 
+$redirect = $_POST['redirect'] ?? '';
+
+$redirectPage = ($redirect === 'reservation.html')
+    ? 'reservation.html'
+    : 'index.html';
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = trim($_POST['email'] ?? '');
     $password = trim($_POST['password'] ?? '');
@@ -71,9 +77,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['customer_id'] = $conn->insert_id;
             }
 
-            $_SESSION['role'] = 'customer';
-            header("Location: index.html");
-            exit();
+        $_SESSION['role'] = 'customer';
+header("Location: " . $redirectPage);
+exit();
         }
     }
 
