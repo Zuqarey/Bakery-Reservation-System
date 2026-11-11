@@ -1,0 +1,243 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cozy Bake | Customer Dashboard</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f4e9de;color:#392016;font-family:Arial}
+.sidebar{position:fixed;width:80px;height:100vh;background:repeating-linear-gradient(0deg,#63351f,#63351f 9px,#4f2819 12px);display:flex;flex-direction:column;align-items:center;padding:30px 10px;gap:20px}
+.sidebar button{background:none;border:0;color:white;font-size:25px;cursor:pointer;padding:12px;border-radius:12px}
+.sidebar button.active,.sidebar button:hover{background:#ffffff30}
+.bottom{margin-top:auto}
+.wrap{margin-left:80px}
+header{background:#fffaf5;padding:25px 35px;display:flex;justify-content:space-between;border-bottom:1px solid #e6d2c2}
+header p{margin:5px 0;color:#9d7d69}
+.avatar{background:#603621;color:#ffbd83;border-radius:50%;padding:15px}
+main{padding:40px 4%;max-width:1500px;margin:auto}
+h1{font:italic bold clamp(35px,5vw,60px) Georgia;margin:8px 0}
+h2{font-size:20px}
+.eyebrow{font-size:12px;letter-spacing:3px;color:#a64e1c;font-weight:bold}
+.muted{color:#967c6c}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:30px 0}
+.card,.panel{background:white;padding:25px;border-radius:25px;box-shadow:0 2px 5px #0001}
+.card:first-child{background:#f4a35d}
+.card:last-child{background:#603621;color:white}
+.card strong{display:block;font-size:35px;margin:15px 0}
+.grid{display:grid;grid-template-columns:2fr 1fr;gap:20px}
+.visit{background:#f5e3cf;padding:22px;border-radius:18px}
+.visit h3{font:italic bold 30px Georgia}
+.btn{display:inline-block;background:#603621;color:white;padding:12px 18px;border:0;border-radius:12px;text-decoration:none;cursor:pointer}
+.section{display:none}.section.active{display:block}
+table{width:100%;border-collapse:collapse;text-align:left}
+th,td{padding:18px 10px;border-bottom:1px solid #ead8c8}
+th{font-size:12px;letter-spacing:2px;color:#a57553}
+.table-wrap{overflow-x:auto}
+.cart-row{display:flex;justify-content:space-between;padding:15px 0;border-bottom:1px solid #ead8c8}
+.cart-total{text-align:right;font-size:21px;font-weight:bold;margin:20px}
+@media(max-width:750px){.stats,.grid{grid-template-columns:1fr}main{padding:25px 15px}.sidebar{width:60px}.wrap{margin-left:60px}header{padding:20px}.sidebar button{font-size:20px}}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+<div style="color:white;font-size:35px;margin-bottom:60px">♧</div>
+<button class="active" data-page="dashboard" onclick="show('dashboard')">▦</button>
+<button data-page="orders" onclick="show('orders')">▤</button>
+<button data-page="cart" onclick="show('cart')">🛒</button>
+<button data-page="bookings" onclick="show('bookings')">♧</button>
+<button class="bottom" onclick="logout()">⇥</button>
+</aside>
+
+<div class="wrap">
+<header>
+<div><b id="page-title">DASHBOARD</b><p>Cozy Bake management</p></div>
+<div class="avatar" id="avatar">C</div>
+</header>
+
+<main>
+<section id="dashboard" class="section active">
+<div class="eyebrow">CUSTOMER DASHBOARD</div>
+<h1 id="greeting">Welcome, customer!</h1>
+<p class="muted">Your Cozy Bake favorites, bookings, and orders in one place.</p>
+
+<div class="stats">
+<div class="card"><b>REWARD POINTS</b><strong>0</strong><small>Rewards coming soon</small></div>
+<div class="card"><b>UPCOMING BOOKING</b><strong id="upcoming">—</strong><small id="next-booking">No upcoming booking</small></div>
+<div class="card"><b>TOTAL ORDERS</b><strong id="total">0</strong><small>Completed checkout orders</small></div>
+</div>
+
+<div class="grid">
+<div class="panel">
+<h2>YOUR NEXT VISIT</h2>
+<div class="visit">
+<h3>Something sweet awaits!</h3>
+<p>Explore our freshly baked treats.</p>
+<a href="menu.html" class="btn">EXPLORE MENU</a>
+</div>
+</div>
+</div>
+</section>
+
+<section id="orders" class="section">
+<div class="eyebrow">MY ORDERS</div>
+<h1>Order history</h1>
+<p class="muted">Your recent Cozy Bake orders.</p>
+<div class="panel">
+<h2>RECENT PURCHASES</h2>
+<div class="table-wrap">
+<table>
+<thead><tr><th>ORDER</th><th>ITEMS</th><th>TOTAL</th><th>STATUS</th></tr></thead>
+<tbody id="order-list"><tr><td colspan="4">No orders yet.</td></tr></tbody>
+</table>
+</div>
+</div>
+</section>
+
+<section id="cart" class="section">
+<div class="eyebrow">MY CART</div>
+<h1>Shopping cart</h1>
+<p class="muted">Items added from our menu.</p>
+<div class="panel">
+<div id="cart-list"></div>
+<div class="cart-total" id="cart-total">RM 0.00</div>
+<a href="menu.html" class="btn">CONTINUE SHOPPING</a>
+<a href="checkout.html" class="btn" id="checkout">CHECKOUT</a>
+</div>
+</section>
+
+<section id="bookings" class="section">
+<div class="eyebrow">RESERVATIONS</div>
+<h1>Your bookings</h1>
+<p class="muted">View your Cozy Bake table reservations.</p>
+<div class="panel">
+<a href="reservation.html" class="btn">NEW RESERVATION</a>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>BOOKING ID</th><th>OUTLET</th><th>DATE</th><th>TIME</th><th>TABLE</th><th>GUESTS</th><th>STATUS</th></tr>
+</thead>
+<tbody id="booking-list">
+<tr><td colspan="7">No bookings yet.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+</main>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const money=n=>"RM "+Number(n||0).toFixed(2);
+const email=sessionStorage.getItem("cozyBakeCustomerEmail");
+const name=sessionStorage.getItem("cozyBakeCustomerName")||"Customer";
+
+// FRONTEND LOGIN CHECK
+if(!email)location.replace("login.html?redirect=customerdashboard.html");
+
+$("greeting").textContent="Welcome, "+name+"!";
+$("avatar").textContent=name[0].toUpperCase();
+
+function read(key){
+ try{return JSON.parse(localStorage.getItem(key)||"[]")}catch{return []}
+}
+
+function show(id){
+ document.querySelectorAll(".section").forEach(s=>s.classList.toggle("active",s.id===id));
+ document.querySelectorAll("[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===id));
+ $("page-title").textContent=id.toUpperCase();
+ if(id==="cart")renderCart();
+ if(id==="orders")loadOrders();
+ if(id==="bookings")loadBookings();
+}
+
+function renderCart(){
+ let cart=read("cozyBakeCart"),total=0;
+ $("cart-list").innerHTML="";
+ cart.forEach(i=>{
+  let amount=Number(i.price||0)*Number(i.quantity||0);
+  total+=amount;
+  let row=document.createElement("div");
+  row.className="cart-row";
+  let item=document.createElement("span");
+  let price=document.createElement("b");
+  item.textContent=i.name+" × "+i.quantity;
+  price.textContent=money(amount);
+  row.append(item,price);
+  $("cart-list").append(row);
+ });
+ if(!cart.length)$("cart-list").textContent="Your cart is empty.";
+ $("cart-total").textContent=money(total);
+ $("checkout").style.display=cart.length?"inline-block":"none";
+}
+
+// PHP CONNECTION: Customer order history
+async function loadOrders(){
+ const list=$("order-list");
+ try{
+  const res=await fetch("getorders.php",{credentials:"same-origin"});
+  const data=await res.json();
+  if(!res.ok||!data.success||!Array.isArray(data.orders))throw Error();
+  $("total").textContent=data.orders.length;
+  fillRows(list,data.orders.map(o=>[
+   o.order_id,o.items,money(o.total),o.status
+  ]),4);
+ }catch{
+  list.innerHTML='<tr><td colspan="4">No orders yet.</td></tr>';
+ }
+}
+
+function fillRows(element,rows,columns){
+ element.innerHTML="";
+ if(!rows.length){
+  let tr=element.insertRow();
+  let td=tr.insertCell();
+  td.colSpan=columns;
+  td.textContent="No "+(columns===7?"bookings":"orders")+" yet.";
+  return;
+ }
+ rows.forEach(values=>{
+  let tr=element.insertRow();
+  values.forEach(value=>{
+   tr.insertCell().textContent=value??"—";
+  });
+ });
+}
+
+// FRONTEND DEMO BOOKINGS
+function loadBookings(){
+ const bookings=read("cozyBakeBookings")
+  .filter(b=>b.email===email)
+  .sort((a,b)=>(a.date+" "+a.time).localeCompare(b.date+" "+b.time));
+
+ fillRows($("booking-list"),bookings.map(b=>[
+  b.id,b.outlet,b.date,b.time,b.table,b.guests,b.status
+ ]),7);
+
+ const next=bookings.find(b=>
+  new Date(b.date+"T"+b.time)>=new Date() &&
+  b.status!=="Cancelled"
+ );
+ $("upcoming").textContent=next?next.date:"—";
+ $("next-booking").textContent=next
+  ?next.outlet+" · "+next.time
+  :"No upcoming booking";
+}
+
+// PHP CONNECTION: Logout backend to be integrated by teammate
+function logout(){
+ sessionStorage.removeItem("cozyBakeDemoLoggedIn");
+ sessionStorage.removeItem("cozyBakeCustomerName");
+ sessionStorage.removeItem("cozyBakeCustomerEmail");
+ location.href="index.html";
+}
+
+loadBookings();
+loadOrders();
+if(location.hash==="#bookings")show("bookings");
+</script>
+</body>
+</html>

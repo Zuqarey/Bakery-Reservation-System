@@ -1,0 +1,199 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cozy Bake | Custom Cake</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#FAF8F5;color:#3D281B;font-family:Arial}
+header{text-align:center;padding:35px}
+h1,h2{font-family:Georgia;font-weight:normal}
+h1{font-size:50px}
+header p{color:#B58D6D}
+main{max-width:1100px;margin:auto;padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:30px}
+.card{background:white;padding:30px;border-radius:20px;box-shadow:0 4px 18px #0001}
+label{display:block;font-weight:bold;margin:18px 0 8px}
+select,input{width:100%;padding:13px;border:1px solid #ddd;border-radius:10px}
+button{width:100%;padding:15px;margin-top:15px;background:#B58D6D;color:white;border:0;border-radius:12px;cursor:pointer}
+button:hover{background:#987153}
+.preview{text-align:center}
+.cake{width:220px;height:155px;margin:65px auto;background:#F5E5C7;border-radius:50% 50% 20% 20%;border:8px solid #fff5;box-shadow:0 15px 0 #D8B994;position:relative;display:flex;align-items:center;justify-content:center}
+.cake.heart{border-radius:48% 48% 50% 50%}
+.cake.square{border-radius:15px}
+#cakeText{overflow-wrap:anywhere;max-width:90%}
+#cakeTop{position:absolute;top:8px;font-size:25px}
+#total{font-size:30px;color:#B58D6D;font-weight:bold}
+#summary{text-align:left;background:#FAF8F5;padding:18px;border-radius:12px;line-height:2}
+.back{display:block;text-align:center;margin:30px;color:#3D281B}
+@media(max-width:700px){main{grid-template-columns:1fr}h1{font-size:38px}}
+</style>
+</head>
+<body>
+
+<header>
+<p>BAKED JUST FOR YOU</p>
+<h1>Customize Your Cake</h1>
+<p>Create your dream cake with Cozy Bake 🤎</p>
+</header>
+
+<main>
+<section class="card">
+<h2>Design Your Cake 🎂</h2>
+
+<label>Cake Size</label>
+<select id="size" onchange="update()">
+<option value="35">6 inch - RM35</option>
+<option value="55">8 inch - RM55</option>
+<option value="75">10 inch - RM75</option>
+</select>
+
+<label>Flavour</label>
+<select id="flavour" onchange="update()">
+<option>Vanilla</option><option>Chocolate</option>
+<option>Red Velvet</option><option>Matcha</option>
+<option>Biscoff</option><option>Tiramisu</option>
+</select>
+
+<label>Shape</label>
+<select id="shape" onchange="update()">
+<option value="round">Round</option>
+<option value="heart">Heart</option>
+<option value="square">Square</option>
+</select>
+
+<label>Cake Colour</label>
+<input type="color" id="colour" value="#F5E5C7" oninput="update()">
+
+<label>Topping</label>
+<select id="topping" onchange="update()">
+<option value="0">No Topping - Free</option>
+<option value="4">Strawberry - RM4</option>
+<option value="5">Chocolate - RM5</option>
+<option value="4">Cherry - RM4</option>
+<option value="4">Oreo - RM4</option>
+<option value="4">Biscoff - RM4</option>
+</select>
+
+<label>Message on Cake</label>
+<input id="message" maxlength="40" placeholder="Happy Birthday!" oninput="update()">
+
+<label>Quantity</label>
+<input type="number" id="qty" value="1" min="1" max="20" onchange="update()">
+
+<button onclick="order('cart')">🛒 Add to Cart</button>
+<button onclick="order('checkout')">Proceed to Checkout</button>
+</section>
+
+<section class="card preview">
+<h2>Your Cake Preview</h2>
+<p>See your creation come to life!</p>
+<div class="cake" id="cake">
+<span id="cakeTop"></span>
+<span id="cakeText"></span>
+</div>
+<h3 id="cakeName">Vanilla Cake</h3>
+<p id="total">RM 35.00</p>
+<div id="summary"></div>
+</section>
+</main>
+
+<a class="back" href="index.html">← Return to Home</a>
+
+<script>
+const $=id=>document.getElementById(id);
+const label=id=>$(id).selectedOptions[0].text.split(" - ")[0];
+const icons={Strawberry:"🍓",Chocolate:"🍫",Cherry:"🍒",Oreo:"🍪",Biscoff:"🍪"};
+
+function data(){
+return {
+name:"Custom "+$("flavour").value+" Cake",
+size:label("size"),flavour:$("flavour").value,
+shape:$("shape").value,colour:$("colour").value,
+topping:label("topping"),message:$("message").value,
+quantity:Number($("qty").value),
+price:Number($("size").value)+Number($("topping").value),
+type:"customcake"
+};
+}
+
+function update(){
+let d=data();
+$("cake").className="cake "+d.shape;
+$("cake").style.background=d.colour;
+$("cakeText").textContent=d.message;
+$("cakeTop").textContent=icons[d.topping]||"";
+$("cakeName").textContent=d.name;
+$("total").textContent="RM "+(d.price*d.quantity).toFixed(2);
+$("summary").textContent=
+`Size: ${d.size} | Flavour: ${d.flavour}
+Shape: ${d.shape} | Topping: ${d.topping}
+Quantity: ${d.quantity}`;
+$("summary").style.whiteSpace="pre-line";
+}
+
+async function order(action){
+let d=data();
+if(!Number.isInteger(d.quantity)||d.quantity<1||d.quantity>20){
+alert("Please complete pickup details and quantity (1-20).");return;
+}
+
+let loggedIn=false;
+try{
+let r=await fetch("getcustomer.php",{credentials:"same-origin"});
+if(r.ok)loggedIn=(await r.json()).loggedIn===true;
+}catch(e){console.error(e)}
+
+if(!loggedIn){
+sessionStorage.setItem("pendingCake",JSON.stringify(d));
+sessionStorage.setItem("pendingAction",action);
+location.href="login.html?redirect=customcake.html";
+return;
+}
+await saveCake(d,action);
+}
+
+async function saveCake(d,action){
+try{
+let r=await fetch("addtocart.php",{
+method:"POST",credentials:"same-origin",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify(d)
+});
+let result=await r.json();
+if(!r.ok||result.success!==true)throw Error("PHP cart failed");
+
+let cart=JSON.parse(localStorage.getItem("cozyBakeCart")||"[]");
+cart.push({...d,id:Date.now()});
+localStorage.setItem("cozyBakeCart",JSON.stringify(cart));
+sessionStorage.removeItem("pendingCake");
+sessionStorage.removeItem("pendingAction");
+
+if(action==="checkout"){
+    location.href="checkoutt.html";
+}else{
+    alert("Custom cake added to cart!");
+}
+}catch(e){console.error(e);alert("Unable to add cake. Check addtocart.php.");}
+}
+
+async function resume(){
+let saved=sessionStorage.getItem("pendingCake");
+if(!saved)return;
+let d=JSON.parse(saved),action=sessionStorage.getItem("pendingAction");
+$("size").value={"6 inch":"35","8 inch":"55","10 inch":"75"}[d.size]||"35";
+$("flavour").value=d.flavour;$("shape").value=d.shape;
+$("colour").value=d.colour;$("message").value=d.message;
+$("qty").value=d.quantity;
+[...$("topping").options].forEach(o=>{
+if(o.text.startsWith(d.topping+" - "))$("topping").value=o.value;
+});
+update();
+if(action)await order(action);
+}
+update();
+resume();
+</script>
+</body>
+</html>

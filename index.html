@@ -1,425 +1,219 @@
-<!--Home Page -->
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-      <title>Cozy Bake : Best Shop Malaysia</title>
-
-    <style>
-       
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            background-color: #FAF8F5;
-            font-family: Arial, sans-serif;
-            color: #3D281B;
-        }
-
-        /* HEADER */
-        header {
-            background-color: #FAF8F5;
-            border-bottom: 1px solid #E8DED5;
-        }
-
-        .logo-section {
-            padding: 20px 6%;
-        }
-
-        .logo h2 {
-            color: #B58D6D;
-            font-family: Georgia, serif;
-            font-size: 38px;
-            margin: 0;
-        }
-
-        .logo p {
-            color: #B58D6D;
-            font-size: 10px;
-            letter-spacing: 3px;
-            margin: 5px 0 0;
-        }
-
-        /* NAVIGATION */
-        .navbar {
-            width: 100%;
-            min-height: 110px;
-            padding: 10px 8px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 25px;
-            background-color: #FAF8F5;
-            border-top: 1px solid #E8DED5;
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 40px;
-            flex-shrink: 0;
-        }
-
-        .nav-links a {
-            color: #3D281B;
-            font-size: 16px;
-            font-weight: 600;
-            text-decoration: none;
-            white-space: nowrap;
-        }
-
-        .nav-links a:hover {
-            color: #B58D6D;
-        }
-
-        /* RIGHT NAVIGATION */
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 24px;
-        }
-
-        /* SEARCH BAR */
-        .search-box {
-            width: 288px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            border: 1px solid #E4D2C2;
-            border-radius: 30px;
-            padding: 0 15px;
-            flex-shrink: 0;
-        }
-
-        .search-box input {
-            width: 100%;
-            min-width: 0;
-            border: none;
-            outline: none;
-            background: transparent;
-            padding: 10px;
-            font-size: 14px;
-            color: #3D281B;
-        }
-
-        .search-box input::placeholder {
-            color: #A9A09A;
-        }
-
-        .search-box button {
-            background: transparent;
-            color: #B58D6D;
-            border: none;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            padding: 0;
-            white-space: nowrap;
-        }
-
-        .search-icon {
-            width: 17px;
-            height: 17px;
-            fill: none;
-            stroke: #3D281B;
-            stroke-width: 1.7;
-        }
-
-        /* NAVIGATION ICONS */
-        .icon-btn {
-            background: transparent;
-            border: none;
-            padding: 5px;
-            cursor: pointer;
-            flex-shrink: 0;
-        }
-
-        .icon-btn svg {
-            width: 25px;
-            height: 25px;
-            fill: none;
-            stroke: #3D281B;
-            stroke-width: 1.7;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        .icon-btn:hover svg {
-            stroke: #B58D6D;
-        }
-
-        /* HERO SECTION */
-        .hero {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 50px;
-            padding: 70px 6%;
-        }
-
-        .hero-text {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .subtitle {
-            color: #B58D6D;
-            font-size: 13px;
-            font-weight: bold;
-            letter-spacing: 2px;
-        }
-
-        .hero-text h1 {
-            color: #3D281B;
-            font-family: Georgia, serif;
-            font-size: clamp(38px, 5vw, 65px);
-            line-height: 1.15;
-            margin: 20px 0;
-        }
-
-        .hero-text h1 span {
-            color: #D99AA5;
-            font-style: italic;
-        }
-
-        .description {
-            color: #795B4D;
-            font-size: 16px;
-            line-height: 1.8;
-            max-width: 480px;
-        }
-
-       
-        .hero-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 30px;
-        }
-
-        .hero-buttons button {
-            padding: 15px 28px;
-            background-color: #B58D6D;
-            color: white;
-            border: none;
-            border-radius: 30px;
-            font-size: 14px;
-            cursor: pointer;
-        }
-
-        .hero-buttons button:hover {
-            background-color: #967052;
-        }
-
-        .hero-buttons .second-button {
-            background-color: transparent;
-            color: #B58D6D;
-            border: 1px solid #B58D6D;
-        }
-
-        .hero-buttons .second-button:hover {
-            background-color: #E8DED5;
-        }
-
-        /* HERO IMAGE */
-        .hero-image {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .hero-image img {
-            display: block;
-            width: 100%;
-            height: 500px;
-            object-fit: cover;
-            border-radius: 200px 200px 20px 20px;
-        }
-
-        /* RESPONSIVE */
-        @media (max-width: 1250px) {
-            .navbar {
-                flex-wrap: wrap;
-                justify-content: center;
-                padding: 20px;
-            }
-
-            .nav-links {
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 25px;
-            }
-
-            .nav-right {
-                justify-content: center;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .logo-section {
-                text-align: center;
-            }
-
-            .navbar {
-                gap: 20px;
-            }
-
-            .nav-links {
-                gap: 18px;
-            }
-
-            .nav-links a {
-                font-size: 14px;
-            }
-
-            .nav-right {
-                flex-wrap: wrap;
-                gap: 18px;
-            }
-
-            .search-box {
-                width: min(288px, 90vw);
-            }
-
-            .hero {
-                flex-direction: column;
-                padding: 40px 20px;
-                gap: 35px;
-            }
-
-            .hero-text,
-            .hero-image {
-                width: 100%;
-            }
-
-            .hero-text h1 {
-                font-size: 45px;
-            }
-
-            .hero-image img {
-                height: 400px;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cozy Bake | Home</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#FAF8F5;color:#3D281B;font-family:Arial,sans-serif}
+button{cursor:pointer;font:inherit}
+header{display:flex;align-items:center;justify-content:space-between;gap:30px;padding:20px 5%;border-bottom:1px solid #E8DED5}
+.logo{text-decoration:none;white-space:nowrap;text-align:center}
+.logo strong{display:block;font:normal bold 36px Georgia,serif;color:#B58D6D}
+.logo small{display:block;color:#B58D6D;letter-spacing:3px;font-size:10px;font-weight:bold;margin-top:4px}
+nav{display:flex;align-items:center;gap:38px}
+nav a{color:#3D281B;text-decoration:none;font-size:16px;font-weight:600;white-space:nowrap}
+nav a:hover{color:#B58D6D}
+.right{display:flex;align-items:center;gap:24px}
+.search{height:50px;width:288px;display:flex;align-items:center;gap:10px;border:1px solid #E4D2C2;border-radius:30px;padding:0 15px}
+.search input{border:0;outline:0;background:transparent;width:100%;min-width:0;color:#3D281B;font-size:14px}
+.search input::placeholder{color:#A9A09A}
+.search button{border:0;background:none;color:#B58D6D;font-size:12px;font-weight:bold}
+.icon{border:0;background:none;padding:5px;color:#3D281B}
+.icon svg,.search svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.search svg{width:17px;height:17px;flex-shrink:0}
+.icon:hover{color:#B58D6D}
+.hero{display:flex;align-items:center;justify-content:space-between;gap:55px;min-height:720px;padding:85px 7% 100px}
+.hero-text,.hero-image{flex:1;min-width:0}
+.subtitle{color:#B58D6D;font-size:13px;font-weight:bold;letter-spacing:3px}
+h1{font:normal clamp(48px,5.4vw,80px)/1.08 Georgia,serif;margin:25px 0 35px}
+h1 span{color:#B77D7B;font-style:italic}
+.description{color:#795B4D;font-size:17px;line-height:1.9;max-width:500px}
+.cta{display:inline-block;margin-top:25px;background:#B58D6D;color:white;text-decoration:none;border-radius:30px;padding:17px 29px;font-size:14px;font-weight:bold}
+.cta:hover{background:#967052}
+.hero-image{position:relative;padding:35px 25px 0 0}
+.hero-image:before{content:"";position:absolute;inset:0 0 45px 65px;background:#E8DED5;border-radius:240px 240px 35px 35px}
+.hero-image img{position:relative;display:block;width:100%;height:560px;object-fit:cover;border-radius:220px 220px 22px 22px}
+footer{background:#4A362E;color:white;display:flex;align-items:center;justify-content:space-between;gap:35px;padding:50px 7%}
+footer strong{font:normal bold 34px Georgia,serif}
+footer small{display:block;letter-spacing:3px;font-size:10px;margin-top:8px}
+footer p{max-width:350px;color:#E3C8B8;font-size:14px;line-height:1.7}
+.modal{display:none;position:fixed;inset:0;background:#0008;z-index:20;align-items:center;justify-content:center;padding:20px}
+.modal.show{display:flex}
+.popup{width:100%;max-width:460px;max-height:85vh;overflow:auto;background:#FFFDFC;padding:28px;border-radius:22px}
+.popup-head{display:flex;justify-content:space-between;align-items:center}
+.popup h2{font:normal 28px Georgia,serif}
+.close{border:0;background:#F1E7DF;border-radius:50%;width:35px;height:35px;font-size:23px}
+.result,.notice{display:block;background:#FAF8F5;padding:14px;margin:10px 0;border-radius:12px;color:#3D281B;text-decoration:none;line-height:1.6}
+.result:hover{background:#F1E7DF}
+@media(max-width:1150px){header{flex-wrap:wrap;justify-content:center}nav{gap:25px}.right{flex-wrap:wrap;justify-content:center}}
+@media(max-width:768px){.hero{flex-direction:column;min-height:auto;padding:45px 6% 80px;gap:30px}.hero-text,.hero-image{width:100%}.hero-image img{height:390px}footer{flex-direction:column;text-align:center}h1{font-size:54px}}
+</style>
 </head>
-
 <body>
 
-    <!-- HEADER -->
-    <header>
+<header>
+<a class="logo" href="index.html">
+<strong>Cozy Bake</strong>
+<small>BAKED WITH LOVE</small>
+</a>
 
-        <!-- LOGO -->
-        <div class="logo-section">
-            <div class="logo">
-                <h2>Cozy Bake</h2>
-                <p>BAKED WITH LOVE</p>
-            </div>
-        </div>
+<nav>
+<a href="menu.html">Menu</a>
+<a href="locations.html">Locations</a>
+<a href="reservation.html">Reservations</a>
+</nav>
 
-        <!-- NAVIGATION BAR -->
-        <nav class="navbar">
+<div class="right">
+<form class="search" onsubmit="searchTreats(event)">
+<svg viewBox="0 0 24 24">
+<circle cx="10.5" cy="10.5" r="6.5"/>
+<path d="M16 16l5 5"/>
+</svg>
+<input id="searchInput" type="search" placeholder="Search treats"
+aria-label="Search treats" oninput="searchTreats()">
+<button type="submit">SEARCH</button>
+</form>
 
-            <!-- LEFT MENU -->
-            <div class="nav-links">
-                <a href="menu.html">Menu</a>
-               <a href="locations.html">Locations</a>
-                <a href="#">Reservations</a>
-                <a href="#">Ask Me</a>
-                
-            </div>
-
-            <!-- RIGHT SIDE -->
-            <div class="nav-right">
-
-                <!-- SEARCH -->
-                <form class="search-box" onsubmit="return false;">
-
-                    <svg class="search-icon" viewBox="0 0 24 24">
-                        <circle cx="10.5" cy="10.5" r="6.5"/>
-                        <path d="M16 16L21 21"/>
-                    </svg>
-
-                    <input
-                        type="search"
-                        placeholder="Search treats"
-                        aria-label="Search treats"
-                    >
-
-                    <button type="submit">SEARCH</button>
-
-                </form>
-
-                <!-- NOTIFICATION -->
-                <button class="icon-btn" type="button"
-                    aria-label="Notifications">
-
-                    <svg viewBox="0 0 24 24">
-                        <path d="M18 8a6 6 0 0 0-12 0
-                                 c0 7-3 7-3 9h18
-                                 c0-2-3-2-3-9"/>
-                        <path d="M10 21h4"/>
-                    </svg>
-
-                </button>
-
-              <!-- ACCOUNT -->
-<button class="icon-btn" type="button"
-    aria-label="Account"
-    onclick="window.location.href='login.html'">
-
-    <svg viewBox="0 0 24 24">
-        <circle cx="12" cy="7" r="4"/>
-        <path d="M4 21v-2a8 8 0 0 1 16 0v2z"/>
-    </svg>
-
+<button class="icon" aria-label="Notifications" onclick="showNotifications()">
+<svg viewBox="0 0 24 24">
+<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>
+</svg>
 </button>
 
-            </div>
+<button class="icon" aria-label="Account" onclick="location.href='login.html'">
+<svg viewBox="0 0 24 24">
+<circle cx="12" cy="7" r="4"/>
+<path d="M4 21v-2a8 8 0 0 1 16 0v2z"/>
+</svg>
+</button>
+</div>
+</header>
 
-        </nav>
+<main class="hero">
+<div class="hero-text">
+<p class="subtitle">FRESHLY BAKED · EVERY DAY</p>
+<h1>Little<br>moments,<br><span>beautifully<br>baked.</span></h1>
+<p class="description">
+From celebration cakes to your morning pastry, everything is
+made with thoughtful ingredients and a little extra care.
+</p>
+<a class="cta" href="customcake.html">Custom Your Cake</a>
+</div>
 
-    </header>
+<div class="hero-image">
+<img src="bakery.jpg" alt="Cozy Bake Bakery">
+</div>
+</main>
 
-    <!-- HOMEPAGE -->
-    <main class="hero">
+<footer>
+<div>
+<strong>Cozy Bake</strong>
+<small>BAKED WITH LOVE</small>
+</div>
+<p>Thoughtful bakes, warm welcomes, and sweet little moments.</p>
+<p>Sign up / Log in</p>
+</footer>
 
-        <!-- LEFT TEXT -->
-        <div class="hero-text">
+<div class="modal" id="searchModal">
+<div class="popup">
+<div class="popup-head">
+<h2>Search Treats</h2>
+<button class="close" onclick="closeModal()">×</button>
+</div>
+<div id="results"></div>
+</div>
+</div>
 
-            <p class="subtitle">
-                FRESHLY BAKED. EVERY DAY.
-            </p>
+<div class="modal" id="notificationModal">
+<div class="popup">
+<div class="popup-head">
+<h2>🔔 Notifications</h2>
+<button class="close" onclick="closeModal()">×</button>
+</div>
+<div id="notices"></div>
+</div>
+</div>
 
-            <h1>
-                Little<br>
-                moments,<br>
-                <span>beautifully<br>baked.</span>
-            </h1>
+<script>
+const $=id=>document.getElementById(id);
 
-            <p class="description">
-                From celebration cakes to your morning pastry,
-                everything is made with thoughtful ingredients
-                and a little extra care.
-            </p>
+const products=[
+"Strawberry Cloud Cake","Morning Croissant","Macaron",
+"Creampuff Strawberry","Strawberry Cheese Cake",
+"Cheesy Kunafa Pistachio","Chocolate Chip Cookies",
+"Redvelvet Cookies","Dark Chocolate Cookies","Blueberry Cookies",
+"Harumanis Mango Cake","Harumanis Cream Puff",
+"Kaya Butter Croissant","Gula Melaka Cheesecake",
+"Pandan Coconut Cookies","Dragon Cake","Durian Cake",
+"Cendol Cheesecake","Salted Caramel Brownies","Lemon Blueberry Cake"
+];
 
-            <div class="hero-buttons">
-                </button>
+function closeModal(){
+document.querySelectorAll(".modal").forEach(x=>x.classList.remove("show"));
+}
 
-                <button type="button" class="second-button">
-                    Custom your cake
-                </button>
-            </div>
+function searchTreats(e){
+if(e)e.preventDefault();
+const q=$("searchInput").value.trim().toLowerCase();
+if(!q){closeModal();return}
 
-        </div>
+const matches=products.filter(x=>x.toLowerCase().includes(q));
+$("results").innerHTML=matches.length?
+matches.map(x=>`<a class="result" href="menu.html">🍰 ${x}</a>`).join(""):
+"<p>No matching products found.</p>";
 
-        <!-- RIGHT IMAGE -->
-        <div class="hero-image">
-            <img src="bakery.jpg" alt="Cozy Bake Bakery">
-        </div>
+$("searchModal").classList.add("show");
+}
 
-    </main>
+//Call Php Notifications
+async function showNotifications(){
 
+    $("notificationModal").classList.add("show");
+    $("notices").innerHTML = '<div class="notice">Loading notifications...</div>';
+
+    try {
+        const response = await fetch("notification.php", {
+            method: "GET",
+            credentials: "same-origin",
+            cache: "no-store"
+        });
+
+        if (!response.ok) throw new Error("PHP error");
+
+        const data = await response.json();
+
+        if (!data.success) {
+            $("notices").innerHTML =
+                `<div class="notice">${data.message || "Unable to load notifications."}</div>`;
+            return;
+        }
+
+        const notifications = data.notifications || [];
+
+        $("notices").innerHTML = notifications.length
+            ? notifications.map(n => `
+                <div class="notice">
+                    <strong>${n.title || "Notification"}</strong>
+                    <p>${n.message || ""}</p>
+                </div>
+            `).join("")
+            : '<div class="notice">🔔 No notifications yet.</div>';
+
+    } catch (error) {
+        $("notices").innerHTML =
+            '<div class="notice">Unable to connect to notification.php.</div>';
+        console.error(error);
+    }
+}
+document.querySelectorAll(".modal").forEach(x=>
+x.onclick=e=>{if(e.target===x)closeModal()});
+
+document.addEventListener("keydown",e=>{
+if(e.key==="Escape")closeModal();
+});
+</script>
 </body>
 </html>

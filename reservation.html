@@ -1,0 +1,287 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cozy Bake | Reservation</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#FAF8F5;color:#3D281B;font-family:Arial}
+header{background:white;padding:22px 7%;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #eee3da}
+a{color:#3D281B;text-decoration:none}
+.logo{font:bold 29px Georgia}
+.hero{text-align:center;padding:65px 20px 45px;background:linear-gradient(#F5EBE2,#FAF8F5)}
+.hero small{color:#B58D6D;letter-spacing:4px;font-size:11px}
+.hero h1{font:normal 56px Georgia;margin:18px 0}
+.hero p,.sub,.note{color:#9B8576}
+.decor{color:#B58D6D;font-size:25px}
+main{max-width:1050px;margin:20px auto 70px;padding:0 20px;display:grid;grid-template-columns:1.4fr .85fr;gap:25px;align-items:start}
+.card{background:white;border:1px solid #F0E5DD;border-radius:22px;padding:35px;box-shadow:0 12px 35px #4d30200a}
+h2{font:normal 28px Georgia;margin:0 0 10px}
+.sub{font-size:13px;margin-bottom:28px}
+.section-title{font:normal 19px Georgia;margin:28px 0 15px;padding-bottom:12px;border-bottom:1px solid #F0E5DD}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.full{grid-column:1/-1}
+label{display:block;font-size:12px;font-weight:bold;margin-bottom:9px;color:#665044}
+input,select,textarea{width:100%;padding:15px;border:1px solid #E8DCD2;border-radius:11px;background:#FFFCFA;color:#3D281B;font:14px Arial}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#B58D6D}
+input[readonly]{background:#F3EEE9;color:#806B5D}
+textarea{height:100px;resize:vertical}
+button{width:100%;background:#B58D6D;color:white;border:0;padding:17px;border-radius:12px;font-weight:bold;cursor:pointer;margin-top:25px}
+button:hover{background:#967253}
+.summary{background:#FAF6F2;border-radius:15px;padding:23px;margin-top:20px;white-space:pre-line;line-height:2.3;font-size:13px;color:#725C4E}
+.note{font-size:12px;line-height:1.8}
+#message{font-size:13px;margin-top:15px}
+footer{text-align:center;color:#A28C7B;font-size:12px;padding:25px}
+@media(max-width:750px){main,.grid{grid-template-columns:1fr}.full{grid-column:auto}.hero h1{font-size:40px}.card{padding:25px}}
+</style>
+</head>
+<body>
+
+<header>
+<a href="index.html" class="logo">Cozy Bake</a>
+<a href="index.html">← Back to Home</a>
+</header>
+
+<section class="hero">
+<small>YOUR SWEET ESCAPE</small>
+<h1>Reserve a Table</h1>
+<div class="decor">✦ ♡ ✦</div>
+<p>A little sweetness, a little comfort, just for you.</p>
+</section>
+
+<main>
+<form class="card" id="reservationForm">
+<h2>Make a Reservation</h2>
+<p class="sub">We can't wait to welcome you to Cozy Bake ♡</p>
+
+<div class="section-title">01. Personal Details</div>
+<div class="grid">
+<div class="full">
+<label>FULL NAME</label>
+<input id="name" readonly placeholder="Auto-filled after login">
+</div>
+<div>
+<label>EMAIL ADDRESS</label>
+<input id="email" type="email" readonly placeholder="Auto-filled after login">
+</div>
+<div>
+<label>PHONE NUMBER *</label>
+<input id="phone" type="tel" required placeholder="0123456789" pattern="[0-9+\-\s]{9,15}">
+</div>
+</div>
+
+<div class="section-title">02. Reservation Details</div>
+<div class="grid">
+<div class="full">
+<label>SELECT OUTLET *</label>
+<select id="outlet" required>
+<option value="">Choose your outlet</option>
+<option>Kangar Jaya Mall Perlis</option>
+<option>Aman Central Kedah</option>
+<option>Queensbay Mall Penang</option>
+</select>
+</div>
+<div>
+<label>RESERVATION DATE *</label>
+<input type="date" id="date" required>
+</div>
+<div>
+<label>RESERVATION TIME *</label>
+<input type="time" id="time" required>
+</div>
+<div>
+<label>NUMBER OF GUESTS *</label>
+<input type="number" id="guests" min="1" max="6" value="2" required>
+</div>
+<div>
+<label>CHOOSE YOUR TABLE *</label>
+<select id="table" required>
+<option value="">Select a table</option>
+</select>
+</div>
+<div class="full">
+<label>SPECIAL REQUEST (OPTIONAL)</label>
+<textarea id="notes" placeholder="Birthday surprise, special occasion..."></textarea>
+</div>
+</div>
+
+<button type="submit">Confirm My Reservation</button>
+<p id="message" role="status"></p>
+</form>
+
+<aside class="card">
+<h2>Your Sweet Moment ♡</h2>
+<p class="sub">A little preview of your reservation.</p>
+<div class="summary" id="summary"></div>
+<p class="note">♡ Booking will be pending until confirmed by our team.</p>
+</aside>
+</main>
+
+<footer>Made with ♡ by Cozy Bake</footer>
+
+<script>
+const $=id=>document.getElementById(id);
+const form=$("reservationForm");
+
+//Tukar false kalau back end dah siap
+const DEMO_MODE=true;
+
+const names=[
+ "Window Side","Cozy Corner","Garden View","Sweet Corner","Café Window",
+ "Café Center","Floral Corner","Garden Lounge","Pastel Corner","Cozy Lounge",
+ "Family Corner","Family Lounge","Sweet Gathering","Celebration Table","Private Corner"
+];
+
+const seats=id=>Math.ceil(Number(id.slice(1))/5)*2;
+const read=()=>JSON.parse(localStorage.getItem("cozyBakeBookings")||"[]");
+const email=sessionStorage.getItem("cozyBakeCustomerEmail");
+const name=sessionStorage.getItem("cozyBakeCustomerName");
+
+// demo front end je
+if(DEMO_MODE){
+ if(!email)location.replace("login.html?redirect=reservation.html");
+ else{
+  $("name").value=name||"Customer";
+  $("email").value=email;
+ }
+}
+
+// php connect untuk login
+async function loadCustomer(){
+ if(DEMO_MODE)return;
+ try{
+  const res=await fetch("getcustomer.php",{credentials:"same-origin"});
+  const data=await res.json();
+  if(!res.ok||data.loggedIn!==true){
+   location.replace("login.html?redirect=reservation.html");
+   return;
+  }
+  const c=data.customer||data;
+  $("name").value=c.name||"";
+  $("email").value=c.email||"";
+  update();
+ }catch{
+  $("message").textContent="Unable to verify login.";
+ }
+}
+
+function getData(){
+ return {
+  type:"Dine-In",
+  name:$("name").value,
+  email:$("email").value,
+  phone:$("phone").value.trim(),
+  outlet:$("outlet").value,
+  date:$("date").value,
+  time:$("time").value,
+  guests:Number($("guests").value),
+  table:$("table").value,
+  notes:$("notes").value.trim()
+ };
+}
+
+function update(){
+ const d=getData();
+ $("summary").textContent=
+`♡ Name: ${d.name||"Auto-fill after login"}
+♡ Email: ${d.email||"Auto-fill after login"}
+♡ Outlet: ${d.outlet||"Not selected"}
+♡ Date: ${d.date||"Not selected"}
+♡ Time: ${d.time||"Not selected"}
+♡ Guests: ${d.guests}
+♡ Table: ${d.table||"Not selected"}
+♡ Request: ${d.notes||"None"}`;
+}
+
+// nak check available ke tak seat tu
+function booked(d,id){
+ return read().some(b=>
+  b.outlet===d.outlet&&b.date===d.date&&
+  b.time===d.time&&b.table===id&&b.status!=="Cancelled"
+ );
+}
+
+function filterTables(){
+ const d=getData(),select=$("table"),old=select.value;
+ select.innerHTML='<option value="">Select a table</option>';
+
+ names.forEach((name,i)=>{
+  const id="T"+(i+1),capacity=seats(id);
+  const unavailable=booked(d,id),small=capacity<d.guests;
+  const option=new Option(
+   `${id} — ${name} (${capacity} seats) — ${
+    unavailable?"Unavailable":small?"Too small":"Available"
+   }`,id
+  );
+  option.disabled=unavailable||small;
+  select.add(option);
+ });
+
+ if([...select.options].some(o=>o.value===old&&!o.disabled))
+  select.value=old;
+
+ update();
+}
+
+form.addEventListener("input",e=>{
+ ["outlet","date","time","guests"].includes(e.target.id)?filterTables():update();
+});
+form.addEventListener("change",e=>{
+ ["outlet","date","time","guests"].includes(e.target.id)?filterTables():update();
+});
+
+$("date").min=new Date(Date.now()-new Date().getTimezoneOffset()*60000)
+ .toISOString().slice(0,10);
+
+// CONFIRM RESERVATION
+form.addEventListener("submit",async e=>{
+ e.preventDefault();
+ const d=getData(),msg=$("message");
+ msg.textContent="";
+
+ if(!d.name||!d.email){
+  location.href="login.html?redirect=reservation.html";
+  return;
+ }
+ if(!d.table||seats(d.table)<d.guests||booked(d,d.table)){
+  msg.textContent="Please select an available table.";
+  return;
+ }
+ if(new Date(d.date+"T"+d.time)<=new Date()){
+  msg.textContent="Please choose a future date and time.";
+  return;
+ }
+
+ if(DEMO_MODE){
+  const bookings=read();
+  bookings.push({...d,id:"RES"+Date.now(),status:"Pending"});
+  localStorage.setItem("cozyBakeBookings",JSON.stringify(bookings));
+  location.href="customerdashboard.html#bookings";
+  return;
+ }
+
+ // php submit reservation ke databased
+ try{
+  const res=await fetch("reservation.php",{
+   method:"POST",
+   credentials:"same-origin",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify(d)
+  });
+  const result=await res.json();
+  if(!res.ok||result.success!==true)
+   throw Error(result.message||"Reservation failed");
+
+  location.href="customerdashboard.html#bookings";
+ }catch(err){
+  msg.textContent=err.message;
+ }
+});
+
+filterTables();
+loadCustomer();
+</script>
+</body>
+</html>

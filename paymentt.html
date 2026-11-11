@@ -1,0 +1,282 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cozy Bake | Payment</title>
+
+<style>
+:root{--cream:#FAF8F5;--brown:#3D281B;--accent:#B58D6D;--soft:#F1E7DF;--line:#E4D1C2;--muted:#806B5D}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--brown);font-family:Arial,sans-serif}
+button,input{font:inherit}
+button{cursor:pointer}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:22px 6%;background:white;border-bottom:1px solid var(--line)}
+.brand{font:bold 28px Georgia;color:var(--brown);text-decoration:none}
+.back{color:var(--muted);font-size:14px;text-decoration:none}
+.container{max-width:1150px;margin:auto;padding:40px 20px 70px}
+.heading{text-align:center;font:bold 48px Georgia;margin:10px 0}
+.subtitle{text-align:center;color:var(--muted);margin-bottom:30px}
+.steps{display:flex;justify-content:center;align-items:center;gap:12px;margin-bottom:35px;flex-wrap:wrap}
+.step{font-size:13px;color:#A18D7E}
+.step.done,.step.active{color:var(--brown);font-weight:bold}
+.step.active{background:var(--soft);padding:10px 16px;border-radius:25px}
+.arrow{color:var(--accent)}
+.layout{display:grid;grid-template-columns:1.3fr .9fr;gap:25px;align-items:start}
+.card{background:white;border-radius:20px;padding:28px;border:1px solid #F0E7E0;box-shadow:0 8px 25px #3D281B0A}
+.card h2{font:bold 23px Georgia;margin:0 0 12px}
+.description{font-size:14px;color:var(--muted);line-height:1.7}
+.methods{display:grid;gap:15px;margin-top:25px}
+.method{display:flex;align-items:center;gap:15px;border:1px solid var(--line);padding:20px;border-radius:14px;cursor:pointer}
+.method:has(input:checked){background:#FBF4EE;border:2px solid var(--accent);padding:19px}
+.method input{accent-color:var(--accent)}
+.method strong{display:block;margin-bottom:5px}
+.method small{color:var(--muted)}
+.payment-details{background:var(--cream);border-radius:15px;padding:25px;margin-top:25px}
+.qr-placeholder{width:210px;height:210px;margin:20px auto;border:3px dashed var(--accent);border-radius:12px;background:white;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.payment-qr{width:100%;height:100%;object-fit:contain}
+.cash-icon{font-size:55px;text-align:center}
+.cash-title{text-align:center;font-weight:bold;margin-top:10px}
+.cash-text{text-align:center;color:var(--muted);font-size:14px;line-height:1.7}
+.hidden{display:none}
+.summary{position:sticky;top:20px}
+.summary-item{display:flex;justify-content:space-between;gap:15px;padding:15px 0;border-bottom:1px solid var(--line);font-size:14px}
+.summary-item small{display:block;color:var(--muted);margin-top:6px;line-height:1.6}
+.summary-total{display:flex;justify-content:space-between;font-size:21px;font-weight:bold;margin:25px 0}
+.confirm-btn{width:100%;padding:17px;border:0;background:var(--accent);color:white;border-radius:12px;font-weight:bold}
+.confirm-btn:hover{background:#987356}
+.confirm-btn:disabled{opacity:.6;cursor:not-allowed}
+.secure-note{text-align:center;color:var(--muted);font-size:12px;line-height:1.7;margin-top:15px}
+.error{display:none;color:#A13E3E;font-size:13px;margin-top:15px}
+.error.show{display:block}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.summary{position:static}}
+@media(max-width:500px){.heading{font-size:36px}.card{padding:20px}.steps{gap:6px}.step{font-size:11px}}
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+<a href="index.html" class="brand">Cozy Bake</a>
+<a href="checkout.html" class="back">← Back to Checkout</a>
+</header>
+
+<main class="container">
+<h1 class="heading">Payment</h1>
+<p class="subtitle">Choose your preferred payment method.</p>
+
+<div class="steps">
+<span class="step done">✓ Cart</span><span class="arrow">→</span>
+<span class="step done">✓ Checkout</span><span class="arrow">→</span>
+<span class="step active">3 Payment</span><span class="arrow">→</span>
+<span class="step">4 Receipt</span>
+</div>
+
+<div class="layout">
+
+<section class="card">
+<h2>Choose Payment Method</h2>
+<p class="description">Select how you would like to pay for your delicious treats.</p>
+
+<div class="methods">
+<label class="method">
+<input type="radio" name="paymentMethod" value="QR Payment" checked>
+<span><strong>📱 QR Payment</strong><small>QR payment demonstration</small></span>
+</label>
+
+<label class="method">
+<input type="radio" name="paymentMethod" value="Cash at Counter">
+<span><strong>💵 Cash at Counter</strong><small>Pay when you arrive</small></span>
+</label>
+</div>
+
+<div id="qr-section" class="payment-details">
+<h2 style="text-align:center">QR Payment</h2>
+<p class="description" style="text-align:center">QR payment demonstration for Cozy Bake.</p>
+<div class="qr-placeholder">
+<img src="paymentqr.jpeg" alt="Cozy Bake QR Payment" class="payment-qr">
+</div>
+</div>
+
+<div id="cash-section" class="payment-details hidden">
+<div class="cash-icon">💵</div>
+<h3 class="cash-title">Pay at Counter</h3>
+<p class="cash-text">Your order will be placed with payment pending. Please pay at the selected Cozy Bake outlet when you arrive.</p>
+</div>
+</section>
+
+<aside class="card summary">
+<h2>Order Summary</h2>
+<div id="order-summary"></div>
+<div class="summary-total">
+<span>Total</span>
+<span id="payment-total">RM 0.00</span>
+</div>
+<button class="confirm-btn" id="confirm-btn" onclick="confirmOrder()">Confirm Order →</button>
+<p id="payment-error" class="error" role="alert"></p>
+<p class="secure-note">Demo payment only. No real payment will be processed on this page.</p>
+</aside>
+
+</div>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+const money=n=>"RM "+Number(n||0).toFixed(2);
+
+// PHP CONNECTION MODE
+const DEMO_MODE=false;
+
+// GET CHECKOUT INFORMATION
+let checkout=null;
+try{
+ checkout=JSON.parse(sessionStorage.getItem("cozyBakeCheckout")||"null");
+}catch{}
+
+// GET PRODUCTS DIRECTLY FROM CART / CHECKOUT
+const items=Array.isArray(checkout?.items)
+ ?checkout.items.filter(x=>
+  x&&typeof x.name==="string"&&
+  Number.isFinite(Number(x.price))&&Number(x.price)>=0&&
+  Number.isInteger(Number(x.quantity))&&Number(x.quantity)>0
+ ).map(x=>({...x,price:Number(x.price),quantity:Number(x.quantity)}))
+ :[];
+
+const total=items.reduce((sum,x)=>sum+x.price*x.quantity,0);
+
+// DISPLAY PRODUCTS
+function displaySummary(){
+ const box=$("order-summary");
+ box.replaceChildren();
+
+ if(!checkout||!items.length){
+  box.textContent="No checkout details found. Please return to checkout.";
+  $("confirm-btn").disabled=true;
+  return;
+ }
+
+ items.forEach(x=>{
+  const row=document.createElement("div");
+  row.className="summary-item";
+
+  const info=document.createElement("div");
+  const name=document.createElement("strong");
+  name.textContent=x.name;
+
+  const qty=document.createElement("small");
+  qty.textContent="Quantity: "+x.quantity;
+  info.append(name,qty);
+
+  // DISPLAY CUSTOM CAKE DETAILS
+  if(x.type==="customcake"){
+   const extra=document.createElement("small");
+   extra.textContent=[
+    x.size,x.flavour,x.shape,x.topping,
+    x.message?"Message: "+x.message:"",
+    x.location?"Pickup: "+x.location:"",
+    x.pickupDate?"Date: "+x.pickupDate:""
+   ].filter(Boolean).join(" | ");
+   info.append(extra);
+  }
+
+  const price=document.createElement("span");
+  price.textContent=money(x.price*x.quantity);
+
+  row.append(info,price);
+  box.append(row);
+ });
+
+ $("payment-total").textContent=money(total);
+}
+
+// PAYMENT METHOD
+function showPaymentMethod(){
+ const method=document.querySelector('input[name="paymentMethod"]:checked').value;
+ $("qr-section").classList.toggle("hidden",method!=="QR Payment");
+ $("cash-section").classList.toggle("hidden",method!=="Cash at Counter");
+}
+
+document.querySelectorAll('input[name="paymentMethod"]').forEach(input=>
+ input.addEventListener("change",showPaymentMethod)
+);
+
+//CALL PHP
+async function confirmOrder(){
+ if(!checkout||!items.length)return;
+
+ const button=$("confirm-btn");
+ const error=$("payment-error");
+ error.classList.remove("show");
+
+ const method=document.querySelector('input[name="paymentMethod"]:checked').value;
+
+ const data={
+  ...checkout,
+  items,
+  total:Number(total.toFixed(2)),
+  paymentMethod:method,
+  paymentStatus:method==="QR Payment"?"Pending Verification":"Pending Payment",
+  demoMode:DEMO_MODE,
+  submittedAt:new Date().toISOString()
+ };
+
+ button.disabled=true;
+ button.textContent="Processing...";
+
+ try{
+
+  if(DEMO_MODE){
+   data.orderId="DEMO-"+Date.now();
+  }else{
+
+   // =================================
+   // PHP CONNECTION: payment.php
+   // SEND ORDER DETAILS TO DATABASE
+   // =================================
+
+   const form=new FormData();
+   form.append("paymentData",JSON.stringify(data));
+
+   const res=await fetch("payment.php",{
+    method:"POST",
+    credentials:"same-origin",
+    body:form
+   });
+
+   const result=await res.json();
+
+   if(!res.ok||result.success!==true)
+    throw Error(result.message||"Payment submission failed");
+
+   // RECEIVE PHP RESPONSE
+   data.orderId=result.orderId;
+   data.receiptNo=result.receiptNo||null;
+   data.backendConfirmed=true;
+  }
+
+  // SAVE RECEIPT INFORMATION
+  sessionStorage.setItem("cozyBakeReceipt",JSON.stringify(data));
+
+  // CLEAR CART 
+  localStorage.removeItem("cozyBakeCart");
+  sessionStorage.removeItem("cozyBakeCheckout");
+
+ 
+  location.href="receiptt.html";
+
+ }catch(err){
+  console.error(err);
+  error.textContent=err.message||"Unable to submit order.";
+  error.classList.add("show");
+  button.disabled=false;
+  button.textContent="Confirm Order →";
+ }
+}
+
+displaySummary();
+showPaymentMethod();
+</script>
+
+</body>
+</html>
