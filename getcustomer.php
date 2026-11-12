@@ -1,24 +1,23 @@
-
 <?php
 session_start();
-header("Content-Type: application/json");
+header('Content-Type: application/json');
 
-if (
-    isset($_SESSION['user_id']) &&
-    ($_SESSION['role'] ?? '') === 'customer'
-) {
+if (!empty($_SESSION['user_email']) || !empty($_SESSION['customer_logged_in']) || !empty($_SESSION['user_id'])) {
+    $name = $_SESSION['user_name'] ?? $_SESSION['customer_name'] ?? 'Customer';
+    $email = $_SESSION['user_email'] ?? $_SESSION['customer_email'] ?? '';
+    $id = $_SESSION['customer_id'] ?? $_SESSION['user_id'] ?? 1;
+
     echo json_encode([
-        "loggedIn" => true,
-        "role" => "customer",
-        "customer" => [
-            "name" => $_SESSION['user_name'] ?? "",
-            "email" => $_SESSION['user_email'] ?? ""
-        ]
+        'loggedIn' => true,
+        'customer' => $name, // Digunakan oleh menu.html
+        'name' => $name,     // Digunakan oleh reservation.html
+        'email' => $email,
+        'customer_id' => $id,
+        'role' => $_SESSION['role'] ?? 'customer'
     ]);
 } else {
     echo json_encode([
-        "loggedIn" => false,
-        "role" => "guest"
+        'loggedIn' => false
     ]);
 }
 ?>
