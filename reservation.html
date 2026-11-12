@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,7 +6,7 @@
 <title>Cozy Bake | Reservation</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#FAF8F5;color:#3D281B;font-family:Arial}
+body{margin:0;background:#FAF8F5;color:#3D281B;font-family:Arial,sans-serif}
 header{background:white;padding:22px 7%;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #eee3da}
 a{color:#3D281B;text-decoration:none}
 .logo{font:bold 29px Georgia}
@@ -41,7 +40,10 @@ footer{text-align:center;color:#A28C7B;font-size:12px;padding:25px}
 
 <header>
 <a href="index.html" class="logo">Cozy Bake</a>
-<a href="index.html">← Back to Home</a>
+<div style="display:flex;gap:18px;">
+  <a href="custdashboard.html">👤 Dashboard</a>
+  <a href="index.html">← Back to Home</a>
+</div>
 </header>
 
 <section class="hero">
@@ -125,7 +127,6 @@ footer{text-align:center;color:#A28C7B;font-size:12px;padding:25px}
 const $=id=>document.getElementById(id);
 const form=$("reservationForm");
 
-//Tukar false kalau back end dah siap
 const DEMO_MODE=true;
 
 const names=[
@@ -136,35 +137,35 @@ const names=[
 
 const seats=id=>Math.ceil(Number(id.slice(1))/5)*2;
 const read=()=>JSON.parse(localStorage.getItem("cozyBakeBookings")||"[]");
-const email=sessionStorage.getItem("cozyBakeCustomerEmail");
-const name=sessionStorage.getItem("cozyBakeCustomerName");
+let email=sessionStorage.getItem("cozyBakeCustomerEmail") || localStorage.getItem("cozyBakeCustomerEmail");
+let name=sessionStorage.getItem("cozyBakeCustomerName") || localStorage.getItem("cozyBakeCustomerName");
 
-// demo front end je
-if(DEMO_MODE){
- if(!email)location.replace("login.html?redirect=reservation.html");
- else{
-  $("name").value=name||"Customer";
-  $("email").value=email;
- }
-}
-
-// php connect untuk login
 async function loadCustomer(){
- if(DEMO_MODE)return;
- try{
-  const res=await fetch("getcustomer.php",{credentials:"same-origin"});
-  const data=await res.json();
-  if(!res.ok||data.loggedIn!==true){
-   location.replace("login.html?redirect=reservation.html");
-   return;
+  if (email) {
+    $("name").value = name || email.split("@")[0];
+    $("email").value = email;
+    update();
   }
-  const c=data.customer||data;
-  $("name").value=c.name||"";
-  $("email").value=c.email||"";
-  update();
- }catch{
-  $("message").textContent="Unable to verify login.";
- }
+  try{
+    const res=await fetch("getcustomer.php",{credentials:"same-origin"});
+    if (res.ok) {
+      const data=await res.json();
+      if(data.loggedIn===true){
+        email = data.email || email;
+        name = data.name || data.customer || name;
+        $("name").value = name;
+        $("email").value = email;
+        sessionStorage.setItem("cozyBakeCustomerEmail", email);
+        sessionStorage.setItem("cozyBakeCustomerName", name);
+        update();
+        return;
+      }
+    }
+  }catch(e){}
+
+  if(!email){
+    location.replace("login.html?redirect=reservation.html");
+  }
 }
 
 function getData(){
@@ -195,7 +196,6 @@ function update(){
 ♡ Request: ${d.notes||"None"}`;
 }
 
-// nak check available ke tak seat tu
 function booked(d,id){
  return read().some(b=>
   b.outlet===d.outlet&&b.date===d.date&&
@@ -235,7 +235,6 @@ form.addEventListener("change",e=>{
 $("date").min=new Date(Date.now()-new Date().getTimezoneOffset()*60000)
  .toISOString().slice(0,10);
 
-// CONFIRM RESERVATION
 form.addEventListener("submit",async e=>{
  e.preventDefault();
  const d=getData(),msg=$("message");
@@ -254,30 +253,23 @@ form.addEventListener("submit",async e=>{
   return;
  }
 
- if(DEMO_MODE){
-  const bookings=read();
-  bookings.push({...d,id:"RES"+Date.now(),status:"Pending"});
-  localStorage.setItem("cozyBakeBookings",JSON.stringify(bookings));
-  location.href="customerdashboard.html#bookings";
-  return;
- }
+ // Simpan ke dalam localStorage supaya custdashboard.html boleh memaparkan tempahan
+ const bookings=read();
+ bookings.push({...d,id:"RES"+Date.now(),status:"Pending"});
+ localStorage.setItem("cozyBakeBookings",JSON.stringify(bookings));
 
- // php submit reservation ke databased
+ // Cuba hantar juga ke reservation.php jika wujud
  try{
-  const res=await fetch("reservation.php",{
+  await fetch("reservation.php",{
    method:"POST",
    credentials:"same-origin",
    headers:{"Content-Type":"application/json"},
    body:JSON.stringify(d)
   });
-  const result=await res.json();
-  if(!res.ok||result.success!==true)
-   throw Error(result.message||"Reservation failed");
+ }catch(err){}
 
-  location.href="customerdashboard.html#bookings";
- }catch(err){
-  msg.textContent=err.message;
- }
+ // Redirect ke custdashboard.html#bookings (bukan customerdashboard.html)
+ location.href="custdashboard.html#bookings";
 });
 
 filterTables();

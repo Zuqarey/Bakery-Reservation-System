@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,12 +14,13 @@
 --line:#E4D1C2;
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--brown);font-family:Arial}
+body{margin:0;background:var(--bg);color:var(--brown);font-family:Arial,sans-serif}
 button{cursor:pointer;font:inherit;border:0}
 
-.top{display:flex;justify-content:space-between;align-items:center;padding:25px 6%}
-.welcome{color:var(--accent);font-weight:bold}
-.cart-btn{background:var(--soft);padding:15px 25px;border-radius:15px;font-weight:bold}
+.top{display:flex;justify-content:space-between;align-items:center;padding:25px 6%;gap:15px}
+.welcome{color:var(--accent);font-weight:bold;text-decoration:none}
+.top-actions{display:flex;align-items:center;gap:12px}
+.cart-btn{background:var(--soft);padding:13px 22px;border-radius:15px;font-weight:bold;color:var(--brown);text-decoration:none}
 
 header{text-align:center;padding:35px 15px}
 header h1{font:normal clamp(42px,7vw,75px) Georgia;margin:15px}
@@ -107,10 +107,13 @@ border:1px solid var(--line);border-radius:10px
 <body>
 
 <div class="top">
-<strong class="welcome" id="welcome">Welcome to Cozy Bake!</strong>
-<button class="cart-btn" onclick="openModal('cart')">
-🛒 My Cart (<span id="count">0</span>)
-</button>
+  <a href="custdashboard.html" class="welcome" id="welcome">Welcome to Cozy Bake!</a>
+  <div class="top-actions">
+    <a href="custdashboard.html" class="cart-btn">👤 Dashboard</a>
+    <button class="cart-btn" onclick="openModal('cart')">
+      🛒 My Cart (<span id="count">0</span>)
+    </button>
+  </div>
 </div>
 
 <header>
@@ -205,20 +208,20 @@ Log in to continue, or create an account to save your orders, receipts and reser
 <button class="guest-link" onclick="closeModal()">Continue browsing as guest</button>
 </div>
 
-<form id="loginForm" class="form" action="login.php" method="POST" hidden>
+<form id="loginForm" class="form" action="login.php" method="POST" onsubmit="return handleInlineAuth(event, 'login')" hidden>
 <h3>Welcome Back!</h3>
 <p>Log in to your Cozy Bake account.</p>
-<input type="email" name="email" placeholder="Email address" required>
-<input type="password" name="password" placeholder="Password" required>
+<input type="email" id="inlineLoginEmail" name="email" placeholder="Email address" required>
+<input type="password" id="inlineLoginPass" name="password" placeholder="Password" required>
 <button class="btn" type="submit">LOG IN</button>
 <p><button type="button" onclick="panel('registerForm')">Create an account</button></p>
 </form>
 
-<form id="registerForm" class="form" action="signup.php" method="POST" hidden>
+<form id="registerForm" class="form" action="signup.php" method="POST" onsubmit="return handleInlineAuth(event, 'register')" hidden>
 <h3>Create an Account</h3>
-<input type="text" name="name" placeholder="Name" required>
-<input type="email" name="email" placeholder="Email address" required>
-<input type="password" name="password" placeholder="Create password" minlength="6" required>
+<input type="text" id="inlineRegName" name="name" placeholder="Name" required>
+<input type="email" id="inlineRegEmail" name="email" placeholder="Email address" required>
+<input type="password" id="inlineRegPass" name="password" placeholder="Create password" minlength="6" required>
 <button class="btn" type="submit">REGISTER</button>
 <p><button type="button" onclick="panel('loginForm')">Already have an account?</button></p>
 </form>
@@ -279,32 +282,86 @@ function panel(id){
 ["choice","loginForm","registerForm"].forEach(x=>$(x).hidden=x!==id);
 }
 
+// SEMAKAN LOG MASUK PINTAR (Semak variable customer ATAU sessionStorage/localStorage)
+function getStoredCustomer() {
+  const email = sessionStorage.getItem("cozyBakeCustomerEmail") || localStorage.getItem("cozyBakeCustomerEmail");
+  const name = sessionStorage.getItem("cozyBakeCustomerName") || localStorage.getItem("cozyBakeCustomerName");
+  if (email) {
+    return { loggedIn: true, customer: name || email.split("@")[0], email: email };
+  }
+  return null;
+}
+
 function needLogin(){
-if(customer)return false;
-closeModal();
-panel("choice");
-openModal("login");
-return true;
+  if (!customer) {
+    customer = getStoredCustomer();
+  }
+  if (customer) return false;
+  closeModal();
+  panel("choice");
+  openModal("login");
+  return true;
+}
+
+// Apabila pengguna log masuk terus dari popup dalam menu.html
+function handleInlineAuth(e, mode) {
+  const email = (mode === 'login' ? $("inlineLoginEmail").value : $("inlineRegEmail").value).trim().toLowerCase();
+  const nameInput = mode === 'register' ? $("inlineRegName").value.trim() : "";
+  const prefix = email.split("@")[0] || "Customer";
+  const displayName = nameInput || prefix;
+
+  sessionStorage.setItem("cozyBakeDemoLoggedIn", "true");
+  sessionStorage.setItem("cozyBakeCustomerName", displayName);
+  sessionStorage.setItem("cozyBakeCustomerEmail", email);
+  localStorage.setItem("cozyBakeDemoLoggedIn", "true");
+  localStorage.setItem("cozyBakeCustomerName", displayName);
+  localStorage.setItem("cozyBakeCustomerEmail", email);
+
+  customer = { loggedIn: true, customer: displayName, email: email };
+  $("welcome").textContent = "Welcome Back, " + displayName + "! 🤎";
+
+  // Jika dalam mod Go Live (tiada PHP), jangan reload ke login.php, terus tutup modal & benarkan beli!
+  if (window.location.port === "5500" || window.location.protocol === "file:") {
+    e.preventDefault();
+    if (prefix.includes("admin")) {
+      window.location.href = "admin.html";
+    } else if (prefix.includes("staff")) {
+      window.location.href = "staff_dashboard.html";
+    } else {
+      closeModal();
+    }
+    return false;
+  }
+  return true;
 }
 
 /* CUSTOMER SESSION */
 async function loadCustomer(){
-try{
-const r=await fetch("getcustomer.php",{
-credentials:"same-origin",
-cache:"no-store"
-});
-if(!r.ok)throw Error("Not logged in");
+  // 1. Semak sessionStorage / localStorage dahulu supaya pantas dan tidak gagal
+  const localCust = getStoredCustomer();
+  if (localCust) {
+    customer = localCust;
+    $("welcome").textContent = "Welcome Back, " + localCust.customer + "! 🤎";
+  }
 
-const d=await r.json();
-if(d.loggedIn){
-customer=d;
-$("welcome").textContent="Welcome Back, "+d.customer+"! 🤎";
-}
-}catch(e){
-customer=null;
-$("welcome").textContent="Welcome to Cozy Bake!";
-}
+  // 2. Semak juga getcustomer.php jika berada di XAMPP
+  try{
+    const r=await fetch("getcustomer.php",{
+      credentials:"same-origin",
+      cache:"no-store"
+    });
+    if(r.ok){
+      const d=await r.json();
+      if(d.loggedIn){
+        customer=d;
+        sessionStorage.setItem("cozyBakeCustomerName", d.customer);
+        if(d.email) sessionStorage.setItem("cozyBakeCustomerEmail", d.email);
+        $("welcome").textContent="Welcome Back, "+d.customer+"! 🤎";
+      }
+    }
+  }catch(e){
+    // Kekalkan localCust jika getcustomer.php gagal dihubungi
+  }
 }
 
 /* PHP CONNECTION */
@@ -320,7 +377,7 @@ if(!r.ok)throw Error("PHP error");
 const d=await r.json();
 if(!d.success)throw Error(d.message||"Failed");
 }catch(e){
-console.warn("PHP sync failed:",e);
+console.warn("PHP sync skipped:",e);
 }
 }
 

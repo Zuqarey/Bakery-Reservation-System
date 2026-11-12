@@ -331,69 +331,77 @@
     function showForm(mode) {
         currentMode = mode;
 
-        document.getElementById("welcomeScreen")
-            .classList.add("hidden");
+        document.getElementById("welcomeScreen").classList.add("hidden");
+        document.getElementById("formScreen").classList.remove("hidden");
 
-        document.getElementById("formScreen")
-            .classList.remove("hidden");
+        const register = (mode === "register");
 
-        const register = mode === "register";
+        document.getElementById("nameField").classList.toggle("hidden", !register);
+        const nameInput = document.getElementById("Name") || document.getElementById("fullName");
+        if (nameInput) nameInput.required = register;
 
-        document.getElementById("nameField")
-            .classList.toggle("hidden", !register);
+        document.getElementById("loginTab").classList.toggle("active", !register);
+        document.getElementById("registerTab").classList.toggle("active", register);
 
-        document.getElementById("fullName")
-            .required = register;
+        document.getElementById("formHeading").textContent = register
+            ? "Create your account"
+            : "Welcome in";
 
-        document.getElementById("loginTab")
-            .classList.toggle("active", !register);
-
-        document.getElementById("registerTab")
-            .classList.toggle("active", register);
-
-        document.getElementById("formHeading")
-            .textContent = register
-                ? "Create your account"
-                : "Welcome in";
-
-        document.getElementById("submitBtn")
-            .textContent = register
-                ? "CREATE ACCOUNT"
-                : "LOG IN";
+        document.getElementById("submitBtn").textContent = register
+            ? "CREATE ACCOUNT"
+            : "LOG IN";
     }
 
     function backToWelcome() {
-        document.getElementById("welcomeScreen")
-            .classList.remove("hidden");
-
-        document.getElementById("formScreen")
-            .classList.add("hidden");
+        document.getElementById("welcomeScreen").classList.remove("hidden");
+        document.getElementById("formScreen").classList.add("hidden");
     }
 
     function closeLogin() {
-        if (window.parent !== window &&
-            typeof window.parent.closeAccount === "function") {
+        if (window.parent !== window && typeof window.parent.closeAccount === "function") {
             window.parent.closeAccount();
         } else {
-            window.location.href = "index.html";
+            window.top.location.href = "index.html";
         }
     }
-function submitForm(event) {
-    const form = document.getElementById("accountForm");
 
-    form.action = (currentMode === "register")
-        ? "signup.php"
-        : "login.php";
+    function submitForm(event) {
+        const email = document.getElementById("email").value.trim().toLowerCase();
+        const nameInput = document.getElementById("Name");
+        const emailPrefix = email.split("@")[0] || "Customer";
+        const displayName = (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : emailPrefix;
 
-    const params = new URLSearchParams(window.location.search);
+        // Simpan ke sessionStorage supaya custdashboard.html mengenali pelanggan yang log masuk
+        sessionStorage.setItem("cozyBakeDemoLoggedIn", "true");
+        sessionStorage.setItem("cozyBakeCustomerName", displayName);
+        sessionStorage.setItem("cozyBakeCustomerEmail", email);
 
-    document.getElementById("loginRedirect").value =
-        params.get("redirect") === "reservation.html"
-            ? "reservation.html"
-            : "";
+        // Jika dibuka melalui Go Live (port 5500), terus redirect guna JavaScript
+        if (window.location.port === "5500" || window.location.protocol === "file:") {
+            if (event) event.preventDefault();
+            if (emailPrefix.includes("admin")) {
+                window.top.location.href = "admin.html";
+            } else if (emailPrefix.includes("staff")) {
+                window.top.location.href = "staff_dashboard.html";
+            } else {
+                const params = new URLSearchParams(window.location.search);
+                window.top.location.href = (params.get("redirect") === "reservation.html")
+                    ? "reservation.html"
+                    : "custdashboard.html";
+            }
+            return false;
+        }
 
-    return true;
-}
+        // Jika dibuka melalui XAMPP (localhost), hantar ke PHP
+        const form = document.getElementById("accountForm");
+        form.action = (currentMode === "register") ? "signup.php" : "login.php";
+
+        const params = new URLSearchParams(window.location.search);
+        document.getElementById("loginRedirect").value =
+            params.get("redirect") === "reservation.html" ? "reservation.html" : "";
+
+        return true;
+    }
 </script>
 
 </body>
