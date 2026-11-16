@@ -4,553 +4,409 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Cozy Bake | Our Menu</title>
-
 <style>
-:root{
---bg:#FAF8F5;
---brown:#3D281B;
---accent:#B58D6D;
---soft:#F1E7DF;
---line:#E4D1C2;
-}
+:root{--cream:#FAF8F5;--brown:#3D281B;--accent:#B58D6D;--soft:#F1E7DF;--line:#E4D1C2}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--brown);font-family:Arial,sans-serif}
-button{cursor:pointer;font:inherit;border:0}
-
-.top{display:flex;justify-content:space-between;align-items:center;padding:25px 6%;gap:15px}
-.welcome{color:var(--accent);font-weight:bold;text-decoration:none}
-.top-actions{display:flex;align-items:center;gap:12px}
-.cart-btn{background:var(--soft);padding:13px 22px;border-radius:15px;font-weight:bold;color:var(--brown);text-decoration:none}
-
-header{text-align:center;padding:35px 15px}
-header h1{font:normal clamp(42px,7vw,75px) Georgia;margin:15px}
+body{margin:0;background:var(--cream);color:var(--brown);font-family:Arial,sans-serif}
+button{font:inherit;cursor:pointer}
+.top{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:25px 6% 0}
+.welcome{color:var(--accent);font-weight:bold}
+.cart-btn{background:var(--soft);border:0;padding:15px 25px;border-radius:15px;font-weight:bold}
+header{text-align:center;padding:35px 20px}
+header h1{font:normal clamp(42px,7vw,75px) Georgia,serif;margin:15px}
 header p,.category{color:var(--accent)}
-
-.filters{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;background:var(--soft);padding:18px;margin:0 6%;border-radius:15px}
-.filters button{background:transparent;padding:12px 20px;border-radius:20px}
-.filters button.active,.filters button:hover{background:var(--accent);color:white}
-
-.products{display:grid;grid-template-columns:repeat(3,1fr);gap:25px;max-width:1250px;margin:auto;padding:40px 6%}
-.card{background:white;border-radius:18px;overflow:hidden;box-shadow:0 5px 20px #3d281b15}
-.image{height:230px;position:relative;cursor:pointer}
+.filters{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;background:var(--soft);padding:18px;margin:0 6% 35px;border-radius:15px}
+.filters button{border:0;background:transparent;padding:12px 25px;border-radius:25px}
+.filters .active,.filters button:hover{background:var(--accent);color:white}
+.products{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;max-width:1250px;margin:auto;padding:15px 6% 60px}
+.card{background:white;border-radius:20px;overflow:hidden;box-shadow:0 5px 20px #3d281b12}
+.image{height:240px;position:relative;cursor:pointer}
 .image img{width:100%;height:100%;object-fit:cover}
-.badge{position:absolute;top:12px;left:12px;background:var(--accent);color:white;padding:8px;border-radius:15px;font-size:11px}
-.details{padding:20px}
-.description{font-size:13px;color:#806B5D;line-height:1.6;min-height:55px}
-.actions{display:flex;gap:10px;margin-top:15px}
-.btn{background:var(--accent);color:white;padding:13px;border-radius:10px;font-weight:bold;flex:1}
+.badge{position:absolute;top:15px;left:15px;background:var(--accent);color:white;padding:8px 12px;border-radius:20px;font-size:11px}
+.details{padding:22px}
+.details h3{margin:0 0 12px}
+.description{color:#806B5D;font-size:13px;line-height:1.7;min-height:65px}
+.actions{display:flex;gap:10px}
+.btn{flex:1;border:0;border-radius:12px;padding:13px;font-weight:bold;background:var(--accent);color:white}
 .light{background:var(--soft);color:var(--brown)}
-.back{display:block;width:max-content;margin:20px auto 55px;padding:15px 25px;background:var(--brown);color:white;text-decoration:none;border-radius:25px}
-
-.modal{display:none;position:fixed;inset:0;background:#0009;z-index:1000;align-items:center;justify-content:center;padding:20px}
+.back{display:block;width:fit-content;margin:0 auto 55px;padding:15px 30px;background:var(--brown);color:white;text-decoration:none;border-radius:25px}
+.modal{display:none;position:fixed;inset:0;z-index:1000;background:#0009;justify-content:center;align-items:center;padding:20px}
 .modal.show{display:flex}
-.popup{background:white;border-radius:22px;padding:30px;width:100%;max-width:550px;max-height:90vh;overflow:auto;position:relative}
-.close{position:absolute;right:15px;top:12px;background:var(--soft);border-radius:50%;width:35px;height:35px;font-size:22px}
-
-#qimg{width:100%;height:230px;object-fit:cover;border-radius:12px}
-.qty,.cart-row,.total{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:15px 0}
-.qty button{background:var(--soft);padding:9px 15px;border-radius:8px}
+.popup{position:relative;background:white;border-radius:22px;padding:28px;width:100%;max-width:600px;max-height:90vh;overflow:auto}
+.close{position:absolute;top:15px;right:20px;border:0;border-radius:50%;width:35px;height:35px;font-size:23px}
+#quick-image{width:100%;height:260px;object-fit:cover;border-radius:15px}
+.quantity,.cart-row,.total{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:20px 0}
+.quantity button{background:var(--soft);border:0;border-radius:8px;padding:8px 15px}
 .cart-row{border-bottom:1px solid var(--line);padding:12px 0}
-.total{font-size:20px;font-weight:bold}
-
-/* LOGIN DESIGN */
-#login .popup{max-width:840px;padding:0;border-radius:23px;overflow:hidden;background:#FFFDFC}
-
-.login-head{
-background:linear-gradient(110deg,#91675A,#B78F81);
-padding:35px 44px;color:white;position:relative
-}
-.login-head small{font-size:14px;letter-spacing:5px;font-weight:bold}
-.login-head h2{font:normal 48px Georgia,serif;margin:18px 0 0}
-#login .close{
-top:25px;right:25px;width:50px;height:50px;
-background:transparent;border:1px solid white;color:white;font-size:28px
-}
-.login-body{text-align:center;padding:44px}
-.account-icon{
-width:100px;height:100px;background:#E6C9BD;
-border-radius:50%;display:grid;place-items:center;
-margin:0 auto 30px;font-size:45px
-}
-.eyebrow{color:#A9887D;letter-spacing:4px;font-size:13px;font-weight:bold}
-.login-body h3{font:normal 43px Georgia,serif;margin:25px 0}
-.login-body p{color:#A47E70;line-height:1.7}
-.login-actions{display:flex;gap:18px;margin:40px 0 30px}
-.login-actions button{flex:1;padding:20px;border-radius:10px;font-weight:bold}
-.login-actions .btn{background:#B18A7F;color:white}
-.login-actions .light{background:transparent;border:1px solid #DEC9BE;color:#3D281B}
-.guest-link{background:none;color:#A47E70;text-decoration:underline;margin-top:5px}
-
-.form{max-width:420px;margin:auto}
-.form input{
-display:block;width:100%;padding:15px;margin:12px 0;
-border:1px solid var(--line);border-radius:10px
-}
-.form .btn{width:100%}
-.form button:not(.btn){background:none;text-decoration:underline;color:var(--accent)}
-
+.cart-row h4{margin:0 0 8px}
+.cart-row p{color:var(--accent)}
+.total{font-size:21px;font-weight:bold}
+.remove{border:0;background:none;color:#B14F4F}
+.login-head{background:linear-gradient(110deg,#946659,#ba9181);color:white;padding:30px}
+.login-head h2{font:normal 36px Georgia,serif}
+.login-body{text-align:center;padding:35px}
+.login-body h3{font:normal 30px Georgia,serif}
+.login-body p{color:#a47e70;line-height:1.6}
+.login-form{max-width:420px;margin:auto}
+.login-form input{display:block;width:100%;padding:15px;margin:12px 0;border:1px solid var(--line);border-radius:10px}
+.login-form .btn{width:100%}
+.switch{border:0;background:none;color:var(--accent);text-decoration:underline}
 [hidden]{display:none!important}
-
-@media(max-width:850px){.products{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:600px){
-.products{grid-template-columns:1fr}
-.top{flex-wrap:wrap}
-.actions,.login-actions{flex-direction:column}
-.login-head{padding:30px 25px}
-.login-head h2{font-size:34px}
-.login-body{padding:35px 22px}
-.login-body h3{font-size:32px}
-}
+@media(max-width:900px){.products{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.products{grid-template-columns:1fr}.actions{flex-direction:column}.popup{padding:20px}.top{flex-wrap:wrap}}
 </style>
 </head>
-
 <body>
 
 <div class="top">
-  <a href="custdashboard.html" class="welcome" id="welcome">Welcome to Cozy Bake!</a>
-  <div class="top-actions">
-    <a href="custdashboard.html" class="cart-btn">👤 Dashboard</a>
+    <span class="welcome" id="welcome">Welcome to Cozy Bake!</span>
     <button class="cart-btn" onclick="openModal('cart')">
-      🛒 My Cart (<span id="count">0</span>)
+        🛒 My Cart (<span id="cart-count">0</span>)
     </button>
-  </div>
 </div>
 
 <header>
-<p>FRESHLY BAKED WITH LOVE</p>
-<h1>Our Menu</h1>
-<p>Discover your favourite sweet treats at Cozy Bake.</p>
+    <p>FRESHLY BAKED WITH LOVE</p>
+    <h1>Our Menu</h1>
+    <p>Discover your favourite sweet treats at Cozy Bake.</p>
 </header>
 
-<nav class="filters" id="filters"></nav>
-<div style="text-align:center; margin:20px auto;">
-    <input
-        type="text"
-        id="searchInput"
-        placeholder="🔍 Search your favourite treats..."
-        oninput="searchProducts()"
-        style="
-            width:80%;
-            max-width:500px;
-            padding:15px 20px;
-            border:1px solid #E4D1C2;
-            border-radius:25px;
-            font-size:15px;
-            outline:none;
-            background:white;
-            color:#3D281B;
-        "
-    >
-</div>
+<nav class="filters">
+    <button class="active" onclick="filterProducts('All',this)">All</button>
+    <button onclick="filterProducts('Cakes',this)">Cakes</button>
+    <button onclick="filterProducts('Pastries',this)">Pastries</button>
+    <button onclick="filterProducts('Cookies',this)">Cookies</button>
+   <button onclick="filterProducts('Best Seller',this)">Best Seller</button>
+    <button onclick="filterProducts('Special',this)">Special</button>
+</nav>
 
 <div class="products" id="products"></div>
-
-<a class="back" href="index.html">← Return to Home</a>
+<a href="index.html" class="back">← Return to Home</a>
 
 <!-- QUICK VIEW -->
-<div class="modal" id="quick">
-<div class="popup">
-<button class="close" onclick="closeModal()">×</button>
-<img id="qimg" alt="Product">
-<h2 id="qname"></h2>
-<p id="qdesc"></p>
-<p id="qcat"></p>
-<h3 id="qprice"></h3>
-<div class="qty">
-<strong>Quantity:</strong>
-<button onclick="changeQuick(-1)">−</button>
-<span id="qnum">1</span>
-<button onclick="changeQuick(1)">+</button>
-</div>
-<button class="btn" id="qadd" onclick="addQuick()">Add to Cart</button>
-</div>
+<div class="modal" id="quick" onclick="if(event.target===this)closeModal()">
+    <div class="popup">
+        <button class="close" onclick="closeModal()">×</button>
+        <img id="quick-image" alt="Product">
+        <h2 id="quick-name"></h2>
+        <p id="quick-category"></p>
+        <p id="quick-description"></p>
+        <h3 id="quick-price"></h3>
+        <div class="quantity">
+            <strong>Quantity:</strong>
+            <button onclick="changeQuick(-1)">−</button>
+            <span id="quick-qty">1</span>
+            <button onclick="changeQuick(1)">+</button>
+        </div>
+        <button class="btn" id="quick-add" onclick="addQuick()">🛒 Add to Cart</button>
+    </div>
 </div>
 
 <!-- CART -->
-<div class="modal" id="cart">
-<div class="popup">
-<button class="close" onclick="closeModal()">×</button>
-<h2>🛒 Your Shopping Cart</h2>
-<div id="items"></div>
-<div class="total">Total: <span id="total">RM 0.00</span></div>
-<button class="btn" style="width:100%" onclick="checkout()">Proceed to Checkout</button>
-</div>
-</div>
-
-<!-- LOGIN / REGISTER -->
-<div class="modal" id="login">
-<div class="popup">
-
-<div class="login-head">
-<small>COZY BAKE</small>
-<h2>Your Cozy Bake Account</h2>
-<button class="close" onclick="closeModal()">×</button>
+<div class="modal" id="cart" onclick="if(event.target===this)closeModal()">
+    <div class="popup">
+        <button class="close" onclick="closeModal()">×</button>
+        <h2>🛒 Your Shopping Cart</h2>
+        <div id="cart-items"></div>
+        <div class="total">
+            <span>Total:</span><span id="cart-total">RM 0.00</span>
+        </div>
+        <button class="btn" style="width:100%" onclick="checkout()">
+            Proceed to Checkout
+        </button>
+    </div>
 </div>
 
-<div class="login-body">
+<!-- LOGIN -->
+<div class="modal" id="login" onclick="if(event.target===this)closeModal()">
+    <div class="popup" style="padding:0;max-width:840px">
+        <div class="login-head">
+            <button class="close" onclick="closeModal()">×</button>
+            <small>COZY BAKE</small>
+            <h2>Your Cozy Bake Account</h2>
+        </div>
 
-<div id="choice">
-<div class="account-icon">👤</div>
+        <div class="login-body">
+            <div id="choice">
+                <div style="font-size:55px">👤</div>
+                <p>BEFORE WE GET STARTED</p>
+                <h3>Already have an account?</h3>
+                <p>Log in to continue, or create an account to save your orders.</p>
+                <div class="actions">
+                    <button class="btn" onclick="showPanel('login-form')">YES, LOG IN</button>
+                    <button class="btn light" onclick="showPanel('register-form')">NO, REGISTER</button>
+                </div>
+                <p><button class="switch" onclick="closeModal()">Continue browsing as guest</button></p>
+            </div>
 
-<div class="eyebrow">BEFORE WE GET STARTED</div>
+            <div id="login-form" hidden>
+                <h3>Welcome Back!</h3>
+                <p>Log in to your Cozy Bake account.</p>
+                <form class="login-form" method="POST" action="login.php">
+                    <input type="email" name="email" placeholder="Email address" required>
+                    <input type="password" name="password" placeholder="Password" required>
+                    <button class="btn" type="submit">LOG IN</button>
+                </form>
+                <p><button class="switch" onclick="showPanel('register-form')">Create an account</button></p>
+            </div>
 
-<h3>Already have an account?</h3>
-
-<p>
-Log in to continue, or create an account to save your orders, receipts and reservations.
-</p>
-
-<div class="login-actions">
-<button class="btn" onclick="panel('loginForm')">YES, LOG IN</button>
-<button class="light" onclick="panel('registerForm')">NO, REGISTER</button>
-</div>
-
-<button class="guest-link" onclick="closeModal()">Continue browsing as guest</button>
-</div>
-
-<form id="loginForm" class="form" action="login.php" method="POST" onsubmit="return handleInlineAuth(event, 'login')" hidden>
-<h3>Welcome Back!</h3>
-<p>Log in to your Cozy Bake account.</p>
-<input type="email" id="inlineLoginEmail" name="email" placeholder="Email address" required>
-<input type="password" id="inlineLoginPass" name="password" placeholder="Password" required>
-<button class="btn" type="submit">LOG IN</button>
-<p><button type="button" onclick="panel('registerForm')">Create an account</button></p>
-</form>
-
-<form id="registerForm" class="form" action="signup.php" method="POST" onsubmit="return handleInlineAuth(event, 'register')" hidden>
-<h3>Create an Account</h3>
-<input type="text" id="inlineRegName" name="name" placeholder="Name" required>
-<input type="email" id="inlineRegEmail" name="email" placeholder="Email address" required>
-<input type="password" id="inlineRegPass" name="password" placeholder="Create password" minlength="6" required>
-<button class="btn" type="submit">REGISTER</button>
-<p><button type="button" onclick="panel('loginForm')">Already have an account?</button></p>
-</form>
-
-</div>
-</div>
+            <div id="register-form" hidden>
+                <h3>Create an Account</h3>
+                <form class="login-form" method="POST" action="signup.php">
+                    <input type="text" name="name" placeholder="Full name" required>
+                    <input type="email" name="email" placeholder="Email address" required>
+                    <input type="password" name="password" placeholder="Create password" minlength="6" required>
+                    <button class="btn" type="submit">REGISTER</button>
+                </form>
+                <p><button class="switch" onclick="showPanel('login-form')">Already have an account?</button></p>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
 const $=id=>document.getElementById(id);
-const rm=n=>"RM "+Number(n).toFixed(2);
+const money=n=>"RM "+Number(n).toFixed(2);
+let cart=[],customer=null,selected=0,quickQty=1;
 
-const products=[
-["Strawberry Cloud Cake",58.90,"Cakes","strawberrycloudcake.jpg"],
-["Morning Croissant",8.90,"Pastries","morningcroissant.jpg"],
-["Macaron",18.90,"Pastries","macaron.jpg"],
-["Creampuff Strawberry",15.50,"Pastries","creampuff.jpg"],
-["Strawberry Cheese Cake",79.90,"Cakes","strawberrycheesecake.jpg"],
-["Cheesy Kunafa Pistachio",16.90,"Pastries","kunafa.jpg"],
-["Chocolate Chip Cookies",6.90,"Cookies","chocolatechip.jpg"],
-["Redvelvet Cookies",7.90,"Cookies","redvelvet.jpg"],
-["Dark Chocolate Cookies",7.90,"Cookies","darkchocolate.jpg"],
-["Blueberry Cookies",7.90,"Cookies","blueberry.jpg"],
+try {
+    cart=JSON.parse(localStorage.getItem("cozyBakeCart")||"[]");
+    if(!Array.isArray(cart))cart=[];
+} catch {cart=[];}
 
-["Harumanis Mango Cake",65.90,"Special","harumaniscake.jpg","Perlis"],
-["Harumanis Cream Puff",16.90,"Special","harumanisc.jpg","Perlis"],
-["Kaya Butter Croissant",12.90,"Special","kayacroissant.jpg","Perlis"],
-["Pineapple Cake",69.90,"Special","pineapple.jpg","Kedah"],
-["Ube Chiffon Cake",55.90,"Special","ubeciffon.jpg","Kedah"],
-["Pandan Coconut Cookies",9.90,"Special","onde.jpg","Kedah"],
-["Dragon Cake",70.90,"Special","dragon.jpg","Penang"],
-["Durian Cake",79.90,"Special","duriancake.jpg","Penang"],
-["Cendol Cheesecake",65.90,"Special","pandancake.jpg","Penang"],
-["Salted Caramel Brownies",7.90,"Special","caramel.jpg","Penang"],
-["Lemon Blueberry Cake",74.90,"Special","lemonblueberry.jpg","Penang"]
-];
+//Ni sambung ke PHP
+async function loadCustomer(){
+    try {
+        const response=await fetch("getcustomer.php",{
+            credentials:"same-origin",
+            cache:"no-store"
+        });
+        if(!response.ok)throw Error("Not logged in");
 
-let cart=[];
-let customer=null;
-let selected=0;
-let quickQty=1;
-
-try{
-cart=JSON.parse(localStorage.getItem("cozyBakeCart")||"[]");
-if(!Array.isArray(cart))cart=[];
-}catch{cart=[]}
+        const data=await response.json();
+        if(data.loggedIn===true){
+            customer=data;
+            $("welcome").textContent="Welcome Back, "+data.name+"! 🤎";
+            sessionStorage.setItem("cozyBakeCustomerName",data.name);
+            sessionStorage.setItem("cozyBakeCustomerEmail",data.email);
+        }
+    } catch(error){
+        customer=null;
+        $("welcome").textContent="Welcome to Cozy Bake!";
+        sessionStorage.removeItem("cozyBakeCustomerName");
+        sessionStorage.removeItem("cozyBakeCustomerEmail");
+    }
+}
 
 function openModal(id){
-if(id==="cart")renderCart();
-$(id).classList.add("show");
+    if(id==="cart")renderCart();
+    $(id).classList.add("show");
 }
-
 function closeModal(){
-document.querySelectorAll(".modal").forEach(x=>x.classList.remove("show"));
+    document.querySelectorAll(".modal").forEach(m=>m.classList.remove("show"));
+}
+function showPanel(id){
+    ["choice","login-form","register-form"].forEach(x=>$(x).hidden=x!==id);
+}
+function requestLogin(){
+    if(customer)return false;
+    closeModal();
+    showPanel("choice");
+    openModal("login");
+    return true;
 }
 
-function panel(id){
-["choice","loginForm","registerForm"].forEach(x=>$(x).hidden=x!==id);
-}
-
-// SEMAKAN LOG MASUK PINTAR (Semak variable customer ATAU sessionStorage/localStorage)
-function getStoredCustomer() {
-  const email = sessionStorage.getItem("cozyBakeCustomerEmail") || localStorage.getItem("cozyBakeCustomerEmail");
-  const name = sessionStorage.getItem("cozyBakeCustomerName") || localStorage.getItem("cozyBakeCustomerName");
-  if (email) {
-    return { loggedIn: true, customer: name || email.split("@")[0], email: email };
-  }
-  return null;
-}
-
-function needLogin(){
-  if (!customer) {
-    customer = getStoredCustomer();
-  }
-  if (customer) return false;
-  closeModal();
-  panel("choice");
-  openModal("login");
-  return true;
-}
-
-// Apabila pengguna log masuk terus dari popup dalam menu.html
-function handleInlineAuth(e, mode) {
-  const email = (mode === 'login' ? $("inlineLoginEmail").value : $("inlineRegEmail").value).trim().toLowerCase();
-  const nameInput = mode === 'register' ? $("inlineRegName").value.trim() : "";
-  const prefix = email.split("@")[0] || "Customer";
-  const displayName = nameInput || prefix;
-
-  sessionStorage.setItem("cozyBakeDemoLoggedIn", "true");
-  sessionStorage.setItem("cozyBakeCustomerName", displayName);
-  sessionStorage.setItem("cozyBakeCustomerEmail", email);
-  localStorage.setItem("cozyBakeDemoLoggedIn", "true");
-  localStorage.setItem("cozyBakeCustomerName", displayName);
-  localStorage.setItem("cozyBakeCustomerEmail", email);
-
-  customer = { loggedIn: true, customer: displayName, email: email };
-  $("welcome").textContent = "Welcome Back, " + displayName + "! 🤎";
-
-  // Jika dalam mod Go Live (tiada PHP), jangan reload ke login.php, terus tutup modal & benarkan beli!
-  if (window.location.port === "5500" || window.location.protocol === "file:") {
-    e.preventDefault();
-    if (prefix.includes("admin")) {
-      window.location.href = "admin.html";
-    } else if (prefix.includes("staff")) {
-      window.location.href = "staff_dashboard.html";
-    } else {
-      closeModal();
-    }
-    return false;
-  }
-  return true;
-}
-
-/* CUSTOMER SESSION */
-async function loadCustomer(){
-  // 1. Semak sessionStorage / localStorage dahulu supaya pantas dan tidak gagal
-  const localCust = getStoredCustomer();
-  if (localCust) {
-    customer = localCust;
-    $("welcome").textContent = "Welcome Back, " + localCust.customer + "! 🤎";
-  }
-
-  // 2. Semak juga getcustomer.php jika berada di XAMPP
-  try{
-    const r=await fetch("getcustomer.php",{
-      credentials:"same-origin",
-      cache:"no-store"
-    });
-    if(r.ok){
-      const d=await r.json();
-      if(d.loggedIn){
-        customer=d;
-        sessionStorage.setItem("cozyBakeCustomerName", d.customer);
-        if(d.email) sessionStorage.setItem("cozyBakeCustomerEmail", d.email);
-        $("welcome").textContent="Welcome Back, "+d.customer+"! 🤎";
-      }
-    }
-  }catch(e){
-    // Kekalkan localCust jika getcustomer.php gagal dihubungi
-  }
-}
-
-/* PHP CONNECTION */
+/* PHP CART */
 async function syncPHP(file,data){
-try{
-const r=await fetch(file,{
-method:"POST",
-credentials:"same-origin",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify(data)
-});
-if(!r.ok)throw Error("PHP error");
-const d=await r.json();
-if(!d.success)throw Error(d.message||"Failed");
-}catch(e){
-console.warn("PHP sync skipped:",e);
-}
+    try{
+        const r=await fetch(file,{
+            method:"POST",credentials:"same-origin",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify(data)
+        });
+        if(!r.ok)throw Error("PHP error");
+        const result=await r.json();
+        if(!result.success)throw Error(result.message||"Failed");
+    }catch(e){console.warn("PHP sync unavailable:",e);}
 }
 
 /* CART */
+//Sambung ke PHP 
 function saveCart(){
-localStorage.setItem("cozyBakeCart",JSON.stringify(cart));
-$("count").textContent=cart.reduce((a,b)=>a+b.quantity,0);
-renderCart();
+    localStorage.setItem("cozyBakeCart",JSON.stringify(cart));
+    $("cart-count").textContent=cart.reduce((n,x)=>n+x.quantity,0);
+    renderCart();
 }
 
-function addToCart(i,qty=1){
-if(needLogin())return;
+function addToCart(name,qty=1){
+    const p=products.find(x=>x[0]===name);
+    if(!p)return;
+    if(requestLogin())return;
 
-const p=products[i];
-const item=cart.find(x=>x.name===p[0]);
+    const item=cart.find(x=>x.name===name);
+    if(item)item.quantity+=qty;
+    else cart.push({name,price:p[1],quantity:qty});
 
-if(item)item.quantity+=qty;
-else cart.push({
-    name:p[0],
-    price:p[1],
-    quantity:qty,
-    state:p[4] || null
-});
-
-saveCart();
-closeModal();
-openModal("cart");
-
-syncPHP("addtocart.php",{
-name:p[0],price:p[1],quantity:qty
-});
+    saveCart();
+    closeModal();
+    openModal("cart");
+    syncPHP("addtocart.php",{name,price:p[1],quantity:qty});
 }
 
 function changeCart(i,n){
-const x=cart[i];
-if(!x)return;
-
-x.quantity+=n;
-if(x.quantity<=0)return removeCart(i);
-
-saveCart();
-syncPHP("updatecart.php",{name:x.name,quantity:x.quantity});
+    const item=cart[i];
+    if(!item)return;
+    item.quantity+=n;
+    if(item.quantity<=0)return removeCart(i);
+    saveCart();
+    syncPHP("updatecart.php",{name:item.name,quantity:item.quantity});
 }
 
 function removeCart(i){
-const [x]=cart.splice(i,1);
-if(!x)return;
-
-saveCart();
-syncPHP("removecart.php",{name:x.name});
+    const [item]=cart.splice(i,1);
+    if(!item)return;
+    saveCart();
+    syncPHP("removecart.php",{name:item.name});
 }
 
 function renderCart(){
-$("items").innerHTML=cart.length?cart.map((x,i)=>`
-<div class="cart-row">
-<div>
-<strong>${x.name}</strong>
-<p>${rm(x.price)} each</p>
-<button onclick="removeCart(${i})">Remove</button>
-</div>
-<div class="qty">
-<button onclick="changeCart(${i},-1)">−</button>
-${x.quantity}
-<button onclick="changeCart(${i},1)">+</button>
-</div>
-</div>`).join(""):"Your cart is empty.";
+    const holder=$("cart-items");
+    holder.replaceChildren();
+    let total=0;
 
-$("total").textContent=rm(cart.reduce((s,x)=>s+x.price*x.quantity,0));
-}
+    if(!cart.length)holder.textContent="Your cart is empty.";
 
-function searchProducts() {
-    const search = document.getElementById("searchInput")
-        .value.toLowerCase().trim();
+    cart.forEach((item,i)=>{
+        total+=item.price*item.quantity;
+        const row=document.createElement("div");
+        row.className="cart-row";
 
-    document.querySelectorAll(".card").forEach(card => {
-        const name = card.querySelector("h3").textContent.toLowerCase();
+        const info=document.createElement("div");
+        const name=document.createElement("h4");
+        name.textContent=item.name;
+        const price=document.createElement("p");
+        price.textContent=money(item.price)+" each";
+        const remove=document.createElement("button");
+        remove.className="remove";
+        remove.textContent="Remove";
+        remove.onclick=()=>removeCart(i);
+        info.append(name,price,remove);
 
-        card.style.display = name.includes(search) ? "block" : "none";
+        const controls=document.createElement("div");
+        controls.className="quantity";
+
+        const minus=document.createElement("button");
+        minus.textContent="−";
+        minus.onclick=()=>changeCart(i,-1);
+        const qty=document.createElement("span");
+        qty.textContent=item.quantity;
+        const plus=document.createElement("button");
+        plus.textContent="+";
+        plus.onclick=()=>changeCart(i,1);
+
+        controls.append(minus,qty,plus);
+        row.append(info,controls);
+        holder.append(row);
     });
+
+    $("cart-total").textContent=money(total);
 }
 
 function checkout(){
-if(!cart.length)return alert("Your cart is empty.");
-if(needLogin())return;
-location.href="checkoutt.html";
+    if(!cart.length)return alert("Your cart is empty.");
+    if(requestLogin())return;
+    location.href="checkoutt.html";
 }
 
-/* DISPLAY PRODUCTS */
+/* PRODUCTS */
 function displayProducts(){
-$("products").innerHTML=products.map((p,i)=>`
-<div class="card" data-cat="${p[2]}" data-best="${i===0}">
-<div class="image" onclick="quickView(${i})">
-<img src="${p[3]}" alt="${p[0]}">
-${i===0?'<span class="badge">BEST SELLER</span>':""}
-</div>
-<div class="details">
-<h3>${p[0]}</h3>
-<p class="description">${p[4]?"Exclusively available at "+p[4]+" Branch.":"Freshly baked with love at Cozy Bake."}</p>
-<p class="category">${p[2]}</p>
-<h3>${rm(p[1])}</h3>
-<div class="actions">
-<button class="btn light" onclick="quickView(${i})">👁 Quick View</button>
-<button class="btn" onclick="addToCart(${i})">🛒 Add to Cart</button>
-</div>
-</div>
-</div>`).join("");
+    const holder=$("products");
+
+    products.forEach((p,i)=>{
+        const card=document.createElement("div");
+        card.className="card";
+        card.dataset.category=p[2];
+
+        card.innerHTML=`
+        <div class="image">
+            <img src="${p[3]}" alt="${p[0]}">
+            ${i===0?'<span class="badge">BEST SELLER</span>':""}
+        </div>
+        <div class="details">
+            <h3>${p[0]}</h3>
+            <p class="description">${p[4]}</p>
+            <p class="category">${p[2]}</p>
+            <h4>${money(p[1])}</h4>
+            <div class="actions">
+                <button class="btn light">👁 Quick View</button>
+                <button class="btn add">🛒 Add to Cart</button>
+            </div>
+        </div>`;
+
+        card.querySelector(".image").onclick=()=>quickView(i);
+        card.querySelector(".light").onclick=()=>quickView(i);
+        card.querySelector(".add").onclick=()=>addToCart(p[0]);
+        holder.append(card);
+    });
 }
 
-/* FILTER */
-const categories=["All","Cakes","Pastries","Cookies","Best Seller","Special"];
 
-$("filters").innerHTML=categories.map((x,i)=>
-`<button class="${i===0?"active":""}" onclick="filterProducts('${x}',this)">${x}</button>`
-).join("");
+function filterProducts(category,btn){
+    document.querySelectorAll(".filters button").forEach(b=>{
+        b.classList.remove("active");
+    });
 
-function filterProducts(cat,btn){
-document.querySelectorAll(".filters button").forEach(b=>b.classList.remove("active"));
-btn.classList.add("active");
+    btn.classList.add("active");
 
-document.querySelectorAll(".card").forEach(c=>{
-c.style.display=
-cat==="All"||
-c.dataset.cat===cat||
-(cat==="Best Seller"&&c.dataset.best==="true")
-?"block":"none";
-});
+    document.querySelectorAll(".card").forEach((card,i)=>{
+        const product=products[i];
+
+        const show=
+            category==="All" ||
+            (category==="Best Seller" && i===0) ||
+            product[2]===category;
+
+        card.style.display=show?"block":"none";
+    });
 }
+
 
 /* QUICK VIEW */
 function quickView(i){
-selected=i;
-quickQty=1;
-const p=products[i];
-
-$("qimg").src=p[3];
-$("qname").textContent=p[0];
-$("qcat").textContent=p[2];
-$("qdesc").textContent=p[4]?"Available at "+p[4]+" Branch.":"Freshly baked with love.";
-
-updateQuick();
-openModal("quick");
+    selected=i;
+    quickQty=1;
+    const p=products[i];
+    $("quick-image").src=p[3];
+    $("quick-name").textContent=p[0];
+    $("quick-category").textContent=p[2];
+    $("quick-description").textContent=p[4];
+    updateQuick();
+    openModal("quick");
 }
 
 function updateQuick(){
-const p=products[selected];
-$("qnum").textContent=quickQty;
-$("qprice").textContent=rm(p[1])+" each";
-$("qadd").textContent="🛒 Add to Cart — "+rm(p[1]*quickQty);
+    const p=products[selected];
+    $("quick-qty").textContent=quickQty;
+    $("quick-price").textContent=money(p[1])+" each";
+    $("quick-add").textContent="🛒 Add to Cart — "+money(p[1]*quickQty);
 }
 
 function changeQuick(n){
-quickQty=Math.max(1,quickQty+n);
-updateQuick();
+    quickQty=Math.max(1,quickQty+n);
+    updateQuick();
 }
 
 function addQuick(){
-addToCart(selected,quickQty);
+    addToCart(products[selected][0],quickQty);
 }
 
-document.querySelectorAll(".modal").forEach(m=>{
-m.addEventListener("click",e=>{
-if(e.target===m)closeModal();
-});
-});
-
 document.addEventListener("keydown",e=>{
-if(e.key==="Escape")closeModal();
+    if(e.key==="Escape")closeModal();
 });
 
 displayProducts();
 saveCart();
 loadCustomer();
 </script>
-
 </body>
 </html>
