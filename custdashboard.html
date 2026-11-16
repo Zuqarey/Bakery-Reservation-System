@@ -1,297 +1,327 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Cozy Bake | Customer Dashboard</title>
+<title>Cozy Bake | Customer Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;600;700&family=Oswald:wght@500;600&family=Pacifico&display=swap" rel="stylesheet">
+
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#f4e9de;color:#392016;font-family:Arial,sans-serif}
+:root{--bg:#F5EDE3;--white:#fff;--header:#FDFBF7;--brown:#5C2C16;--dark:#3E1C0C;--caramel:#B58E6B;--orange:#EB9E55;--text:#2C1A11;--muted:#8C7A6B;--border:#EFE6DC;--shadow:0 6px 20px rgba(92,44,22,.05)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh}
+button{font-family:inherit;cursor:pointer}
 
-/* Sidebar Auto-Expand Bila Hover */
-.sidebar{
-  position:fixed;
-  top:0;
-  left:0;
-  width:80px;
-  height:100vh;
-  background:repeating-linear-gradient(0deg,#63351f,#63351f 9px,#4f2819 12px);
-  display:flex;
-  flex-direction:column;
-  align-items:stretch;
-  padding:25px 14px;
-  gap:16px;
-  z-index:30;
-  transition:width 0.3s ease;
-  overflow:hidden;
-  white-space:nowrap;
-}
-.sidebar:hover{
-  width:220px;
-  box-shadow:6px 0 24px rgba(0,0,0,0.2);
-}
-.brand-logo{
-  color:white;
-  font-size:30px;
-  margin-bottom:35px;
-  display:flex;
-  align-items:center;
-  gap:14px;
-  padding:0 10px;
-}
-.brand-text{
-  font-family:Georgia,serif;
-  font-size:20px;
-  font-weight:bold;
-  opacity:0;
-  transition:opacity 0.2s ease;
-}
-.sidebar button{
-  background:none;
-  border:0;
-  color:white;
-  font-size:22px;
-  cursor:pointer;
-  padding:12px;
-  border-radius:12px;
-  display:flex;
-  align-items:center;
-  gap:14px;
-  text-align:left;
-}
-.sidebar button.active,.sidebar button:hover{background:#ffffff30}
-.nav-label{
-  font-size:15px;
-  font-weight:bold;
-  opacity:0;
-  transition:opacity 0.2s ease;
-}
-.sidebar:hover .nav-label,
-.sidebar:hover .brand-text{
-  opacity:1;
-}
-.bottom{margin-top:auto}
+/* SIDEBAR */
+.sidebar{width:68px;background:linear-gradient(180deg,#5A351D,#432512 50%,#5A351D);color:#F5EDE3;position:fixed;inset:0 auto 0 0;padding:20px 12px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;z-index:100;transition:width .28s;box-shadow:4px 0 24px #0003}
+.sidebar:hover{width:230px}
+.brand-row{display:flex;align-items:center;gap:14px;padding:6px 10px;white-space:nowrap}
+.brand-icon{min-width:24px}
+.brand-text,.portal-info,.nav-label{opacity:0;transition:.2s}
+.sidebar:hover .brand-text,.sidebar:hover .portal-info,.sidebar:hover .nav-label{opacity:1}
+.portal-info{padding:16px 10px 8px;white-space:nowrap}
+.portal-info small{display:block;font-size:10px;letter-spacing:1.4px;color:#D2B49C}
+.portal-info strong{font-size:15px;color:white}
+.nav-list{list-style:none;display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.nav-item{display:flex;align-items:center;gap:14px;padding:12px;width:100%;border:0;border-radius:12px;background:transparent;color:#E6D7C8;text-decoration:none;white-space:nowrap;font-size:14px;text-align:left}
+.nav-item:hover,.nav-item.active{background:#ffffff29;color:white}
+.nav-icon{min-width:20px;display:flex;justify-content:center}
+.nav-label{font-size:14px;font-weight:500}
 
-.wrap{margin-left:80px}
-header{background:#fffaf5;padding:25px 35px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e6d2c2}
-header p{margin:5px 0;color:#9d7d69}
-.avatar{background:#603621;color:#ffbd83;border-radius:50%;width:48px;height:48px;display:grid;place-items:center;font-weight:bold;font-size:18px}
-main{padding:40px 4%;max-width:1500px;margin:auto}
-h1{font:italic bold clamp(35px,5vw,60px) Georgia;margin:8px 0}
-h2{font-size:20px}
-.eyebrow{font-size:12px;letter-spacing:3px;color:#a64e1c;font-weight:bold}
-.muted{color:#967c6c}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:30px 0}
-.card,.panel{background:white;padding:25px;border-radius:25px;box-shadow:0 2px 5px #0001}
-.card:first-child{background:#f4a35d}
-.card:last-child{background:#603621;color:white}
-.card strong{display:block;font-size:35px;margin:15px 0}
-.grid{display:grid;grid-template-columns:2fr 1fr;gap:20px}
-.visit{background:#f5e3cf;padding:22px;border-radius:18px}
-.visit h3{font:italic bold 30px Georgia}
-.btn{display:inline-block;background:#603621;color:white;padding:12px 18px;border:0;border-radius:12px;text-decoration:none;cursor:pointer}
-.section{display:none}.section.active{display:block}
-table{width:100%;border-collapse:collapse;text-align:left}
-th,td{padding:18px 10px;border-bottom:1px solid #ead8c8}
-th{font-size:12px;letter-spacing:2px;color:#a57553}
-.table-wrap{overflow-x:auto}
-.cart-row{display:flex;justify-content:space-between;padding:15px 0;border-bottom:1px solid #ead8c8}
-.cart-total{text-align:right;font-size:21px;font-weight:bold;margin:20px}
-@media(max-width:750px){.stats,.grid{grid-template-columns:1fr}main{padding:25px 15px}.sidebar{width:60px}.wrap{margin-left:60px}header{padding:20px}.sidebar button{font-size:20px}}
+/* HEADER */
+.main-wrapper{margin-left:68px;flex:1;min-width:0}
+.top-header{height:76px;background:var(--header);padding:0 38px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50}
+.header-title h2{font:18px Oswald;letter-spacing:.6px}
+.header-title p{font-size:12px;color:var(--muted)}
+.header-actions{display:flex;align-items:center;gap:14px;position:relative}
+.bell-btn,.avatar-circle{width:40px;height:40px;border:0;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.bell-btn{background:#F3E6D8;color:var(--brown);position:relative}
+.bell-badge{position:absolute;top:-2px;right:-2px;background:#A93226;color:white;font-size:10px;width:17px;height:17px;border-radius:50%;display:grid;place-items:center}
+.avatar-circle{background:var(--brown);color:white;font-weight:600}
+
+/* NOTIFICATIONS */
+.notif-popover{position:absolute;top:54px;right:0;width:340px;max-width:90vw;background:var(--header);border:1px solid var(--border);border-radius:18px;padding:20px;box-shadow:0 14px 36px #2c1a1129;display:none;z-index:200}
+.notif-popover.open{display:block}
+.notif-header{margin-bottom:14px}
+.notif-header small{font-size:10px;letter-spacing:1.2px;color:#A05A2C;font-weight:700}
+.notif-header h4{font:22px 'Instrument Serif'}
+.notif-item{display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--border);cursor:pointer}
+.notif-icon{width:36px;height:36px;border-radius:10px;background:#F4E7D7;display:grid;place-items:center;flex-shrink:0}
+.notif-body h5{font-size:13px;margin-bottom:3px}
+.notif-body p,.empty{font-size:12px;color:var(--muted)}
+
+/* CONTENT */
+.content-container{padding:32px 38px;max-width:1400px}
+.page-section{display:none}
+.page-section.active{display:block}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:1.5px;color:#9C5116;margin-bottom:5px}
+.script-heading{font:38px Pacifico;color:#3B1D0E;margin-bottom:6px}
+.page-subtitle{font-size:14px;color:var(--muted);margin-bottom:26px}
+.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:28px}
+.kpi-card,.white-card{border-radius:20px;box-shadow:var(--shadow);padding:22px 24px;background:white}
+.kpi-card{border:0;text-align:left;display:flex;flex-direction:column;gap:9px;min-height:132px}
+.kpi-card.orange{background:var(--orange)}
+.kpi-card.espresso{background:var(--brown);color:white}
+.kpi-label{font-size:11px;font-weight:700;letter-spacing:1.2px}
+.kpi-value{font-size:30px;font-weight:700}
+.kpi-sub{font-size:12px;opacity:.75}
+.white-card{border-radius:22px;padding:26px 28px}
+.card-header-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
+.card-title{font:17px Oswald;letter-spacing:.5px}
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{text-align:left;font-size:10px;letter-spacing:1px;color:var(--muted);padding:12px 8px;border-bottom:1px solid var(--border)}
+.data-table td{padding:15px 8px;font-size:13px;border-bottom:1px solid var(--border)}
+.visit{background:var(--header);padding:25px;border:1px dashed #DCCDBF;border-radius:14px}
+.visit h3{font:28px 'Instrument Serif';margin-bottom:10px}
+.visit p{font-size:14px;color:var(--muted);margin-bottom:18px}
+.btn{display:inline-block;padding:11px 22px;border:0;border-radius:999px;background:var(--caramel);color:white;text-decoration:none;font-size:12px;font-weight:700;margin-top:10px}
+.btn:hover{background:var(--brown)}
+.btn-soft{background:#EFE5D8;color:var(--text);margin-right:8px}
+.cart-row{display:flex;justify-content:space-between;padding:15px 8px;border-bottom:1px solid var(--border)}
+.cart-total{text-align:right;font-size:22px;font-weight:700;margin:20px;color:var(--brown)}
+
+@media(max-width:1024px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.top-header{padding:0 18px}.content-container{padding:24px 18px}.kpi-grid{grid-template-columns:1fr}.white-card{padding:20px 14px}.script-heading{font-size:32px}}
 </style>
 </head>
+
 <body>
 
 <aside class="sidebar">
-  <div class="brand-logo"><span>♧</span><span class="brand-text">Cozy Bake</span></div>
-  <button class="active" data-page="dashboard" onclick="show('dashboard')"><span>▦</span><span class="nav-label">Dashboard</span></button>
-  <button data-page="orders" onclick="show('orders')"><span>▤</span><span class="nav-label">My Orders</span></button>
-  <button data-page="cart" onclick="show('cart')"><span>🛒</span><span class="nav-label">My Cart</span></button>
-  <button data-page="bookings" onclick="show('bookings')"><span>📅</span><span class="nav-label">Bookings</span></button>
-  <button class="bottom" onclick="window.location.href='logout.php'"><span>⇥</span><span class="nav-label">Log Out</span></button>
+<div>
+ <div class="brand-row">
+  <div class="brand-icon">
+   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
+    <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+   </svg>
+  </div>
+  <span class="brand-text">Cozy Bake</span>
+ </div>
+
+ <div class="portal-info">
+  <small>CUSTOMER PORTAL</small>
+  <strong id="sidebarCustomerName">Customer</strong>
+ </div>
+
+ <ul class="nav-list">
+  <li><button class="nav-item active" data-page="dashboard" onclick="show('dashboard')"><span class="nav-icon">▦</span><span class="nav-label">Dashboard</span></button></li>
+  <li><button class="nav-item" data-page="orders" onclick="show('orders')"><span class="nav-icon">▤</span><span class="nav-label">Order History</span></button></li>
+  <li><button class="nav-item" data-page="cart" onclick="show('cart')"><span class="nav-icon">🛒</span><span class="nav-label">My Cart</span></button></li>
+  <li><button class="nav-item" data-page="booking-history" onclick="show('booking-history')"><span class="nav-icon">▤</span><span class="nav-label">Booking History</span></button></li>
+  <li><button class="nav-item" data-page="upcoming-booking" onclick="show('upcoming-booking')"><span class="nav-icon">▦</span><span class="nav-label">Upcoming Booking</span></button></li>
+  <li><a href="index.html" class="nav-item"><span class="nav-icon">⌂</span><span class="nav-label">Storefront</span></a></li>
+ </ul>
+</div>
+<ul class="nav-list">
+ <li><button class="nav-item" onclick="logout()"><span class="nav-icon">⇥</span><span class="nav-label">Log out</span></button></li>
+</ul>
 </aside>
 
-<div class="wrap">
-<header>
-<div><b id="page-title">DASHBOARD</b><p>Cozy Bake management</p></div>
-<div class="avatar" id="avatar">C</div>
+<div class="main-wrapper">
+<header class="top-header">
+ <div class="header-title">
+  <h2 id="page-title">DASHBOARD</h2>
+  <p>Cozy Bake Customer Portal</p>
+ </div>
+ <div class="header-actions">
+  <button class="bell-btn" onclick="toggleNotifications()" aria-label="Notifications">
+   ♧<span class="bell-badge" id="notificationCount" style="display:none">0</span>
+  </button>
+  <div class="avatar-circle" id="customerAvatar">C</div>
+  <div class="notif-popover" id="notifPopover">
+   <div class="notif-header"><small>NOTIFICATION CENTRE</small><h4>Customer Updates</h4></div>
+   <div id="notificationList"><p class="empty">No notifications yet.</p></div>
+  </div>
+ </div>
 </header>
 
-<main>
-<section id="dashboard" class="section active">
-<div class="eyebrow">CUSTOMER DASHBOARD</div>
-<h1 id="greeting">Welcome, customer!</h1>
-<p class="muted">Your Cozy Bake favorites, bookings, and orders in one place.</p>
+<main class="content-container">
 
-<div class="stats">
-<div class="card"><b>REWARD POINTS</b><strong>0</strong><small>Rewards coming soon</small></div>
-<div class="card"><b>UPCOMING BOOKING</b><strong id="upcoming">—</strong><small id="next-booking">No upcoming booking</small></div>
-<div class="card"><b>TOTAL ORDERS</b><strong id="total">0</strong><small>Completed checkout orders</small></div>
-</div>
+<section id="dashboard" class="page-section active">
+ <div class="eyebrow">CUSTOMER DASHBOARD</div>
+ <h1 class="script-heading" id="greeting">Welcome, Customer!</h1>
+ <p class="page-subtitle">Your Cozy Bake favorites, bookings and orders.</p>
 
-<div class="grid">
-<div class="panel">
-<h2>YOUR NEXT VISIT</h2>
-<div class="visit">
-<h3>Something sweet awaits!</h3>
-<p>Explore our freshly baked treats.</p>
-<a href="menu.html" class="btn">EXPLORE MENU</a>
-</div>
-</div>
-</div>
+ <div class="kpi-grid">
+  <button class="kpi-card orange" onclick="show('orders')">
+   <span class="kpi-label">ORDER HISTORY</span><span class="kpi-value" id="total">0</span><span class="kpi-sub">View recent orders</span>
+  </button>
+  <button class="kpi-card" onclick="show('upcoming-booking')">
+   <span class="kpi-label">UPCOMING BOOKING</span><span class="kpi-value" id="upcoming">—</span><span class="kpi-sub" id="next-booking">No upcoming booking</span>
+  </button>
+  <button class="kpi-card espresso" onclick="show('cart')">
+   <span class="kpi-label">MY CART</span><span class="kpi-value" id="cart-count">0</span><span class="kpi-sub">View cart items</span>
+  </button>
+ </div>
+
+ <div class="white-card">
+  <div class="card-header-bar"><h3 class="card-title">YOUR NEXT VISIT</h3></div>
+  <div class="visit">
+   <h3>Something sweet awaits!</h3>
+   <p>Explore our freshly baked treats.</p>
+   <a href="menu.html" class="btn">EXPLORE MENU</a>
+  </div>
+ </div>
 </section>
 
-<section id="orders" class="section">
-<div class="eyebrow">MY ORDERS</div>
-<h1>Order history</h1>
-<p class="muted">Your recent Cozy Bake orders.</p>
-<div class="panel">
-<h2>RECENT PURCHASES</h2>
-<div class="table-wrap">
-<table>
-<thead><tr><th>ORDER</th><th>ITEMS</th><th>TOTAL</th><th>STATUS</th></tr></thead>
-<tbody id="order-list"><tr><td colspan="4">No orders yet.</td></tr></tbody>
-</table>
-</div>
-</div>
+<section id="orders" class="page-section">
+ <div class="eyebrow">MY ORDERS</div><h1 class="script-heading">Order History</h1>
+ <p class="page-subtitle">Your recent Cozy Bake orders.</p>
+ <div class="white-card">
+  <div class="card-header-bar"><h3 class="card-title">RECENT PURCHASES</h3></div>
+  <div style="overflow-x:auto"><table class="data-table">
+   <thead><tr><th>ORDER</th><th>ITEMS</th><th>TOTAL</th><th>STATUS</th></tr></thead>
+   <tbody id="order-list"><tr><td colspan="4">No orders yet.</td></tr></tbody>
+  </table></div>
+ </div>
 </section>
 
-<section id="cart" class="section">
-<div class="eyebrow">MY CART</div>
-<h1>Shopping cart</h1>
-<p class="muted">Items added from our menu.</p>
-<div class="panel">
-<div id="cart-list"></div>
-<div class="cart-total" id="cart-total">RM 0.00</div>
-<a href="menu.html" class="btn">CONTINUE SHOPPING</a>
-<a href="checkout.html" class="btn" id="checkout">CHECKOUT</a>
-</div>
+<section id="cart" class="page-section">
+ <div class="eyebrow">MY CART</div><h1 class="script-heading">Shopping Cart</h1>
+ <p class="page-subtitle">Items added from our menu.</p>
+ <div class="white-card">
+  <div class="card-header-bar"><h3 class="card-title">CART ITEMS</h3></div>
+  <div id="cart-list"></div>
+  <div class="cart-total" id="cart-total">RM 0.00</div>
+  <a href="menu.html" class="btn btn-soft">CONTINUE SHOPPING</a>
+  <a href="checkoutt.html" class="btn" id="checkoutt">CHECKOUT</a>
+ </div>
 </section>
 
-<section id="bookings" class="section">
-<div class="eyebrow">RESERVATIONS</div>
-<h1>Your bookings</h1>
-<p class="muted">View your Cozy Bake table reservations.</p>
-<div class="panel">
-<a href="reservation.html" class="btn">NEW RESERVATION</a>
-<div class="table-wrap">
-<table>
-<thead>
-<tr><th>BOOKING ID</th><th>OUTLET</th><th>DATE</th><th>TIME</th><th>TABLE</th><th>GUESTS</th><th>STATUS</th></tr>
-</thead>
-<tbody id="booking-list">
-<tr><td colspan="7">No bookings yet.</td></tr>
-</tbody>
-</table>
-</div>
-</div>
+<section id="booking-history" class="page-section">
+ <div class="eyebrow">RESERVATIONS</div><h1 class="script-heading">Booking History</h1>
+ <p class="page-subtitle">Your previous Cozy Bake reservations.</p>
+ <div class="white-card">
+  <div class="card-header-bar"><h3 class="card-title">PREVIOUS BOOKINGS</h3><a href="reservation.html" class="btn">NEW RESERVATION</a></div>
+  <div style="overflow-x:auto"><table class="data-table">
+   <thead><tr><th>ID</th><th>OUTLET</th><th>DATE</th><th>TIME</th><th>TABLE</th><th>GUESTS</th><th>STATUS</th></tr></thead>
+   <tbody id="history-list"><tr><td colspan="7">No bookings yet.</td></tr></tbody>
+  </table></div>
+ </div>
 </section>
+
+<section id="upcoming-booking" class="page-section">
+ <div class="eyebrow">RESERVATIONS</div><h1 class="script-heading">Upcoming Booking</h1>
+ <p class="page-subtitle">Your upcoming Cozy Bake reservations.</p>
+ <div class="white-card">
+  <div class="card-header-bar"><h3 class="card-title">UPCOMING RESERVATIONS</h3><a href="reservation.html" class="btn">NEW RESERVATION</a></div>
+  <div style="overflow-x:auto"><table class="data-table">
+   <thead><tr><th>ID</th><th>OUTLET</th><th>DATE</th><th>TIME</th><th>TABLE</th><th>GUESTS</th><th>STATUS</th></tr></thead>
+   <tbody id="upcoming-list"><tr><td colspan="7">No upcoming bookings.</td></tr></tbody>
+  </table></div>
+ </div>
+</section>
+
 </main>
 </div>
 
 <script>
 const $=id=>document.getElementById(id);
 const money=n=>"RM "+Number(n||0).toFixed(2);
-const email=sessionStorage.getItem("cozyBakeCustomerEmail")||"customer@gmail.com";
-const name=sessionStorage.getItem("cozyBakeCustomerName")||"Customer";
+const name=sessionStorage.getItem("cozyBakeCustomerName")||localStorage.getItem("cozyBakeCustomerName")||"Customer";
+const email=sessionStorage.getItem("cozyBakeCustomerEmail")||localStorage.getItem("cozyBakeCustomerEmail")||"";
 
 $("greeting").textContent="Welcome, "+name+"!";
-$("avatar").textContent=name[0].toUpperCase();
+$("sidebarCustomerName").textContent=name;
+$("customerAvatar").textContent=name.trim().charAt(0).toUpperCase();
 
-function read(key){
- try{return JSON.parse(localStorage.getItem(key)||"[]")}catch{return []}
-}
+function read(key){try{return JSON.parse(localStorage.getItem(key)||"[]")}catch{return[]}}
 
 function show(id){
- document.querySelectorAll(".section").forEach(s=>s.classList.toggle("active",s.id===id));
- document.querySelectorAll("[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===id));
- $("page-title").textContent=id.toUpperCase();
+ document.querySelectorAll(".page-section").forEach(p=>p.classList.toggle("active",p.id===id));
+ document.querySelectorAll(".nav-item[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===id));
+ $("page-title").textContent=({"dashboard":"DASHBOARD","orders":"ORDER HISTORY","cart":"MY CART","booking-history":"BOOKING HISTORY","upcoming-booking":"UPCOMING BOOKING"})[id]||id.toUpperCase();
  if(id==="cart")renderCart();
  if(id==="orders")loadOrders();
- if(id==="bookings")loadBookings();
+ if(id.includes("booking"))loadBookings();
+}
+
+function fillRows(id,rows,cols){
+ const el=$(id);el.innerHTML="";
+ if(!rows.length){const tr=el.insertRow(),td=tr.insertCell();td.colSpan=cols;td.textContent="No records found.";return}
+ rows.forEach(row=>{const tr=el.insertRow();row.forEach(v=>tr.insertCell().textContent=v??"—")});
 }
 
 function renderCart(){
- let cart=read("cozyBakeCart"),total=0;
+ const cart=read("cozyBakeCart");let total=0,count=0;
  $("cart-list").innerHTML="";
  cart.forEach(i=>{
-  let amount=Number(i.price||0)*Number(i.quantity||0);
-  total+=amount;
-  let row=document.createElement("div");
-  row.className="cart-row";
-  let item=document.createElement("span");
-  let price=document.createElement("b");
-  item.textContent=i.name+" × "+i.quantity;
-  price.textContent=money(amount);
-  row.append(item,price);
-  $("cart-list").append(row);
+  const qty=Number(i.quantity||0),price=Number(i.price||0)*qty;
+  total+=price;count+=qty;
+  const row=document.createElement("div");row.className="cart-row";
+  const item=document.createElement("span"),amount=document.createElement("b");
+  item.textContent=(i.name||"Product")+" × "+qty;
+  amount.textContent=money(price);row.append(item,amount);$("cart-list").append(row);
  });
  if(!cart.length)$("cart-list").textContent="Your cart is empty.";
  $("cart-total").textContent=money(total);
- $("checkout").style.display=cart.length?"inline-block":"none";
+ $("cart-count").textContent=count;
+ $("checkoutt").style.display=cart.length?"inline-block":"none";
 }
 
-async function loadOrders(){
- const list=$("order-list");
- try{
-  const res=await fetch("getorders.php",{credentials:"same-origin"});
-  const data=await res.json();
-  if(!res.ok||!data.success||!Array.isArray(data.orders))throw Error();
-  $("total").textContent=data.orders.length;
-  fillRows(list,data.orders.map(o=>[
-   o.order_id,o.items,money(o.total),o.status
-  ]),4);
- }catch{
-  list.innerHTML='<tr><td colspan="4">No orders yet.</td></tr>';
- }
-}
+let notifications=[];
 
-function fillRows(element,rows,columns){
- element.innerHTML="";
- if(!rows.length){
-  let tr=element.insertRow();
-  let td=tr.insertCell();
-  td.colSpan=columns;
-  td.textContent="No "+(columns===7?"bookings":"orders")+" yet.";
-  return;
- }
- rows.forEach(values=>{
-  let tr=element.insertRow();
-  values.forEach(value=>{
-   tr.insertCell().textContent=value??"—";
-  });
+function renderNotifications(){
+ const list=$("notificationList"),badge=$("notificationCount");
+ list.innerHTML="";
+ badge.textContent=notifications.length>9?"9+":notifications.length;
+ badge.style.display=notifications.length?"grid":"none";
+ if(!notifications.length){list.innerHTML='<p class="empty">No notifications yet.</p>';return}
+ notifications.slice(0,8).forEach(n=>{
+  const row=document.createElement("div");row.className="notif-item";
+  const icon=document.createElement("div");icon.className="notif-icon";icon.textContent=n.icon;
+  const body=document.createElement("div");body.className="notif-body";
+  const h=document.createElement("h5");h.textContent=n.title;
+  const p=document.createElement("p");p.textContent=n.detail;
+  body.append(h,p);row.append(icon,body);
+  row.onclick=()=>{$("notifPopover").classList.remove("open");show(n.target)};
+  list.append(row);
  });
 }
 
+function toggleNotifications(){$("notifPopover").classList.toggle("open")}
+
+async function loadOrders(){
+ try{
+  const res=await fetch("getorders.php",{credentials:"same-origin",cache:"no-store"});
+  if(!res.ok)throw Error("Request failed");
+  const data=await res.json();
+  if(!data.success||!Array.isArray(data.orders))throw Error("Invalid response");
+  $("total").textContent=data.orders.length;
+  fillRows("order-list",data.orders.map(o=>[o.order_id,o.items,money(o.total),o.status]),4);
+  notifications=data.orders.slice(0,5).map(o=>({icon:"▤",title:"Order #"+o.order_id,detail:"Order status: "+(o.status||"Updated"),target:"orders"}));
+ }catch(e){console.error(e);$("total").textContent="0";fillRows("order-list",[],4)}
+ renderNotifications();
+}
+
 function loadBookings(){
- const bookings=read("cozyBakeBookings")
-  .filter(b=>!b.email || b.email===email)
-  .sort((a,b)=>(a.date+" "+a.time).localeCompare(b.date+" "+b.time));
-
- fillRows($("booking-list"),bookings.map(b=>[
-  b.id,b.outlet,b.date,b.time,b.table,b.guests,b.status
- ]),7);
-
- const next=bookings.find(b=>
-  new Date(b.date+"T"+b.time)>=new Date() &&
-  b.status!=="Cancelled"
- );
+ const bookings=read("cozyBakeBookings").filter(b=>!b.email||b.email===email).sort((a,b)=>(a.date+" "+a.time).localeCompare(b.date+" "+b.time));
+ const now=new Date(),upcoming=[],history=[];
+ bookings.forEach(b=>{const d=new Date(b.date+"T"+(b.time||"00:00"));if(d>=now&&!["Cancelled","Completed"].includes(b.status))upcoming.push(b);else history.push(b)});
+ const rows=b=>b.map(x=>[x.id,x.outlet,x.date,x.time,x.table,x.guests,x.status]);
+ fillRows("history-list",rows(history),7);fillRows("upcoming-list",rows(upcoming),7);
+ const next=upcoming[0];
  $("upcoming").textContent=next?next.date:"—";
- $("next-booking").textContent=next
-  ?next.outlet+" · "+next.time
-  :"No upcoming booking";
+ $("next-booking").textContent=next?next.outlet+" · "+next.time:"No upcoming booking";
+ const orderNotes=notifications.filter(n=>n.target==="orders");
+ notifications=[...orderNotes,...upcoming.slice(0,5).map(b=>({icon:"▦",title:"Upcoming booking",detail:(b.outlet||"Cozy Bake")+" · "+b.date+" · "+b.time,target:"upcoming-booking"}))];
+ renderNotifications();
 }
 
 function logout(){
- sessionStorage.removeItem("cozyBakeDemoLoggedIn");
- sessionStorage.removeItem("cozyBakeCustomerName");
- sessionStorage.removeItem("cozyBakeCustomerEmail");
- location.href="staff_logout.php";
+ if(!confirm("Are you sure you want to log out?"))return;
+ ["cozyBakeDemoLoggedIn","cozyBakeCustomerName","cozyBakeCustomerEmail","cozyBakeCustomerId","isLoggedIn","userEmail","userName","customer_id","cozyBakeUser"].forEach(k=>{sessionStorage.removeItem(k);localStorage.removeItem(k)});
+ location.href="logout.php";
 }
 
-loadBookings();
-loadOrders();
-if(location.hash==="#bookings")show("bookings");
+document.addEventListener("click",e=>{
+ if(!e.target.closest(".header-actions"))$("notifPopover").classList.remove("open");
+});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")$("notifPopover").classList.remove("open")});
+
+renderCart();loadOrders();loadBookings();
 </script>
 </body>
 </html>
