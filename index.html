@@ -86,12 +86,6 @@ aria-label="Search treats" oninput="searchTreats()">
 <button type="submit">SEARCH</button>
 </form>
 
-<button class="icon" aria-label="Notifications" onclick="showNotifications()">
-<svg viewBox="0 0 24 24">
-<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>
-</svg>
-</button>
-
 <button class="icon" aria-label="Account" onclick="openAccountPage()">
 <svg viewBox="0 0 24 24">
 <circle cx="12" cy="7" r="4"/>
@@ -134,16 +128,6 @@ made with thoughtful ingredients and a little extra care.
 <button class="close" onclick="closeModal()">×</button>
 </div>
 <div id="results"></div>
-</div>
-</div>
-
-<div class="modal" id="notificationModal">
-<div class="popup">
-<div class="popup-head">
-<h2>🔔 Notifications</h2>
-<button class="close" onclick="closeModal()">×</button>
-</div>
-<div id="notices"></div>
 </div>
 </div>
 
@@ -216,45 +200,6 @@ async function checkActiveSession() {
         const display = name || email.split("@")[0];
         $("accountLabel").textContent = display;
         $("footerAuthBtn").textContent = "My Dashboard (" + display + ")";
-    }
-}
-
-// Panggil Notifikasi PHP (dengan fallback mesra jika notification.php belum ada)
-async function showNotifications(){
-    $("notificationModal").classList.add("show");
-    $("notices").innerHTML = '<div class="notice">Loading notifications...</div>';
-
-    try {
-        const response = await fetch("notification.php", {
-            method: "GET",
-            credentials: "same-origin",
-            cache: "no-store"
-        });
-
-        if (!response.ok) throw new Error("PHP error");
-
-        const data = await response.json();
-
-        if (!data.success) {
-            $("notices").innerHTML =
-                `<div class="notice">${data.message || "Unable to load notifications."}</div>`;
-            return;
-        }
-
-        const notifications = data.notifications || [];
-
-        $("notices").innerHTML = notifications.length
-            ? notifications.map(n => `
-                <div class="notice">
-                    <strong>${n.title || "Notification"}</strong>
-                    <p>${n.message || ""}</p>
-                </div>
-            `).join("")
-            : '<div class="notice">🔔 No notifications yet.</div>';
-
-    } catch (error) {
-        $("notices").innerHTML =
-            '<div class="notice">🔔 Welcome to Cozy Bake! Fresh pastries and celebration cakes are available daily.</div>';
     }
 }
 
