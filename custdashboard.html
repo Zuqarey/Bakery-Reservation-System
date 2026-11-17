@@ -35,10 +35,9 @@ button{font-family:inherit;cursor:pointer}
 .header-title h2{font:18px Oswald;letter-spacing:.6px}
 .header-title p{font-size:12px;color:var(--muted)}
 .header-actions{display:flex;align-items:center;gap:14px;position:relative}
-.bell-btn,.avatar-circle{width:40px;height:40px;border:0;border-radius:50%;display:flex;align-items:center;justify-content:center}
-.bell-btn{background:#F3E6D8;color:var(--brown);position:relative}
+.bell-btn{width:40px;height:40px;border:0;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#F3E6D8;color:var(--brown);position:relative}
+.bell-btn svg{width:18px;height:18px;display:block}
 .bell-badge{position:absolute;top:-2px;right:-2px;background:#A93226;color:white;font-size:10px;width:17px;height:17px;border-radius:50%;display:grid;place-items:center}
-.avatar-circle{background:var(--brown);color:white;font-weight:600}
 
 /* NOTIFICATIONS */
 .notif-popover{position:absolute;top:54px;right:0;width:340px;max-width:90vw;background:var(--header);border:1px solid var(--border);border-radius:18px;padding:20px;box-shadow:0 14px 36px #2c1a1129;display:none;z-index:200}
@@ -106,34 +105,126 @@ button{font-family:inherit;cursor:pointer}
  </div>
 
  <ul class="nav-list">
-  <li><button class="nav-item active" data-page="dashboard" onclick="show('dashboard')"><span class="nav-icon">▦</span><span class="nav-label">Dashboard</span></button></li>
-  <li><button class="nav-item" data-page="orders" onclick="show('orders')"><span class="nav-icon">▤</span><span class="nav-label">Order History</span></button></li>
-  <li><button class="nav-item" data-page="cart" onclick="show('cart')"><span class="nav-icon">🛒</span><span class="nav-label">My Cart</span></button></li>
-  <li><button class="nav-item" data-page="booking-history" onclick="show('booking-history')"><span class="nav-icon">▤</span><span class="nav-label">Booking History</span></button></li>
-  <li><button class="nav-item" data-page="upcoming-booking" onclick="show('upcoming-booking')"><span class="nav-icon">▦</span><span class="nav-label">Upcoming Booking</span></button></li>
-  <li><a href="index.html" class="nav-item"><span class="nav-icon">⌂</span><span class="nav-label">Storefront</span></a></li>
+  <li>
+   <button class="nav-item active" data-page="dashboard" onclick="show('dashboard')">
+    <span class="nav-icon">
+     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <rect x="3" y="3" width="7" height="7" rx="1"/>
+      <rect x="14" y="3" width="7" height="7" rx="1"/>
+      <rect x="14" y="14" width="7" height="7" rx="1"/>
+      <rect x="3" y="14" width="7" height="7" rx="1"/>
+     </svg>
+    </span>
+    <span class="nav-label">Dashboard</span>
+   </button>
+  </li>
+
+  <li>
+   <button class="nav-item" data-page="orders" onclick="show('orders')">
+    <span class="nav-icon">
+     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/>
+      <line x1="16" y1="13" x2="8" y2="13"/>
+      <line x1="16" y1="17" x2="8" y2="17"/>
+     </svg>
+    </span>
+    <span class="nav-label">Order History</span>
+   </button>
+  </li>
+
+  <li>
+   <button class="nav-item" data-page="cart" onclick="show('cart')">
+    <span class="nav-icon">
+     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="8" cy="21" r="1"/>
+      <circle cx="19" cy="21" r="1"/>
+      <path d="M2 2h2l2.6 12.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.7L22 6H5"/>
+     </svg>
+    </span>
+    <span class="nav-label">My Cart</span>
+   </button>
+  </li>
+
+  <li>
+   <button class="nav-item" data-page="booking-history" onclick="show('booking-history')">
+    <span class="nav-icon">
+     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <rect x="3" y="4" width="18" height="18" rx="2"/>
+      <path d="M16 2v4M8 2v4M3 10h18"/>
+      <path d="M8 14h.01M12 14h.01M16 14h.01"/>
+     </svg>
+    </span>
+    <span class="nav-label">Booking History</span>
+   </button>
+  </li>
+
+  <li>
+   <button class="nav-item" data-page="upcoming-booking" onclick="show('upcoming-booking')">
+    <span class="nav-icon">
+     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <rect x="3" y="4" width="18" height="18" rx="2"/>
+      <path d="M16 2v4M8 2v4M3 10h18"/>
+      <path d="M12 14v4M10 16h4"/>
+     </svg>
+    </span>
+    <span class="nav-label">Upcoming Booking</span>
+   </button>
+  </li>
+
+  <li>
+   <a href="index.html" class="nav-item">
+    <span class="nav-icon">
+     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="m3 10 9-7 9 7"/>
+      <path d="M5 9v12h14V9"/>
+      <path d="M9 21v-7h6v7"/>
+     </svg>
+    </span>
+    <span class="nav-label">Storefront</span>
+   </a>
+  </li>
  </ul>
 </div>
-<ul class="nav-list">
- <li><button class="nav-item" onclick="logout()"><span class="nav-icon">⇥</span><span class="nav-label">Log out</span></button></li>
+
+<ul class="nav-list bottom-nav">
+ <li>
+  <button class="nav-item" onclick="logout()">
+   <span class="nav-icon">⇥</span>
+   <span class="nav-label">Log Out</span>
+  </button>
+ </li>
 </ul>
 </aside>
 
 <div class="main-wrapper">
 <header class="top-header">
+
  <div class="header-title">
   <h2 id="page-title">DASHBOARD</h2>
   <p>Cozy Bake Customer Portal</p>
  </div>
+
  <div class="header-actions">
+
   <button class="bell-btn" onclick="toggleNotifications()" aria-label="Notifications">
-   ♧<span class="bell-badge" id="notificationCount" style="display:none">0</span>
+   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+   </svg>
+   <span class="bell-badge" id="notificationCount" style="display:none">0</span>
   </button>
-  <div class="avatar-circle" id="customerAvatar">C</div>
+
   <div class="notif-popover" id="notifPopover">
-   <div class="notif-header"><small>NOTIFICATION CENTRE</small><h4>Customer Updates</h4></div>
-   <div id="notificationList"><p class="empty">No notifications yet.</p></div>
+   <div class="notif-header">
+    <small>NOTIFICATION CENTRE</small>
+    <h4>Customer alerts</h4>
+   </div>
+   <div id="notificationList">
+    <p class="empty">No notifications yet.</p>
+   </div>
   </div>
+
  </div>
 </header>
 
@@ -146,18 +237,28 @@ button{font-family:inherit;cursor:pointer}
 
  <div class="kpi-grid">
   <button class="kpi-card orange" onclick="show('orders')">
-   <span class="kpi-label">ORDER HISTORY</span><span class="kpi-value" id="total">0</span><span class="kpi-sub">View recent orders</span>
+   <span class="kpi-label">ORDER HISTORY</span>
+   <span class="kpi-value" id="total">0</span>
+   <span class="kpi-sub">View recent orders</span>
   </button>
+
   <button class="kpi-card" onclick="show('upcoming-booking')">
-   <span class="kpi-label">UPCOMING BOOKING</span><span class="kpi-value" id="upcoming">—</span><span class="kpi-sub" id="next-booking">No upcoming booking</span>
+   <span class="kpi-label">UPCOMING BOOKING</span>
+   <span class="kpi-value" id="upcoming">—</span>
+   <span class="kpi-sub" id="next-booking">No upcoming booking</span>
   </button>
+
   <button class="kpi-card espresso" onclick="show('cart')">
-   <span class="kpi-label">MY CART</span><span class="kpi-value" id="cart-count">0</span><span class="kpi-sub">View cart items</span>
+   <span class="kpi-label">MY CART</span>
+   <span class="kpi-value" id="cart-count">0</span>
+   <span class="kpi-sub">View cart items</span>
   </button>
  </div>
 
  <div class="white-card">
-  <div class="card-header-bar"><h3 class="card-title">YOUR NEXT VISIT</h3></div>
+  <div class="card-header-bar">
+   <h3 class="card-title">YOUR NEXT VISIT</h3>
+  </div>
   <div class="visit">
    <h3>Something sweet awaits!</h3>
    <p>Explore our freshly baked treats.</p>
@@ -167,22 +268,34 @@ button{font-family:inherit;cursor:pointer}
 </section>
 
 <section id="orders" class="page-section">
- <div class="eyebrow">MY ORDERS</div><h1 class="script-heading">Order History</h1>
+ <div class="eyebrow">MY ORDERS</div>
+ <h1 class="script-heading">Order History</h1>
  <p class="page-subtitle">Your recent Cozy Bake orders.</p>
  <div class="white-card">
-  <div class="card-header-bar"><h3 class="card-title">RECENT PURCHASES</h3></div>
-  <div style="overflow-x:auto"><table class="data-table">
-   <thead><tr><th>ORDER</th><th>ITEMS</th><th>TOTAL</th><th>STATUS</th></tr></thead>
-   <tbody id="order-list"><tr><td colspan="4">No orders yet.</td></tr></tbody>
-  </table></div>
+  <div class="card-header-bar">
+   <h3 class="card-title">RECENT PURCHASES</h3>
+  </div>
+  <div style="overflow-x:auto">
+   <table class="data-table">
+    <thead>
+     <tr><th>ORDER</th><th>ITEMS</th><th>TOTAL</th><th>STATUS</th></tr>
+    </thead>
+    <tbody id="order-list">
+     <tr><td colspan="4">No orders yet.</td></tr>
+    </tbody>
+   </table>
+  </div>
  </div>
 </section>
 
 <section id="cart" class="page-section">
- <div class="eyebrow">MY CART</div><h1 class="script-heading">Shopping Cart</h1>
+ <div class="eyebrow">MY CART</div>
+ <h1 class="script-heading">Shopping Cart</h1>
  <p class="page-subtitle">Items added from our menu.</p>
  <div class="white-card">
-  <div class="card-header-bar"><h3 class="card-title">CART ITEMS</h3></div>
+  <div class="card-header-bar">
+   <h3 class="card-title">CART ITEMS</h3>
+  </div>
   <div id="cart-list"></div>
   <div class="cart-total" id="cart-total">RM 0.00</div>
   <a href="menu.html" class="btn btn-soft">CONTINUE SHOPPING</a>
@@ -191,26 +304,46 @@ button{font-family:inherit;cursor:pointer}
 </section>
 
 <section id="booking-history" class="page-section">
- <div class="eyebrow">RESERVATIONS</div><h1 class="script-heading">Booking History</h1>
+ <div class="eyebrow">RESERVATIONS</div>
+ <h1 class="script-heading">Booking History</h1>
  <p class="page-subtitle">Your previous Cozy Bake reservations.</p>
  <div class="white-card">
-  <div class="card-header-bar"><h3 class="card-title">PREVIOUS BOOKINGS</h3><a href="reservation.html" class="btn">NEW RESERVATION</a></div>
-  <div style="overflow-x:auto"><table class="data-table">
-   <thead><tr><th>ID</th><th>OUTLET</th><th>DATE</th><th>TIME</th><th>TABLE</th><th>GUESTS</th><th>STATUS</th></tr></thead>
-   <tbody id="history-list"><tr><td colspan="7">No bookings yet.</td></tr></tbody>
-  </table></div>
+  <div class="card-header-bar">
+   <h3 class="card-title">PREVIOUS BOOKINGS</h3>
+   <a href="reservation.html" class="btn">NEW RESERVATION</a>
+  </div>
+  <div style="overflow-x:auto">
+   <table class="data-table">
+    <thead>
+     <tr><th>ID</th><th>OUTLET</th><th>DATE</th><th>TIME</th><th>TABLE</th><th>GUESTS</th><th>STATUS</th></tr>
+    </thead>
+    <tbody id="history-list">
+     <tr><td colspan="7">No bookings yet.</td></tr>
+    </tbody>
+   </table>
+  </div>
  </div>
 </section>
 
 <section id="upcoming-booking" class="page-section">
- <div class="eyebrow">RESERVATIONS</div><h1 class="script-heading">Upcoming Booking</h1>
+ <div class="eyebrow">RESERVATIONS</div>
+ <h1 class="script-heading">Upcoming Booking</h1>
  <p class="page-subtitle">Your upcoming Cozy Bake reservations.</p>
  <div class="white-card">
-  <div class="card-header-bar"><h3 class="card-title">UPCOMING RESERVATIONS</h3><a href="reservation.html" class="btn">NEW RESERVATION</a></div>
-  <div style="overflow-x:auto"><table class="data-table">
-   <thead><tr><th>ID</th><th>OUTLET</th><th>DATE</th><th>TIME</th><th>TABLE</th><th>GUESTS</th><th>STATUS</th></tr></thead>
-   <tbody id="upcoming-list"><tr><td colspan="7">No upcoming bookings.</td></tr></tbody>
-  </table></div>
+  <div class="card-header-bar">
+   <h3 class="card-title">UPCOMING RESERVATIONS</h3>
+   <a href="reservation.html" class="btn">NEW RESERVATION</a>
+  </div>
+  <div style="overflow-x:auto">
+   <table class="data-table">
+    <thead>
+     <tr><th>ID</th><th>OUTLET</th><th>DATE</th><th>TIME</th><th>TABLE</th><th>GUESTS</th><th>STATUS</th></tr>
+    </thead>
+    <tbody id="upcoming-list">
+     <tr><td colspan="7">No upcoming bookings.</td></tr>
+    </tbody>
+   </table>
+  </div>
  </div>
 </section>
 
@@ -225,37 +358,71 @@ const email=sessionStorage.getItem("cozyBakeCustomerEmail")||localStorage.getIte
 
 $("greeting").textContent="Welcome, "+name+"!";
 $("sidebarCustomerName").textContent=name;
-$("customerAvatar").textContent=name.trim().charAt(0).toUpperCase();
 
-function read(key){try{return JSON.parse(localStorage.getItem(key)||"[]")}catch{return[]}}
+function read(key){
+ try{return JSON.parse(localStorage.getItem(key)||"[]")}
+ catch{return[]}
+}
 
 function show(id){
  document.querySelectorAll(".page-section").forEach(p=>p.classList.toggle("active",p.id===id));
  document.querySelectorAll(".nav-item[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===id));
- $("page-title").textContent=({"dashboard":"DASHBOARD","orders":"ORDER HISTORY","cart":"MY CART","booking-history":"BOOKING HISTORY","upcoming-booking":"UPCOMING BOOKING"})[id]||id.toUpperCase();
+
+ $("page-title").textContent=({
+  "dashboard":"DASHBOARD",
+  "orders":"ORDER HISTORY",
+  "cart":"MY CART",
+  "booking-history":"BOOKING HISTORY",
+  "upcoming-booking":"UPCOMING BOOKING"
+ })[id]||id.toUpperCase();
+
  if(id==="cart")renderCart();
  if(id==="orders")loadOrders();
  if(id.includes("booking"))loadBookings();
 }
 
 function fillRows(id,rows,cols){
- const el=$(id);el.innerHTML="";
- if(!rows.length){const tr=el.insertRow(),td=tr.insertCell();td.colSpan=cols;td.textContent="No records found.";return}
- rows.forEach(row=>{const tr=el.insertRow();row.forEach(v=>tr.insertCell().textContent=v??"—")});
+ const el=$(id);
+ el.innerHTML="";
+
+ if(!rows.length){
+  const tr=el.insertRow(),td=tr.insertCell();
+  td.colSpan=cols;
+  td.textContent="No records found.";
+  return;
+ }
+
+ rows.forEach(row=>{
+  const tr=el.insertRow();
+  row.forEach(v=>tr.insertCell().textContent=v??"—");
+ });
 }
 
 function renderCart(){
- const cart=read("cozyBakeCart");let total=0,count=0;
+ const cart=read("cozyBakeCart");
+ let total=0,count=0;
  $("cart-list").innerHTML="";
+
  cart.forEach(i=>{
   const qty=Number(i.quantity||0),price=Number(i.price||0)*qty;
-  total+=price;count+=qty;
-  const row=document.createElement("div");row.className="cart-row";
-  const item=document.createElement("span"),amount=document.createElement("b");
+  total+=price;
+  count+=qty;
+
+  const row=document.createElement("div");
+  row.className="cart-row";
+
+  const item=document.createElement("span");
+  const amount=document.createElement("b");
+
   item.textContent=(i.name||"Product")+" × "+qty;
-  amount.textContent=money(price);row.append(item,amount);$("cart-list").append(row);
+  amount.textContent=money(price);
+
+  row.append(item,amount);
+  $("cart-list").append(row);
  });
+
  if(!cart.length)$("cart-list").textContent="Your cart is empty.";
+
  $("cart-total").textContent=money(total);
  $("cart-count").textContent=count;
  $("checkoutt").style.display=cart.length?"inline-block":"none";
@@ -264,64 +431,164 @@ function renderCart(){
 let notifications=[];
 
 function renderNotifications(){
- const list=$("notificationList"),badge=$("notificationCount");
+ const list=$("notificationList");
+ const badge=$("notificationCount");
+
  list.innerHTML="";
  badge.textContent=notifications.length>9?"9+":notifications.length;
  badge.style.display=notifications.length?"grid":"none";
- if(!notifications.length){list.innerHTML='<p class="empty">No notifications yet.</p>';return}
+
+ if(!notifications.length){
+  list.innerHTML='<p class="empty">No notifications yet.</p>';
+  return;
+ }
+
  notifications.slice(0,8).forEach(n=>{
-  const row=document.createElement("div");row.className="notif-item";
-  const icon=document.createElement("div");icon.className="notif-icon";icon.textContent=n.icon;
-  const body=document.createElement("div");body.className="notif-body";
-  const h=document.createElement("h5");h.textContent=n.title;
-  const p=document.createElement("p");p.textContent=n.detail;
-  body.append(h,p);row.append(icon,body);
-  row.onclick=()=>{$("notifPopover").classList.remove("open");show(n.target)};
+  const row=document.createElement("div");
+  row.className="notif-item";
+
+  const icon=document.createElement("div");
+  icon.className="notif-icon";
+  icon.textContent=n.icon;
+
+  const body=document.createElement("div");
+  body.className="notif-body";
+
+  const h=document.createElement("h5");
+  h.textContent=n.title;
+
+  const p=document.createElement("p");
+  p.textContent=n.detail;
+
+  body.append(h,p);
+  row.append(icon,body);
+
+  row.onclick=()=>{
+   $("notifPopover").classList.remove("open");
+   show(n.target);
+  };
+
   list.append(row);
  });
 }
 
-function toggleNotifications(){$("notifPopover").classList.toggle("open")}
+function toggleNotifications(){
+ $("notifPopover").classList.toggle("open");
+}
 
 async function loadOrders(){
  try{
-  const res=await fetch("getorders.php",{credentials:"same-origin",cache:"no-store"});
+  const res=await fetch("getorders.php",{
+   credentials:"same-origin",
+   cache:"no-store"
+  });
+
   if(!res.ok)throw Error("Request failed");
+
   const data=await res.json();
-  if(!data.success||!Array.isArray(data.orders))throw Error("Invalid response");
+
+  if(!data.success||!Array.isArray(data.orders))
+   throw Error("Invalid response");
+
   $("total").textContent=data.orders.length;
-  fillRows("order-list",data.orders.map(o=>[o.order_id,o.items,money(o.total),o.status]),4);
-  notifications=data.orders.slice(0,5).map(o=>({icon:"▤",title:"Order #"+o.order_id,detail:"Order status: "+(o.status||"Updated"),target:"orders"}));
- }catch(e){console.error(e);$("total").textContent="0";fillRows("order-list",[],4)}
+
+  fillRows("order-list",data.orders.map(o=>[
+   o.order_id,o.items,money(o.total),o.status
+  ]),4);
+
+  notifications=data.orders.slice(0,5).map(o=>({
+   icon:"▤",
+   title:"Order #"+o.order_id,
+   detail:"Order status: "+(o.status||"Updated"),
+   target:"orders"
+  }));
+
+ }catch(e){
+  console.error(e);
+  $("total").textContent="0";
+  fillRows("order-list",[],4);
+ }
+
  renderNotifications();
 }
 
 function loadBookings(){
- const bookings=read("cozyBakeBookings").filter(b=>!b.email||b.email===email).sort((a,b)=>(a.date+" "+a.time).localeCompare(b.date+" "+b.time));
+ const bookings=read("cozyBakeBookings")
+  .filter(b=>!b.email||b.email===email)
+  .sort((a,b)=>(a.date+" "+a.time).localeCompare(b.date+" "+b.time));
+
  const now=new Date(),upcoming=[],history=[];
- bookings.forEach(b=>{const d=new Date(b.date+"T"+(b.time||"00:00"));if(d>=now&&!["Cancelled","Completed"].includes(b.status))upcoming.push(b);else history.push(b)});
- const rows=b=>b.map(x=>[x.id,x.outlet,x.date,x.time,x.table,x.guests,x.status]);
- fillRows("history-list",rows(history),7);fillRows("upcoming-list",rows(upcoming),7);
+
+ bookings.forEach(b=>{
+  const d=new Date(b.date+"T"+(b.time||"00:00"));
+
+  if(d>=now&&!["Cancelled","Completed"].includes(b.status))
+   upcoming.push(b);
+  else history.push(b);
+ });
+
+ const rows=b=>b.map(x=>[
+  x.id,x.outlet,x.date,x.time,x.table,x.guests,x.status
+ ]);
+
+ fillRows("history-list",rows(history),7);
+ fillRows("upcoming-list",rows(upcoming),7);
+
  const next=upcoming[0];
+
  $("upcoming").textContent=next?next.date:"—";
  $("next-booking").textContent=next?next.outlet+" · "+next.time:"No upcoming booking";
+
  const orderNotes=notifications.filter(n=>n.target==="orders");
- notifications=[...orderNotes,...upcoming.slice(0,5).map(b=>({icon:"▦",title:"Upcoming booking",detail:(b.outlet||"Cozy Bake")+" · "+b.date+" · "+b.time,target:"upcoming-booking"}))];
+
+ notifications=[
+  ...orderNotes,
+  ...upcoming.slice(0,5).map(b=>({
+   icon:"▦",
+   title:"Upcoming booking",
+   detail:(b.outlet||"Cozy Bake")+" · "+b.date+" · "+b.time,
+   target:"upcoming-booking"
+  }))
+ ];
+
  renderNotifications();
 }
 
 function logout(){
  if(!confirm("Are you sure you want to log out?"))return;
- ["cozyBakeDemoLoggedIn","cozyBakeCustomerName","cozyBakeCustomerEmail","cozyBakeCustomerId","isLoggedIn","userEmail","userName","customer_id","cozyBakeUser"].forEach(k=>{sessionStorage.removeItem(k);localStorage.removeItem(k)});
+
+ [
+  "cozyBakeDemoLoggedIn",
+  "cozyBakeCustomerName",
+  "cozyBakeCustomerEmail",
+  "cozyBakeCustomerId",
+  "isLoggedIn",
+  "userEmail",
+  "userName",
+  "customer_id",
+  "cozyBakeUser"
+ ].forEach(k=>{
+  sessionStorage.removeItem(k);
+  localStorage.removeItem(k);
+ });
+
  location.href="logout.php";
 }
 
 document.addEventListener("click",e=>{
- if(!e.target.closest(".header-actions"))$("notifPopover").classList.remove("open");
+ if(!e.target.closest(".header-actions"))
+  $("notifPopover").classList.remove("open");
 });
-document.addEventListener("keydown",e=>{if(e.key==="Escape")$("notifPopover").classList.remove("open")});
 
-renderCart();loadOrders();loadBookings();
+document.addEventListener("keydown",e=>{
+ if(e.key==="Escape")
+  $("notifPopover").classList.remove("open");
+});
+
+renderCart();
+loadOrders();
+loadBookings();
 </script>
+
 </body>
 </html>
