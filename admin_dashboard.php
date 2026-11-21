@@ -14,7 +14,18 @@ if ($html === false) {
     http_response_code(500);
     exit('The administrator dashboard could not be loaded.');
 }
-$html = str_replace('reed (Admin)', htmlspecialchars($_SESSION['admin_name'] ?? 'Administrator', ENT_QUOTES, 'UTF-8') . ' (Admin)', $html);
-$html = str_replace("onclick=\"alert('Logged out of Admin Portal')\"", 'href="admin_logout.php"', $html);
+// Fill in the logged-in admin's name and avatar initial.
+$adminName = trim((string)($_SESSION['admin_name'] ?? ''));
+if ($adminName === '') {
+    $adminName = 'Administrator';
+}
+$adminInitial = function_exists('mb_substr')
+    ? mb_strtoupper(mb_substr($adminName, 0, 1, 'UTF-8'), 'UTF-8')
+    : strtoupper(substr($adminName, 0, 1));
+$html = str_replace(
+    ['{{ADMIN_NAME}}', '{{ADMIN_INITIAL}}'],
+    [htmlspecialchars($adminName, ENT_QUOTES, 'UTF-8'), htmlspecialchars($adminInitial, ENT_QUOTES, 'UTF-8')],
+    $html
+);
 echo $html;
 ?>
