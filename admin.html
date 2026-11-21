@@ -796,9 +796,8 @@
       el.addEventListener('click', select);
       el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(); } });
     });
-    showProduct(0);
-    document.getElementById('bestSellerName').textContent = products[0].product_name;
-    document.getElementById('bestSellerSummary').textContent = `${products[0].units_sold} units sold · ${money(products[0].revenue)} revenue`;
+    const top = products[0];
+    document.getElementById("bestSellerThumb").innerHTML = top.image_path ? `<img src="${safe(top.image_path)}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">` : '🥐';
   }
 
   function renderNotifications(items) {
