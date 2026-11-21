@@ -1,24 +1,22 @@
 <!DOCTYPE html>
-<html lang="ms">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cozy Bake - Staff Login</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>Cozy Bake — Staff Login</title>
+  <link rel="stylesheet" href="cozy-theme.css">
   <style>
     :root {
-      --header-bg: #ab8261;
-      --header-bg-hover: #987252;
-      --body-bg: #fffdf9;
-      --active-role-bg: #5c2d18;
-      --border-color: #e5ccb6;
-      --input-border: #ebd9c8;
-      --text-brown: #6b4d38;
-      --text-dark: #3a2518;
-      --btn-bg: #ab8261;
-      --btn-hover: #946f51;
+      --header-bg: #5A351D;
+      --header-bg-hover: #432512;
+      --body-bg: #FDFBF7;
+      --active-role-bg: #5C2C16;
+      --border-color: #EFE6DC;
+      --input-border: #DFD3C6;
+      --text-brown: #8C7A6B;
+      --text-dark: #2C1A11;
+      --btn-bg: #B58E6B;
+      --btn-hover: #5C2C16;
       --backdrop-bg: rgba(40, 30, 25, 0.6);
     }
 
@@ -26,11 +24,11 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'DM Sans', sans-serif;
     }
 
     body {
-      background: linear-gradient(135deg, #2d1f18 0%, #1a100b 100%);
+      background: var(--bg-cream);
       min-height: 100vh;
       display: flex;
       justify-content: center;
@@ -43,31 +41,32 @@
       background-color: var(--body-bg);
       width: 100%;
       max-width: 460px;
-      border-radius: 16px;
+      border-radius: 22px;
+      border: 1px solid var(--border-color);
       overflow: hidden;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 20px 54px rgba(92, 44, 22, 0.12);
       position: relative;
     }
 
     /* Header Section */
     .modal-header {
-      background-color: var(--header-bg);
-      padding: 24px 28px 22px;
+      background: linear-gradient(135deg, #5A351D 0%, #432512 100%);
+      padding: 26px 28px 22px;
       color: #ffffff;
       position: relative;
     }
 
     .brand-title {
-      font-size: 0.8rem;
-      letter-spacing: 2.5px;
+      font-size: 0.72rem;
+      letter-spacing: 2px;
       text-transform: uppercase;
       font-weight: 700;
-      opacity: 0.9;
-      margin-bottom: 2px;
+      color: #D2B49C;
+      margin-bottom: 4px;
     }
 
     .welcome-text {
-      font-family: 'Playfair Display', serif;
+      font-family: 'Instrument Serif', serif;
       font-size: 2rem;
       font-weight: 500;
       line-height: 1.1;

@@ -1,24 +1,168 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Cozy Bake | Admin Login</title>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cozy Bake — Admin Login</title>
+<link rel="stylesheet" href="cozy-theme.css">
 <style>
-*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:#f5eee5;color:#34251d;font-family:'DM Sans',sans-serif}.panel{width:min(420px,100%);background:#fffdf9;border:1px solid #e8d9c8;border-radius:22px;padding:38px;box-shadow:0 18px 50px #51351b18}.brand{text-align:center;color:#9b633b;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase}.panel h1{text-align:center;font:40px 'Instrument Serif',serif;margin:10px 0 6px}.sub{text-align:center;color:#88786c;font-size:13px;margin:0 0 28px}.field{margin:16px 0}.field label{display:block;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px}.field input{width:100%;padding:13px 14px;border:1px solid #dfd1c2;border-radius:10px;font:14px 'DM Sans',sans-serif}.field input:focus{outline:2px solid #c18b5b;outline-offset:1px}.submit{width:100%;border:0;border-radius:999px;padding:14px;background:#8d5735;color:white;font-weight:700;letter-spacing:1px;cursor:pointer;margin-top:10px}.submit:hover{background:#503321}.foot{text-align:center;color:#9b8c80;font-size:11px;margin-top:22px}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: var(--bg-cream);
+    color: var(--text-dark);
+    font-family: 'DM Sans', sans-serif;
+  }
+  .panel {
+    width: min(430px, 100%);
+    background: var(--header-cream);
+    border: 1px solid var(--border-soft);
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 20px 54px rgba(92, 44, 22, 0.12);
+  }
+  .panel-header {
+    background: linear-gradient(135deg, #5A351D 0%, #432512 100%);
+    color: #F5EDE3;
+    padding: 28px 34px 24px;
+    text-align: center;
+  }
+  .brand-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #E6D7C8;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .panel-header h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 38px;
+    font-weight: 400;
+    color: #FFFFFF;
+    line-height: 1.1;
+  }
+  .panel-header p {
+    color: #D2B49C;
+    font-size: 13px;
+    margin-top: 6px;
+  }
+  .panel-body {
+    padding: 30px 34px 32px;
+  }
+  .field { margin-bottom: 18px; }
+  .field label {
+    display: block;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--text-dark);
+    margin-bottom: 7px;
+  }
+  .input-wrap { position: relative; }
+  .field input {
+    width: 100%;
+    padding: 13px 14px;
+    border: 1px solid #DFD3C6;
+    border-radius: 10px;
+    background: #FFFFFF;
+    color: var(--text-dark);
+    font: 14px 'DM Sans', sans-serif;
+  }
+  .field input:focus {
+    outline: none;
+    border-color: var(--caramel);
+    box-shadow: 0 0 0 3px rgba(181, 142, 107, 0.18);
+  }
+  .toggle-pw {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 0;
+    background: none;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 6px;
+  }
+  .toggle-pw:hover { color: var(--espresso); }
+  .submit {
+    width: 100%;
+    border: 0;
+    border-radius: 999px;
+    padding: 14px;
+    background: var(--caramel);
+    color: #FFFFFF;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-top: 6px;
+  }
+  .submit:hover { background: var(--espresso); }
+  .foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-top: 22px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-soft);
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .foot a {
+    color: var(--espresso);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .foot a:hover { color: var(--caramel); text-decoration: underline; }
 </style>
 </head>
 <body>
 <main class="panel">
-  <div class="brand">Cozy Bake · Admin Portal</div>
-  <h1>Welcome Back</h1>
-  <p class="sub">Sign in with your administrator account</p>
-  <form action="admin_login.php" method="post" autocomplete="on">
-    <div class="field"><label for="email">Email Address</label><input id="email" name="email" type="email" autocomplete="username" required></div>
-    <div class="field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required></div>
-    <button class="submit" type="submit">SIGN IN</button>
-  </form>
-  <div class="foot">Authorized administrators only</div>
+  <div class="panel-header">
+    <div class="brand-badge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
+        <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+      </svg>
+      <span>Cozy Bake · Admin Portal</span>
+    </div>
+    <h1>Welcome Back</h1>
+    <p>Sign in with your administrator account</p>
+  </div>
+  <div class="panel-body">
+    <form action="admin_login.php" method="post" autocomplete="on">
+      <div class="field">
+        <label for="email">Email Address</label>
+        <input id="email" name="email" type="email" autocomplete="username" placeholder="admin@cozybake.com" required>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <div class="input-wrap">
+          <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" style="padding-right: 60px;" required>
+          <button type="button" class="toggle-pw" onclick="const i=document.getElementById('password');const s=i.type==='password';i.type=s?'text':'password';this.textContent=s?'Hide':'Show';">Show</button>
+        </div>
+      </div>
+      <button class="submit" type="submit">Sign In</button>
+    </form>
+    <div class="foot">
+      <span>Authorized admins only</span>
+      <a href="index.html">← Back to Storefront</a>
+    </div>
+  </div>
 </main>
 </body>
 </html>

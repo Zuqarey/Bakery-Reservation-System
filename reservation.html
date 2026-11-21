@@ -3,33 +3,35 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Cozy Bake | Reservation</title>
+<title>Cozy Bake — Reservation</title>
+<link rel="stylesheet" href="cozy-theme.css">
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#FAF8F5;color:#3D281B;font-family:Arial,sans-serif}
-header{background:white;padding:22px 7%;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #eee3da}
-a{color:#3D281B;text-decoration:none}
-.logo{font:bold 29px Georgia}
-.hero{text-align:center;padding:65px 20px 45px;background:linear-gradient(#F5EBE2,#FAF8F5)}
-.hero small{color:#B58D6D;letter-spacing:4px;font-size:11px}
-.hero h1{font:normal 56px Georgia;margin:18px 0}
-.hero p,.sub,.note{color:#9B8576}
-.decor{color:#B58D6D;font-size:25px}
+body{margin:0;background:var(--bg-cream);color:var(--text-dark);font-family:'DM Sans',sans-serif}
+header{background:var(--header-cream);padding:20px 7%;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-soft)}
+a{color:var(--text-dark);text-decoration:none;font-weight:600}
+a:hover{color:var(--caramel)}
+.logo{font:400 32px 'Instrument Serif',serif;color:var(--espresso)}
+.hero{text-align:center;padding:56px 20px 38px;background:linear-gradient(#EFE5D8,var(--bg-cream))}
+.hero small{color:#9C5116;letter-spacing:3px;font-size:11px;font-weight:700}
+.hero h1{font:400 58px 'Instrument Serif',serif;margin:14px 0;color:#3B1D0E}
+.hero p,.sub,.note{color:var(--text-muted)}
+.decor{color:var(--caramel);font-size:22px}
 main{max-width:1050px;margin:20px auto 70px;padding:0 20px;display:grid;grid-template-columns:1.4fr .85fr;gap:25px;align-items:start}
-.card{background:white;border:1px solid #F0E5DD;border-radius:22px;padding:35px;box-shadow:0 12px 35px #4d30200a}
-h2{font:normal 28px Georgia;margin:0 0 10px}
-.sub{font-size:13px;margin-bottom:28px}
-.section-title{font:normal 19px Georgia;margin:28px 0 15px;padding-bottom:12px;border-bottom:1px solid #F0E5DD}
+.card{background:var(--surface-white);border:1px solid var(--border-soft);border-radius:22px;padding:34px;box-shadow:var(--shadow-card)}
+h2{font:400 30px 'Instrument Serif',serif;margin:0 0 8px;color:var(--espresso-dark)}
+.sub{font-size:13.5px;margin-bottom:26px}
+.section-title{font:500 15px 'Oswald',sans-serif;letter-spacing:1px;text-transform:uppercase;color:var(--espresso);margin:28px 0 15px;padding-bottom:10px;border-bottom:1px solid var(--border-soft)}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 .full{grid-column:1/-1}
-label{display:block;font-size:12px;font-weight:bold;margin-bottom:9px;color:#665044}
-input,select,textarea{width:100%;padding:15px;border:1px solid #E8DCD2;border-radius:11px;background:#FFFCFA;color:#3D281B;font:14px Arial}
-input:focus,select:focus,textarea:focus{outline:none;border-color:#B58D6D}
-input[readonly]{background:#F3EEE9;color:#806B5D}
+label{display:block;font-size:10.5px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:8px;color:var(--text-dark)}
+input,select,textarea{width:100%;padding:13px 14px;border:1px solid #DFD3C6;border-radius:10px;background:#FFFFFF;color:var(--text-dark);font:14px 'DM Sans',sans-serif}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--caramel)}
+input[readonly]{background:#F5EDE3;color:var(--text-muted)}
 textarea{height:100px;resize:vertical}
-button{width:100%;background:#B58D6D;color:white;border:0;padding:17px;border-radius:12px;font-weight:bold;cursor:pointer;margin-top:25px}
-button:hover{background:#967253}
-.summary{background:#FAF6F2;border-radius:15px;padding:23px;margin-top:20px;white-space:pre-line;line-height:2.3;font-size:13px;color:#725C4E}
+button{width:100%;background:var(--caramel);color:white;border:0;padding:15px;border-radius:999px;font-size:13px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;cursor:pointer;margin-top:25px}
+button:hover{background:var(--espresso)}
+.summary{background:var(--header-cream);border:1px solid var(--border-soft);border-radius:16px;padding:22px;margin-top:20px;white-space:pre-line;line-height:2.2;font-size:13.5px;color:var(--text-dark)}
 .note{font-size:12px;line-height:1.8}
 #message{font-size:13px;margin-top:15px}
 footer{text-align:center;color:#A28C7B;font-size:12px;padding:25px}

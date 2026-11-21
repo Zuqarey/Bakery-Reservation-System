@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cozy Bake — Admin Portal</title>
+  <link rel="stylesheet" href="cozy-theme.css">
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@400;500;600;700&family=Oswald:wght@500;600&family=Pacifico&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -38,9 +39,9 @@
     .brand-icon { min-width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
     .brand-text { font-weight: 600; font-size: 16px; opacity: 0; transition: opacity 0.2s; }
     .sidebar:hover .brand-text, .sidebar:hover .portal-info, .sidebar:hover .nav-label { opacity: 1; }
-    .portal-info { padding: 16px 10px 8px; opacity: 0; transition: opacity 0.2s; white-space: nowrap; }
+    .portal-info { padding: 16px 10px 8px; opacity: 0; transition: opacity 0.2s; width: 206px; white-space: normal; }
     .portal-info small { display: block; font-size: 10px; letter-spacing: 1.4px; color: #D2B49C; text-transform: uppercase; }
-    .portal-info strong { font-size: 15px; color: #FFF; }
+    .portal-info strong { display: block; font-size: 14px; line-height: 1.3; color: #FFF; overflow-wrap: break-word; }
     .nav-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
     .nav-item { display: flex; align-items: center; gap: 14px; padding: 12px; border-radius: 12px; cursor: pointer; color: #E6D7C8; text-decoration: none; white-space: nowrap; transition: background 0.2s, color 0.2s; }
     .nav-item:hover, .nav-item.active { background: rgba(255, 255, 255, 0.16); color: #FFFFFF; }
@@ -196,7 +197,7 @@
 
       <div class="portal-info">
         <small>ADMIN PORTAL</small>
-        <strong>{{ADMIN_NAME}} (Admin)</strong>
+        <strong title="{{ADMIN_NAME}}">{{ADMIN_NAME}}</strong>
       </div>
 
       <ul class="nav-list">
@@ -300,20 +301,20 @@
           
           <div class="kpi-card interactive" onclick="switchTab('reports', 'FINANCIAL REPORTS', document.querySelectorAll('.nav-item')[3])">
             <span class="kpi-label">TOTAL ORDERS TODAY</span>
-            <div class="kpi-value">0</div>
-            <span class="kpi-sub">Data pending DB connection</span>
+            <div class="kpi-value" id="kpiOrdersToday">0</div>
+            <span class="kpi-sub" id="kpiOrdersTodaySub">Loading orders…</span>
           </div>
           
           <div class="kpi-card interactive espresso" onclick="switchTab('catalog', 'MENU & CATALOG', document.querySelectorAll('.nav-item')[1])">
             <span class="kpi-label">ACTIVE MENU ITEMS</span>
-            <div class="kpi-value">0</div>
-            <span class="kpi-sub">Data pending DB connection</span>
+            <div class="kpi-value" id="kpiActiveMenu">0</div>
+            <span class="kpi-sub" id="kpiActiveMenuSub">Loading catalog…</span>
           </div>
           
           <div class="kpi-card interactive" onclick="switchTab('users', 'STAFF & USERS', document.querySelectorAll('.nav-item')[2])">
             <span class="kpi-label">ACTIVE TEAM MEMBERS</span>
-            <div class="kpi-value">0</div>
-            <span class="kpi-sub">Data pending DB connection</span>
+            <div class="kpi-value" id="kpiActiveTeam">0</div>
+            <span class="kpi-sub" id="kpiActiveTeamSub">Loading team…</span>
           </div>
         </div>
 
@@ -334,7 +335,7 @@
               <h3 class="card-title">BEST SELLER</h3>
             </div>
             <div style="display: flex; gap: 16px; margin-top: 10px;">
-              <div class="product-thumb" style="width: 70px; height: 70px;">🥐</div>
+              <div id="bestSellerThumb" class="product-thumb" style="width: 70px; height: 70px; overflow: hidden; flex-shrink: 0;">🥐</div>
               <div>
                 <h4 id="bestSellerName" style="font-size: 16px; font-weight: 700;">Loading best seller…</h4>
                 <p id="bestSellerSummary" style="font-size: 12px; color: var(--text-muted); margin: 4px 0 12px;">Loading sales data…</p>
@@ -388,7 +389,7 @@
             <h3 class="card-title" id="userTableHeading">BAKERY STAFF DIRECTORY</h3>
           </div>
 
-          <div class="pill-group" style="margin:14px 0 4px;"><button class="filter-pill active" id="staffActiveView" type="button">CURRENT STAFF</button><button class="filter-pill" id="staffRemovedView" type="button">REMOVED STAFF</button></div>
+          <div class="pill-group" id="staffSubFilters" style="margin:14px 0 4px;"><button class="filter-pill active" id="staffActiveView" type="button">CURRENT STAFF</button><button class="filter-pill" id="staffRemovedView" type="button">REMOVED STAFF</button></div>
           <div class="staff-grid" id="staffGridContainer"><p>Loading staff accounts...</p></div>
 
           <table class="data-table" id="customerTable" style="display:none; margin-top: 10px;">
@@ -612,20 +613,85 @@
     </div>
   </div>
 
+  <!-- ==========================================
+       MODAL 6: LOG OUT CONFIRMATION (ON BACK)
+       ========================================== -->
+  <div class="modal-backdrop" id="logoutConfirmModal">
+    <div class="cozy-modal" style="width: 400px;">
+      <div class="cozy-modal-header">
+        <div>
+          <small>ADMIN SESSION</small>
+          <h3>Log out of portal?</h3>
+        </div>
+        <button class="modal-close" onclick="closeModal('logoutConfirmModal')">✕</button>
+      </div>
+      <div class="cozy-modal-body">
+        <p style="font-size: 14px; color: var(--text-muted); line-height: 1.5;">
+          You're already on the first page of the dashboard. Would you like to log out of the Admin Portal?
+        </p>
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+          <button class="btn-soft" type="button" onclick="closeModal('logoutConfirmModal')">STAY HERE</button>
+          <a class="btn-danger-outline" href="admin_logout.php" style="text-decoration: none; display: inline-flex; align-items: center;">YES, LOG OUT</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     // --- PURE UI INTERACTION SCRIPT (NO DATA GENERATION) ---
     
-    function switchTab(tabId, headerText, navEl) {
+    const TAB_META = {
+      overview: { title: 'EXECUTIVE OVERVIEW', navIndex: 0 },
+      catalog:  { title: 'MENU & CATALOG', navIndex: 1 },
+      users:    { title: 'STAFF & USERS', navIndex: 2 },
+      reports:  { title: 'FINANCIAL REPORTS', navIndex: 3 }
+    };
+    let currentTab = 'overview';
+
+    function switchTab(tabId, headerText, navEl, pushHistory = true) {
+      const meta = TAB_META[tabId];
+      if (!meta) return;
       document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
       document.getElementById('tab-' + tabId).classList.add('active');
-      document.getElementById('topHeaderTitle').textContent = headerText;
+      document.getElementById('topHeaderTitle').textContent = headerText || meta.title;
 
-      document.querySelectorAll('.sidebar .nav-item').forEach(el => el.classList.remove('active'));
-      if (navEl) navEl.classList.add('active');
+      const navItems = document.querySelectorAll('.sidebar .nav-item');
+      navItems.forEach(el => el.classList.remove('active'));
+      const targetNav = navEl || navItems[meta.navIndex];
+      if (targetNav) targetNav.classList.add('active');
+
+      if (pushHistory && tabId !== currentTab) {
+        history.pushState({ tab: tabId }, '', '#' + tabId);
+      }
+      currentTab = tabId;
     }
+
+    window.addEventListener('popstate', (e) => {
+      if (e.state && e.state.guard) {
+        // User hit Back from the first dashboard page — stay here and ask to log out.
+        history.pushState({ tab: currentTab }, '', '#' + currentTab);
+        openModal('logoutConfirmModal');
+        return;
+      }
+      const hashTab = location.hash.replace('#', '');
+      const tabId = (e.state && e.state.tab) || (TAB_META[hashTab] ? hashTab : 'overview');
+      switchTab(tabId, null, null, false);
+    });
+
+    (function initTabHistory() {
+      const hashTab = location.hash.replace('#', '');
+      const initialTab = TAB_META[hashTab] ? hashTab : 'overview';
+      // Place a guard entry beneath the initial tab so Back on the first page triggers the logout prompt.
+      history.replaceState({ guard: true }, '', '#' + initialTab);
+      history.pushState({ tab: initialTab }, '', '#' + initialTab);
+      if (initialTab !== 'overview') {
+        switchTab(initialTab, null, null, false);
+      }
+    })();
 
     function toggleUserView(view) {
       const grid = document.getElementById('staffGridContainer');
+      const subFilters = document.getElementById('staffSubFilters');
       const custTable = document.getElementById('customerTable');
       const btnStaff = document.getElementById('btnShowStaff');
       const btnCust = document.getElementById('btnShowCustomers');
@@ -633,12 +699,14 @@
 
       if (view === 'staff') {
         grid.style.display = 'grid';
+        subFilters.style.display = 'flex';
         custTable.style.display = 'none';
         btnStaff.classList.add('active');
         btnCust.classList.remove('active');
         heading.textContent = 'BAKERY STAFF DIRECTORY';
       } else {
         grid.style.display = 'none';
+        subFilters.style.display = 'none';
         custTable.style.display = 'table';
         btnCust.classList.add('active');
         btnStaff.classList.remove('active');
@@ -653,6 +721,23 @@
     function openModal(id) { document.getElementById(id).classList.add('open'); if (id === 'profitStatsModal') renderProfitDetailChart(); }
     function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
+    // Close modals & notifications on Escape key or clicking outside.
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-backdrop.open').forEach(m => m.classList.remove('open'));
+        document.getElementById('notifPopover').classList.remove('open');
+      }
+    });
+    document.addEventListener('click', (e) => {
+      if (e.target.classList && e.target.classList.contains('modal-backdrop')) {
+        e.target.classList.remove('open');
+      }
+      const popover = document.getElementById('notifPopover');
+      if (popover && popover.classList.contains('open') && !e.target.closest('#notifPopover') && !e.target.closest('.bell-btn')) {
+        popover.classList.remove('open');
+      }
+    });
+
     let showRemovedStaff = false;
     async function loadAdminUsers() {
       const grid = document.getElementById('staffGridContainer');
@@ -661,6 +746,10 @@
         const response = await fetch('admin_users.php?action=list', {credentials:'same-origin'});
         const data = await response.json();
         if (!response.ok || !data.success) throw new Error(data.message || 'Could not load accounts.');
+        const activeStaffCount = data.staff.filter(st => st.status === 'Active').length;
+        const currentStaffCount = data.staff.filter(st => st.status !== 'Removed').length;
+        document.getElementById('kpiActiveTeam').textContent = activeStaffCount;
+        document.getElementById('kpiActiveTeamSub').textContent = `${currentStaffCount} total staff account${currentStaffCount === 1 ? '' : 's'}`;
         const visibleStaff = data.staff.filter(st => (st.status === 'Removed') === showRemovedStaff);
         grid.innerHTML = visibleStaff.length ? visibleStaff.map(st => `<div class="staff-card" style="cursor:default;${st.status==='Removed'?'opacity:.72;':''}"><div class="staff-card-left"><div class="staff-avatar">${escapeAdminText(st.name.slice(0,2).toUpperCase())}</div><div class="staff-meta"><h4>${escapeAdminText(st.name)}</h4><p>${escapeAdminText(st.email)}</p><div class="staff-id">Staff ID: ${st.staff_id} · User ID: ${st.user_id}</div></div></div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end"><span class="status-pill ${st.status==='Active'?'pill-green':(st.status==='Removed'?'pill-red':'pill-yellow')}">${escapeAdminText(st.status)}</span>${st.status==='Removed'?`<button class="btn-soft" onclick="restoreAdminStaff(${st.staff_id})">RESTORE</button>`:`<button class="btn-soft" onclick="setAdminStaffStatus(${st.staff_id}, '${st.status==='Active'?'Inactive':'Active'}')">${st.status==='Active'?'Deactivate':'Activate'}</button><button class="btn-danger-outline" onclick="removeAdminStaff(${st.staff_id})">REMOVE</button>`}</div></div>`).join('') : (showRemovedStaff ? '<p>No removed staff accounts.</p>' : '<p>No current staff accounts found.</p>');
         rows.innerHTML = data.customers.length ? data.customers.map(c => `<tr><td><strong>${escapeAdminText(c.name)}</strong></td><td>${escapeAdminText(c.email)}</td><td>${c.orders} orders</td><td><strong>RM ${Number(c.spent).toFixed(2)}</strong></td><td><span class="status-pill pill-yellow">${c.orders>=10?'Regular':'New'}</span></td></tr>`).join('') : '<tr><td colspan="5">No customer accounts found.</td></tr>';
@@ -711,6 +800,10 @@
       document.getElementById('reportFinancialThisMonth').textContent = money(data.summary.this_month);
       document.getElementById('reportFinancialLastMonth').textContent = money(data.summary.last_month);
       document.getElementById('reportFinancialAllTime').textContent = money(data.summary.all_time);
+      const ordersToday = Number(data.summary.orders_today || 0);
+      const totalOrders = Number(data.summary.total_orders || 0);
+      document.getElementById('kpiOrdersToday').textContent = ordersToday;
+      document.getElementById('kpiOrdersTodaySub').textContent = `${totalOrders} total order${totalOrders === 1 ? '' : 's'} recorded`;
       const ledger = document.getElementById('adminReportLedger');
       ledger.innerHTML = data.ledger.length ? data.ledger.map(r => `<tr><td><strong>${r.receipt_no ? escapeHtml(r.receipt_no) : '#'+escapeHtml(r.order_id)}</strong></td><td>${escapeHtml(r.order_date || '—')}</td><td>${escapeHtml(r.customer_name || 'Unknown customer')}</td><td>${escapeHtml(r.outlet || '—')}</td><td>${escapeHtml(r.order_type || '—')}</td><td><strong>${money(r.total)}</strong></td><td>${escapeHtml(r.status_name || 'Unspecified')}</td></tr>`).join('') : '<tr><td colspan="7">No order records found yet.</td></tr>';
       window.adminMonthlyRevenueData = data.months || [];
@@ -784,6 +877,7 @@
     if (!products.length) {
       list.innerHTML = '<div class="fav-item"><div>No customer favorites yet. Product sales will appear here after orders contain items.</div></div>';
       document.getElementById('favoriteProductDetails').innerHTML = '<p style="color:var(--text-muted);">There are no recorded product sales to display yet.</p>';
+      document.getElementById('bestSellerThumb').textContent = '🥐';
       document.getElementById('bestSellerName').textContent = 'No sales recorded yet';
       document.getElementById('bestSellerSummary').textContent = 'Best seller will appear after the first order.';
       return;
@@ -796,8 +890,16 @@
       el.addEventListener('click', select);
       el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(); } });
     });
+    showProduct(0);
     const top = products[0];
-    document.getElementById("bestSellerThumb").innerHTML = top.image_path ? `<img src="${safe(top.image_path)}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">` : '🥐';
+    const thumb = document.getElementById('bestSellerThumb');
+    if (thumb) {
+      thumb.innerHTML = top.image_path
+        ? `<img src="${safe(top.image_path)}" alt="${safe(top.product_name)}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" onerror="this.parentElement.textContent='🥐'">`
+        : '🥐';
+    }
+    document.getElementById('bestSellerName').textContent = top.product_name;
+    document.getElementById('bestSellerSummary').textContent = `${top.units_sold} units sold · ${money(top.revenue)} revenue`;
   }
 
   function renderNotifications(items) {
@@ -859,7 +961,7 @@
     const data=await response.json();if(!response.ok||!data.success)throw new Error(data.message||'Catalog request failed.');return data;
   }
   async function load(){
-    try{const data=await request('list');products=data.products||[];renderProducts();message(`${products.filter(p=>Number(p.is_active)===1).length} active and ${products.filter(p=>Number(p.is_active)===0).length} archived product(s).`);}
+    try{const data=await request('list');products=data.products||[];renderProducts();const activeCount=products.filter(p=>Number(p.is_active)===1).length,archivedCount=products.filter(p=>Number(p.is_active)===0).length;$('kpiActiveMenu').textContent=activeCount;$('kpiActiveMenuSub').textContent=`${archivedCount} archived item${archivedCount===1?'':'s'}`;message(`${activeCount} active and ${archivedCount} archived product(s).`);}
     catch(e){$('catalogList').innerHTML='<div class="catalog-item">Could not load products. Check admin_catalog.php and the PHP error log.</div>';message(e.message,true);}
   }
   window.openProductModal=function(id=null){

@@ -4,48 +4,50 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Cozy Bake | Payment</title>
+<title>Cozy Bake — Payment</title>
+<link rel="stylesheet" href="cozy-theme.css">
 
 <style>
-:root{--cream:#FAF8F5;--brown:#3D281B;--accent:#B58D6D;--soft:#F1E7DF;--line:#E4D1C2;--muted:#806B5D}
+:root{--cream:#F5EDE3;--brown:#2C1A11;--accent:#B58E6B;--espresso:#5C2C16;--soft:#EFE5D8;--line:#EFE6DC;--muted:#8C7A6B}
 *{box-sizing:border-box}
-body{margin:0;background:var(--cream);color:var(--brown);font-family:Arial,sans-serif}
+body{margin:0;background:var(--cream);color:var(--brown);font-family:'DM Sans',sans-serif}
 button,input{font:inherit}
 button{cursor:pointer}
-.topbar{display:flex;justify-content:space-between;align-items:center;padding:22px 6%;background:white;border-bottom:1px solid var(--line)}
-.brand{font:bold 28px Georgia;color:var(--brown);text-decoration:none}
-.back{color:var(--muted);font-size:14px;text-decoration:none}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:20px 6%;background:var(--header-cream);border-bottom:1px solid var(--line)}
+.brand{font:400 32px 'Instrument Serif',serif;color:var(--espresso);text-decoration:none}
+.back{color:var(--espresso);font-size:14px;font-weight:600;text-decoration:none}
+.back:hover{color:var(--accent)}
 .container{max-width:1150px;margin:auto;padding:40px 20px 70px}
-.heading{text-align:center;font:bold 48px Georgia;margin:10px 0}
+.heading{text-align:center;font:400 52px 'Instrument Serif',serif;color:#3B1D0E;margin:10px 0}
 .subtitle{text-align:center;color:var(--muted);margin-bottom:30px}
 .steps{display:flex;justify-content:center;align-items:center;gap:12px;margin-bottom:35px;flex-wrap:wrap}
-.step{font-size:13px;color:#A18D7E}
-.step.done,.step.active{color:var(--brown);font-weight:bold}
-.step.active{background:var(--soft);padding:10px 16px;border-radius:25px}
+.step{font-size:13px;color:var(--muted)}
+.step.done,.step.active{color:var(--espresso);font-weight:700}
+.step.active{background:var(--surface-white);border:1px solid var(--line);padding:10px 18px;border-radius:999px;box-shadow:var(--shadow-card)}
 .arrow{color:var(--accent)}
 .layout{display:grid;grid-template-columns:1.3fr .9fr;gap:25px;align-items:start}
-.card{background:white;border-radius:20px;padding:28px;border:1px solid #F0E7E0;box-shadow:0 8px 25px #3D281B0A}
-.card h2{font:bold 23px Georgia;margin:0 0 12px}
+.card{background:white;border-radius:22px;padding:28px;border:1px solid var(--line);box-shadow:var(--shadow-card)}
+.card h2{font:400 28px 'Instrument Serif',serif;color:var(--espresso-dark);margin:0 0 12px}
 .description{font-size:14px;color:var(--muted);line-height:1.7}
 .methods{display:grid;gap:15px;margin-top:25px}
-.method{display:flex;align-items:center;gap:15px;border:1px solid var(--line);padding:20px;border-radius:14px;cursor:pointer}
-.method:has(input:checked){background:#FBF4EE;border:2px solid var(--accent);padding:19px}
-.method input{accent-color:var(--accent)}
+.method{display:flex;align-items:center;gap:15px;border:1px solid #DFD3C6;padding:20px;border-radius:14px;cursor:pointer}
+.method:has(input:checked){background:#FBF4EE;border:2px solid var(--espresso);padding:19px}
+.method input{accent-color:var(--espresso)}
 .method strong{display:block;margin-bottom:5px}
 .method small{color:var(--muted)}
-.payment-details{background:var(--cream);border-radius:15px;padding:25px;margin-top:25px}
-.qr-placeholder{width:210px;height:210px;margin:20px auto;border:3px dashed var(--accent);border-radius:12px;background:white;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.payment-details{background:var(--header-cream);border:1px solid var(--line);border-radius:16px;padding:25px;margin-top:25px}
+.qr-placeholder{width:210px;height:210px;margin:20px auto;border:3px dashed var(--accent);border-radius:14px;background:white;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .payment-qr{width:100%;height:100%;object-fit:contain}
 .cash-icon{font-size:55px;text-align:center}
-.cash-title{text-align:center;font-weight:bold;margin-top:10px}
+.cash-title{text-align:center;font-weight:700;margin-top:10px}
 .cash-text{text-align:center;color:var(--muted);font-size:14px;line-height:1.7}
 .hidden{display:none}
 .summary{position:sticky;top:20px}
 .summary-item{display:flex;justify-content:space-between;gap:15px;padding:15px 0;border-bottom:1px solid var(--line);font-size:14px}
 .summary-item small{display:block;color:var(--muted);margin-top:6px;line-height:1.6}
-.summary-total{display:flex;justify-content:space-between;font-size:21px;font-weight:bold;margin:25px 0}
-.confirm-btn{width:100%;padding:17px;border:0;background:var(--accent);color:white;border-radius:12px;font-weight:bold}
-.confirm-btn:hover{background:#987356}
+.summary-total{display:flex;justify-content:space-between;font-size:21px;font-weight:700;margin:25px 0;color:var(--espresso)}
+.confirm-btn{width:100%;padding:15px;border:0;background:var(--accent);color:white;border-radius:999px;font-size:13px;font-weight:700;letter-spacing:.8px;text-transform:uppercase}
+.confirm-btn:hover{background:var(--espresso)}
 .confirm-btn:disabled{opacity:.6;cursor:not-allowed}
 .secure-note{text-align:center;color:var(--muted);font-size:12px;line-height:1.7;margin-top:15px}
 .error{display:none;color:#A13E3E;font-size:13px;margin-top:15px}

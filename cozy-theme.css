@@ -1,0 +1,134 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@400;500;600;700&family=Oswald:wght@500;600&family=Pacifico&display=swap');
+
+:root {
+  --bg-cream: #F5EDE3;
+  --surface-white: #FFFFFF;
+  --header-cream: #FDFBF7;
+  --espresso: #5C2C16;
+  --espresso-dark: #3E1C0C;
+  --caramel: #B58E6B;
+  --orange-accent: #EB9E55;
+  --text-dark: #2C1A11;
+  --text-muted: #8C7A6B;
+  --border-soft: #EFE6DC;
+  --shadow-card: 0 6px 20px rgba(92, 44, 22, 0.06);
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button, a, input, select, textarea {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.22s ease, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Unified floating button & pill lift effect (matching Admin Portal) */
+.cta,
+.btn,
+.btn-primary,
+.btn-soft,
+.btn-action,
+.submit,
+.confirm-btn,
+.home-btn,
+.print-btn,
+.back,
+.back-home,
+.cart-btn,
+.filter-pill,
+.pill,
+.filters button {
+  box-shadow: 0 4px 12px rgba(92, 44, 22, 0.08);
+}
+
+.cta:hover,
+.btn:hover,
+.btn-primary:hover,
+.btn-soft:hover,
+.btn-action:hover,
+.submit:hover,
+.confirm-btn:hover,
+.home-btn:hover,
+.print-btn:hover,
+.back:hover,
+.back-home:hover,
+.cart-btn:hover,
+.filter-pill:hover,
+.pill:hover,
+.filters button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(92, 44, 22, 0.16);
+}
+
+.cta:active,
+.btn:active,
+.btn-primary:active,
+.btn-soft:active,
+.btn-action:active,
+.submit:active,
+.confirm-btn:active,
+.home-btn:active,
+.print-btn:active,
+.back:active,
+.back-home:active,
+.cart-btn:active,
+.filter-pill:active,
+.pill:active,
+.filters button:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 8px rgba(92, 44, 22, 0.12);
+}
+
+/* Unified floating card lift effect (matching Admin Portal KPI & Staff cards) */
+.kpi-card,
+.location-card,
+.order-card,
+.catalog-item,
+.schedule-row,
+#ingredients-list-container > div,
+#inventory-list > div {
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.22s ease, border-color 0.2s ease;
+}
+
+.kpi-card:hover,
+.location-card:hover,
+.order-card:hover,
+.catalog-item:hover,
+.schedule-row:hover,
+#ingredients-list-container > div:hover,
+#inventory-list > div:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(92, 44, 22, 0.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--caramel);
+  outline-offset: 2px;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-cream);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D6C3B0;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--caramel);
+}

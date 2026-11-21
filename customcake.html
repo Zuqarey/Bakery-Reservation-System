@@ -4,29 +4,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Cozy Bake | Custom Cake</title>
+<title>Cozy Bake — Custom Cake</title>
+<link rel="stylesheet" href="cozy-theme.css">
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#FAF8F5;color:#3D281B;font-family:Arial}
-header{text-align:center;padding:35px}
-h1,h2{font-family:Georgia;font-weight:normal}
-h1{font-size:50px}
-header p{color:#B58D6D}
-main{max-width:1100px;margin:auto;padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:30px}
-.card{background:white;padding:30px;border-radius:20px;box-shadow:0 4px 18px #0001}
-label{display:block;font-weight:bold;margin:18px 0 8px}
-select,input{width:100%;padding:13px;border:1px solid #ddd;border-radius:10px}
-button{width:100%;padding:15px;margin-top:15px;background:#B58D6D;color:white;border:0;border-radius:12px;cursor:pointer}
-button:hover{background:#987153}
+body{margin:0;background:var(--bg-cream);color:var(--text-dark);font-family:'DM Sans',sans-serif}
+header{text-align:center;padding:38px 20px;background:var(--header-cream);border-bottom:1px solid var(--border-soft);margin-bottom:28px}
+h1,h2{font-family:'Instrument Serif',serif;font-weight:400;color:#3B1D0E}
+h1{font-size:54px;margin:8px 0}
+header p{color:#9C5116;font-size:13px;font-weight:600;letter-spacing:1.2px}
+main{max-width:1100px;margin:auto;padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.card{background:var(--surface-white);padding:30px;border-radius:22px;border:1px solid var(--border-soft);box-shadow:var(--shadow-card)}
+label{display:block;font-size:11px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;margin:18px 0 8px}
+select,input{width:100%;padding:12px 14px;border:1px solid #DFD3C6;border-radius:10px;font-family:'DM Sans',sans-serif}
+button{width:100%;padding:14px;margin-top:16px;background:var(--caramel);color:white;border:0;border-radius:999px;font-size:12.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;cursor:pointer}
+button:hover{background:var(--espresso)}
 .preview{text-align:center}
 .cake{width:220px;height:155px;margin:65px auto;background:#F5E5C7;border-radius:50% 50% 20% 20%;border:8px solid #fff5;box-shadow:0 15px 0 #D8B994;position:relative;display:flex;align-items:center;justify-content:center}
 .cake.heart{border-radius:48% 48% 50% 50%}
 .cake.square{border-radius:15px}
 #cakeText{overflow-wrap:anywhere;max-width:90%}
 #cakeTop{position:absolute;top:8px;font-size:25px}
-#total{font-size:30px;color:#B58D6D;font-weight:bold}
-#summary{text-align:left;background:#FAF8F5;padding:18px;border-radius:12px;line-height:2}
-.back{display:block;text-align:center;margin:30px;color:#3D281B}
+#total{font-size:30px;color:var(--espresso);font-weight:700}
+#summary{text-align:left;background:var(--header-cream);border:1px solid var(--border-soft);padding:18px;border-radius:14px;line-height:2}
+.back{display:inline-block;margin:30px auto;color:var(--espresso);font-weight:700;text-decoration:none}
 @media(max-width:700px){main{grid-template-columns:1fr}h1{font-size:38px}}
 </style>
 </head>
