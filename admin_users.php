@@ -13,7 +13,13 @@ try {
    $res=$conn->query("SELECT s.staff_id,s.user_id,s.status,u.name,u.email FROM staff s INNER JOIN `user` u ON u.user_id=s.user_id ORDER BY u.name");
    while($r=$res->fetch_assoc()) $staff[]=$r;
    $customers=[];
-   $sql="SELECT c.customer_id,c.full_name AS name,c.email,COUNT(DISTINCT o.order_id) AS orders,COALESCE(SUM(DISTINCT p.total),0) AS spent FROM customer c LEFT JOIN orders o ON o.customer_id=c.customer_id LEFT JOIN payment p ON p.order_id=o.order_id GROUP BY c.customer_id,c.full_name,c.email ORDER BY c.full_name";
+   // Total payments per order first, then add up per customer.
+   // (SUM(DISTINCT ...) was wrong: orders with the same amount were only counted once.)
+   $sql="SELECT c.customer_id,c.full_name AS name,c.email,COUNT(o.order_id) AS orders,COALESCE(SUM(pt.order_total),0) AS spent
+         FROM customer c
+         LEFT JOIN orders o ON o.customer_id=c.customer_id
+         LEFT JOIN (SELECT order_id, SUM(total) AS order_total FROM payment GROUP BY order_id) pt ON pt.order_id=o.order_id
+         GROUP BY c.customer_id,c.full_name,c.email ORDER BY c.full_name";
    $res=$conn->query($sql);
    while($r=$res->fetch_assoc()) $customers[]=$r;
    reply(200,['success'=>true,'staff'=>$staff,'customers'=>$customers]);
