@@ -1,23 +1,28 @@
 <?php
 session_start();
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=utf-8');
 
-if (!empty($_SESSION['user_email']) || !empty($_SESSION['customer_logged_in']) || !empty($_SESSION['user_id'])) {
-    $name = $_SESSION['user_name'] ?? $_SESSION['customer_name'] ?? 'Customer';
-    $email = $_SESSION['user_email'] ?? $_SESSION['customer_email'] ?? '';
-    $id = $_SESSION['customer_id'] ?? $_SESSION['user_id'] ?? 1;
+// This endpoint is for customer-facing pages only. An administrator session
+// must never be reported as a customer login.
+if (($_SESSION['role'] ?? '') === 'admin' || !empty($_SESSION['admin_logged_in'])) {
+    echo json_encode(['loggedIn' => false]);
+    exit;
+}
 
+if (!empty($_SESSION['customer_logged_in']) && ($_SESSION['role'] ?? 'customer') === 'customer') {
+    $name = $_SESSION['customer_name'] ?? $_SESSION['full_name'] ?? $_SESSION['user_name'] ?? 'Customer';
+    $email = $_SESSION['customer_email'] ?? $_SESSION['user_email'] ?? '';
+    $id = $_SESSION['customer_id'] ?? $_SESSION['id'] ?? null;
     echo json_encode([
         'loggedIn' => true,
-        'customer' => $name, // Digunakan oleh menu.html
-        'name' => $name,     // Digunakan oleh reservation.html
+        'customer' => $name,
+        'name' => $name,
         'email' => $email,
         'customer_id' => $id,
-        'role' => $_SESSION['role'] ?? 'customer'
+        'role' => 'customer'
     ]);
-} else {
-    echo json_encode([
-        'loggedIn' => false
-    ]);
+    exit;
 }
+
+echo json_encode(['loggedIn' => false]);
 ?>

@@ -67,32 +67,81 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
-    $emailPrefix = explode('@', $email)[0];
-    $isAdminEmail = (strpos($emailPrefix, 'admin') !== false);
-    $isStaffEmail = (strpos($emailPrefix, 'staff') !== false);
-
-    $cleanName = ucfirst(str_replace(['staff', 'admin', '_', '.', '-'], '', $emailPrefix));
-    if (empty($cleanName)) {
-        $cleanName = $isAdminEmail ? 'Admin' : ($isStaffEmail ? 'Staff' : 'Customer');
+    // ADMIN: verify membership in the admin table, never infer role from email text.
+    $adminStmt = $conn->prepare(
+        "SELECT u.user_id, u.name, u.email, u.password
+         FROM `user` AS u
+         INNER JOIN `admin` AS a ON a.user_id = u.user_id
+         WHERE LOWER(u.email) = ?
+         LIMIT 1"
+    );
+    if (!$adminStmt) {
+        error_log('Admin lookup prepare failed: ' . $conn->error);
+        echo "<script>alert('Login could not be completed. Please check the server configuration.'); window.location.href='login.html';</script>";
+        exit();
     }
-
-    // 1. ADMIN
-    if ($isAdminEmail) {
+    $adminStmt->bind_param('s', $email);
+    $adminStmt->execute();
+    $adminResult = $adminStmt->get_result();
+    if ($adminResult && $adminResult->num_rows === 1) {
+        $admin = $adminResult->fetch_assoc();
+        if (!password_verify($password, $admin['password'])) {
+            echo "<script>alert('Incorrect email or password.'); window.location.href='login.html';</script>";
+            exit();
+        }
+        session_regenerate_id(true);
+        $_SESSION = [];
         $_SESSION['role'] = 'admin';
         $_SESSION['admin_logged_in'] = true;
-        $_SESSION['user_name'] = $cleanName;
-        $_SESSION['user_email'] = $email;
-        redirectWithSession("admin.html", $cleanName, $email, 1, 'admin');
+        $_SESSION['admin_id'] = (int)$admin['user_id'];
+        $_SESSION['user_id'] = (int)$admin['user_id'];
+        $_SESSION['admin_name'] = $admin['name'];
+        $_SESSION['user_name'] = $admin['name'];
+        $_SESSION['user_email'] = $admin['email'];
+        header('Location: admin_dashboard.php');
+        exit();
     }
+    $adminStmt->close();
 
-    // 2. STAFF
-    if ($isStaffEmail) {
-        $_SESSION['role'] = 'staff';
-        $_SESSION['staff_logged_in'] = true;
-        $_SESSION['staff_name'] = $cleanName;
-        $_SESSION['user_name'] = $cleanName;
-        $_SESSION['user_email'] = $email;
-        redirectWithSession("staff_dashboard.html", $cleanName, $email, 1, 'staff');
+    $emailPrefix = explode('@', $email)[0];
+    $cleanName = ucfirst(str_replace(['staff', 'admin', '_', '.', '-'], '', $emailPrefix));
+    if (empty($cleanName)) $cleanName = 'Customer';
+
+    // STAFF: authenticate against the staff membership in the database,
+    // even when staff use the shared customer login screen.
+    $staffStmt = $conn->prepare(
+        "SELECT u.user_id, u.name, u.email, u.password, s.staff_id, s.status
+         FROM `user` AS u
+         INNER JOIN `staff` AS s ON s.user_id = u.user_id
+         WHERE LOWER(u.email) = ?
+         LIMIT 1"
+    );
+    if ($staffStmt) {
+        $staffStmt->bind_param('s', $email);
+        $staffStmt->execute();
+        $staffResult = $staffStmt->get_result();
+        if ($staffResult && $staffResult->num_rows === 1) {
+            $staff = $staffResult->fetch_assoc();
+            if (!password_verify($password, (string)$staff['password'])) {
+                echo "<script>alert('Incorrect email or password.'); window.location.href='login.html';</script>";
+                exit();
+            }
+            if (strcasecmp(trim((string)$staff['status']), 'Active') !== 0) {
+                echo "<script>alert('Your staff account is not active. Please contact an administrator.'); window.location.href='login.html';</script>";
+                exit();
+            }
+            session_regenerate_id(true);
+            $_SESSION = [];
+            $_SESSION['role'] = 'staff';
+            $_SESSION['staff_logged_in'] = true;
+            $_SESSION['staff_id'] = (int)$staff['staff_id'];
+            $_SESSION['user_id'] = (int)$staff['user_id'];
+            $_SESSION['staff_name'] = $staff['name'];
+            $_SESSION['user_name'] = $staff['name'];
+            $_SESSION['user_email'] = $staff['email'];
+            redirectWithSession('staff_dashboard.html', $staff['name'], $staff['email'], (int)$staff['staff_id'], 'staff');
+        }
+        $staffStmt->close();
     }
 
     // 3. CUSTOMER

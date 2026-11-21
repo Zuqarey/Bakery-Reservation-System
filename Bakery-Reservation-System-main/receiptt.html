@@ -1,0 +1,326 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cozy Bake | Checkout</title>
+<style>
+:root{--bg:#FAF8F5;--brown:#3D281B;--accent:#B58D6D;--line:#E4D1C2}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--brown);font-family:Arial}
+header{background:white;padding:22px 5%;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line)}
+a{color:inherit}
+.brand{font:700 27px Georgia;text-decoration:none}
+.back{font-size:14px;text-decoration:none}
+main{max-width:1150px;margin:auto;padding:35px 20px}
+h1{text-align:center;font:700 50px Georgia;margin:10px}
+h2{font:700 23px Georgia}
+.subtitle{text-align:center;color:var(--accent);margin-bottom:35px}
+.steps{text-align:center;margin-bottom:30px;color:var(--accent)}
+.layout{display:grid;grid-template-columns:1.3fr .9fr;gap:25px;align-items:start}
+.left{display:grid;gap:20px}
+.panel{background:white;padding:27px;border-radius:20px;border:1px solid #F0E7E0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.full{grid-column:1/-1}
+label{display:block;font-size:13px;font-weight:bold;margin:12px 0 8px}
+input,select,textarea{width:100%;padding:13px;border:1px solid var(--line);border-radius:10px;font:inherit}
+input[readonly]{background:#F5F0EB;color:#806B5D}
+textarea{resize:vertical;min-height:90px}
+.choices{display:flex;gap:20px;margin:15px 0}
+.choices label{display:flex;align-items:center;gap:8px}
+.choices input{width:auto;accent-color:var(--accent)}
+.summary{position:sticky;top:20px}
+.item{display:flex;justify-content:space-between;gap:12px;padding:15px 0;border-bottom:1px solid var(--line)}
+.item small{display:block;color:#806B5D;margin-top:6px;line-height:1.5}
+.total{display:flex;justify-content:space-between;font-size:21px;font-weight:bold;padding:20px 0}
+button{width:100%;padding:16px;background:var(--accent);color:white;border:0;border-radius:12px;font-weight:bold;cursor:pointer}
+button:hover{background:#987356}
+button:disabled{opacity:.5;cursor:not-allowed}
+#error{color:#A13E3E;font-size:13px}
+@media(max-width:750px){.layout,.grid{grid-template-columns:1fr}.full{grid-column:auto}.summary{position:static}h1{font-size:38px}}
+</style>
+</head>
+<body>
+
+<header>
+<a class="brand" href="index.html">Cozy Bake</a>
+<a class="back" href="menu.html">← Back to Menu</a>
+</header>
+
+<main>
+<p class="subtitle">ALMOST THERE</p>
+<h1>Checkout</h1>
+<p class="subtitle">Just a few details before your sweet treats are ready.</p>
+<div class="steps">✓ Cart ── ② Checkout ── ③ Payment ── ④ Receipt</div>
+
+<div class="layout">
+<form class="left" id="checkoutForm">
+
+<section class="panel">
+<h2>01. Customer Information</h2>
+<div class="grid">
+<div class="full">
+<label>Name *</label>
+<input id="name" required readonly placeholder="Auto-filled after login">
+</div>
+<div>
+<label>Phone Number *</label>
+<input id="phone" type="tel" required placeholder="0123456789">
+</div>
+<div>
+<label>Email Address *</label>
+<input id="email" type="email" required readonly placeholder="Auto-filled after login">
+</div>
+</div>
+</section>
+
+<section class="panel">
+<h2>02. Order Details</h2>
+<div class="choices">
+<label><input type="radio" name="type" value="Self-Pickup" checked> 🛍️ Self-Pickup</label>
+<label><input type="radio" name="type" value="Dine-In"> ☕ Dine-In</label>
+</div>
+<div class="grid">
+<div class="full">
+<label>Select Outlet *</label>
+<select id="outlet" required>
+<option value="">Choose an outlet</option>
+<option>Kangar Jaya Mall</option>
+<option>Aman Central</option>
+<option>Queensbay Mall</option>
+</select>
+</div>
+<div>
+<label>Preferred Date *</label>
+<input id="date" type="date" required>
+</div>
+<div>
+<label>Preferred Time *</label>
+<input id="time" type="time" required>
+</div>
+</div>
+</section>
+
+<section class="panel">
+<h2>03. Special Instructions</h2>
+<label>Order Notes (Optional)</label>
+<textarea id="notes" maxlength="500" placeholder="Any special requests?"></textarea>
+</section>
+</form>
+
+<aside class="panel summary">
+<h2>Your Order</h2>
+<a href="menu.html">Edit Cart</a>
+<div id="items"></div>
+<div class="total"><span>Total</span><span id="total">RM 0.00</span></div>
+<button type="submit" form="checkoutForm" id="payBtn">Proceed to Payment →</button>
+<p id="error" role="alert"></p>
+</aside>
+</div>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+const money=n=>"RM "+Number(n||0).toFixed(2);
+const branches={
+ Perlis:"Kangar Jaya Mall",
+ Kedah:"Aman Central",
+ Penang:"Queensbay Mall"
+};
+
+// tukar false if backend dah siap
+const DEMO_MODE=true;
+
+// LOGIN CHECK + AUTO-FILL
+async function loadCustomer(){
+ if(DEMO_MODE){
+  const name=sessionStorage.getItem("cozyBakeCustomerName");
+  const email=sessionStorage.getItem("cozyBakeCustomerEmail");
+
+  if(!email){
+   location.replace("login.html?redirect=checkout.html");
+   return;
+  }
+  $("name").value=name||"Customer";
+  $("email").value=email;
+  return;
+ }
+
+ // PHP :logged-in customer
+ try{
+  const res=await fetch("getcustomer.php",{credentials:"same-origin"});
+  const data=await res.json();
+
+  if(!res.ok||data.loggedIn!==true){
+   location.replace("login.html?redirect=checkout.html");
+   return;
+  }
+
+  const customer=data.customer||data;
+  $("name").value=customer.name||"";
+  $("email").value=customer.email||"";
+ }catch{
+  $("error").textContent="Unable to verify customer login.";
+  $("payBtn").disabled=true;
+ }
+}
+
+let cart=[];
+try{
+ const saved=JSON.parse(localStorage.getItem("cozyBakeCart")||"[]");
+ if(Array.isArray(saved))
+  cart=saved.filter(x=>
+   x&&typeof x.name==="string"&&
+   Number(x.price)>=0&&Number.isFinite(Number(x.price))&&
+   Number.isInteger(Number(x.quantity))&&Number(x.quantity)>0
+  );
+}catch{}
+
+// DISPLAY CART
+function renderCart(){
+ $("items").replaceChildren();
+ let total=0;
+
+ cart.forEach(x=>{
+  const amount=Number(x.price)*Number(x.quantity);
+  total+=amount;
+
+  const row=document.createElement("div");
+  row.className="item";
+  const info=document.createElement("div");
+  const title=document.createElement("strong");
+  title.textContent=x.name;
+
+  const details=document.createElement("small");
+  details.textContent=`Qty: ${x.quantity} × ${money(x.price)}`;
+  info.append(title,details);
+
+  if(x.type==="customcake"){
+   const extra=document.createElement("small");
+   extra.textContent=[
+    x.size,x.flavour,x.shape,x.topping,
+    x.message?"Message: "+x.message:"",
+    x.location?"Pickup: "+x.location:"",
+    x.pickupDate?"Date: "+x.pickupDate:""
+   ].filter(Boolean).join(" | ");
+   info.append(extra);
+  }
+
+  const price=document.createElement("strong");
+  price.textContent=money(amount);
+  row.append(info,price);
+  $("items").append(row);
+ });
+
+ if(!cart.length)$("items").textContent="Your cart is empty.";
+ $("total").textContent=money(total);
+ $("payBtn").disabled=!cart.length;
+ return total;
+}
+
+renderCart();
+
+// SPECIAL MENU: restrict to one state per order
+const states=[...new Set(cart.filter(x=>x.state).map(x=>x.state))];
+
+if(states.length===1&&branches[states[0]]){
+ const outlet=branches[states[0]];
+ [...$("outlet").options].forEach(o=>{
+  if(o.value&&o.value!==outlet){
+   o.hidden=true;
+   o.disabled=true;
+  }
+ });
+ $("outlet").value=outlet;
+}
+
+if(states.length>1){
+ $("error").textContent="Special Menu from different states cannot be ordered together.";
+ $("payBtn").disabled=true;
+}
+
+$("date").min=new Date(Date.now()-new Date().getTimezoneOffset()*60000)
+ .toISOString().slice(0,10);
+
+// CHECKOUT SUBMISSION
+$("checkoutForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+ $("error").textContent="";
+
+ if(!cart.length)return;
+
+ if(states.length>1){
+  $("error").textContent="Please separate Special Menu orders from different states.";
+  return;
+ }
+
+ if(!$("name").value||!$("email").value){
+  location.href="login.html?redirect=checkout.html";
+  return;
+ }
+
+ const data={
+  customerName:$("name").value.trim(),
+  customerPhone:$("phone").value.trim(),
+  customerEmail:$("email").value.trim(),
+  orderType:document.querySelector('input[name="type"]:checked').value,
+  outlet:$("outlet").value,
+  orderDate:$("date").value,
+  orderTime:$("time").value,
+  specialInstructions:$("notes").value.trim(),
+  items:cart,
+  total:Number(renderCart().toFixed(2))
+ };
+
+ // SPECIAL MENU VALIDATION
+ if(states.length===1&&data.outlet!==branches[states[0]]){
+  $("error").textContent="Please select the correct outlet for your Special Menu.";
+  return;
+ }
+
+ // CUSTOM CAKE VALIDATION
+ if(cart.some(x=>x.type==="customcake"&&(
+  (x.pickupDate&&x.pickupDate!==data.orderDate)||
+  (x.location&&branches[x.location]!==data.outlet)
+ ))){
+  $("error").textContent="Please use the pickup date and outlet selected for your custom cake.";
+  return;
+ }
+
+ $("payBtn").disabled=true;
+ $("payBtn").textContent="Processing...";
+
+ if(DEMO_MODE){
+  sessionStorage.setItem("cozyBakeCheckout",JSON.stringify(data));
+  location.href="payment.html";
+  return;
+ }
+
+ // PHP : Submit checkout to database
+ try{
+  const res=await fetch("checkout.php",{
+   method:"POST",
+   credentials:"same-origin",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify(data)
+  });
+  const result=await res.json();
+
+  if(!res.ok||result.success!==true)
+   throw Error(result.message||"Checkout failed");
+
+  data.checkoutId=result.checkoutId||null;
+  sessionStorage.setItem("cozyBakeCheckout",JSON.stringify(data));
+  location.href="payment.html";
+ }catch(err){
+  $("error").textContent=err.message;
+  $("payBtn").disabled=false;
+  $("payBtn").textContent="Proceed to Payment →";
+ }
+});
+
+loadCustomer();
+</script>
+</body>
+</html>

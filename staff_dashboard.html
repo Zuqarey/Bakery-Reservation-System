@@ -528,19 +528,58 @@
     // ==========================================
     // DATA & LOGIK 2: ORDERS
     // ==========================================
-    const ordersData = [
-      { id: 'CB-1052', time: '11:42 AM', customer: 'Priya Patel', summary: 'Rainbow Donut Box', total: '$22.00', status: 'READY', channel: 'Pickup', payment: 'Paid online', note: '', items: [{ name: '1 × Rainbow Donut Box', price: '$22.00' }] },
-      { id: 'CB-1051', time: '11:20 AM', customer: 'Ruby Chen', summary: 'Chocolate Layer Cake, Sourdough Loaf', total: '$43.00', status: 'NEW', channel: 'Pickup', payment: 'Paid online', note: 'Slice the sourdough, please.', items: [{ name: '1 × Chocolate Layer Cake', price: '$32.00' }, { name: '1 × Sourdough Loaf', price: '$11.00' }] },
-      { id: 'CB-1050', time: '10:58 AM', customer: 'Sofia Reyes', summary: '2 Berry Tarts, 3 Fresh Scones', total: '$48.50', status: 'NEW', channel: 'Pickup', payment: 'Paid online', note: '', items: [{ name: '2 × Berry Tart', price: '$26.00' }, { name: '3 × Fresh Scones', price: '$22.50' }] },
-      { id: 'CB-1049', time: '10:31 AM', customer: 'Liam Carter', summary: '2 Baguettes, 2 Croissants', total: '$29.00', status: 'PREPARING', channel: 'Pickup', payment: 'Paid online', note: '', items: [{ name: '2 × Baguette', price: '$12.00' }, { name: '2 × Morning Croissant', price: '$17.00' }] },
-      { id: 'CB-1047', time: '9:46 AM', customer: 'Noah Williams', summary: 'Strawberry Cloud', total: '$28.00', status: 'PREPARING', channel: 'Dine-in', payment: 'Paid online', note: 'Extra napkins.', items: [{ name: '1 × Strawberry Cloud', price: '$28.00' }] },
-      { id: 'CB-1046', time: '9:12 AM', customer: 'Mia Thompson', summary: '2 Pistachio Stacks, Country Roll', total: '$34.00', status: 'READY', channel: 'Pickup', payment: 'Paid online', note: '', items: [{ name: '2 × Pistachio Stack', price: '$24.00' }, { name: '1 × Country Roll', price: '$10.00' }] },
-      { id: 'CB-1045', time: '8:40 AM', customer: 'Ethan Davis', summary: '4 Morning Croissants', total: '$34.00', status: 'COMPLETED', channel: 'Dine-in', payment: 'Cash', note: '', items: [{ name: '4 × Morning Croissant', price: '$34.00' }] },
-      { id: 'CB-1044', time: '8:22 AM', customer: 'Harper Bell', summary: '2 Cheesecake Slices, Macarons', total: '$36.00', status: 'COMPLETED', channel: 'Pickup', payment: 'Paid online', note: '', items: [{ name: '2 × Cheesecake Slice', price: '$20.00' }, { name: '1 × French Macarons', price: '$16.00' }] }
-    ];
+    let ordersData = [];
+
+    const moneyRM = value => new Intl.NumberFormat('en-MY', {
+      style: 'currency', currency: 'MYR', minimumFractionDigits: 2
+    }).format(Number(value || 0));
+
+    async function loadDatabaseOrders() {
+      try {
+        const response = await fetch('staff_data.php', {
+          method: 'GET', credentials: 'same-origin', cache: 'no-store',
+          headers: { 'Accept': 'application/json' }
+        });
+        const data = await response.json();
+        if (!response.ok || data.success !== true || !Array.isArray(data.orders)) {
+          throw new Error(data.message || 'Could not load orders. Please log in using the customer login screen with an active staff account.');
+        }
+
+        const previousSelection = selectedOrderId;
+        ordersData = data.orders.map(row => {
+          const orderItems = Array.isArray(row.items) ? row.items : [];
+          return {
+            id: String(row.order_id),
+            time: row.order_time || 'Time not recorded',
+            customer: row.customer_name || 'Customer',
+            summary: row.summary || orderItems.map(i => `${i.quantity} × ${i.product_name || 'Item'}`).join(', '),
+            total: moneyRM(row.total),
+            status: ['NEW','PREPARING','READY','COMPLETED'].includes(String(row.status).toUpperCase()) ? String(row.status).toUpperCase() : 'NEW',
+            channel: row.order_type || 'Order',
+            payment: row.payment_method || 'Not recorded',
+            note: row.special_instructions || '',
+            items: orderItems.map(i => ({
+              name: `${i.quantity} × ${i.product_name || 'Item'}`,
+              price: moneyRM(i.line_total !== undefined ? i.line_total : Number(i.quantity || 0) * Number(i.unit_price || 0))
+            }))
+          };
+        });
+
+        selectedOrderId = ordersData.some(o => o.id === previousSelection)
+          ? previousSelection
+          : (ordersData[0] ? ordersData[0].id : null);
+        renderOrders();
+      } catch (error) {
+        console.error('Staff orders loading failed:', error);
+        const listEl = document.getElementById('orders-list');
+        if (listEl) listEl.innerHTML = `<div style="background:#fff; padding:24px; border-radius:14px; color:#8c7a6b;">${error.message}</div>`;
+        const panel = document.getElementById('order-detail-panel');
+        if (panel) panel.innerHTML = '<p style="color:#8c7a6b;">Database orders could not be loaded.</p>';
+      }
+    }
 
     let currentOrderFilter = 'ALL';
-    let selectedOrderId = 'CB-1052';
+    let selectedOrderId = null;
 
     const orderTitles = {
       ALL: 'Live orders',
@@ -596,7 +635,7 @@
       const listEl = document.getElementById('orders-list');
 
       if (filtered.length === 0) {
-        listEl.innerHTML = `<div style="background:#fff; padding:24px; border-radius:14px; text-align:center; color:#8c7a6b;">Tiada pesanan untuk status ini.</div>`;
+        listEl.innerHTML = `<div style="background:#fff; padding:24px; border-radius:14px; text-align:center; color:#8c7a6b;">${ordersData.length === 0 ? 'Loading database orders...' : 'Tiada pesanan untuk status ini.'}</div>`;
       } else {
         listEl.innerHTML = filtered.map(o => `
           <div class="order-card ${o.id === selectedOrderId ? 'selected' : ''}" onclick="selectOrder('${o.id}')">
@@ -796,10 +835,12 @@
     // ==========================================
     window.addEventListener('DOMContentLoaded', () => {
       renderInventory();
-      renderOrders();
       renderIngredients();
       renderSchedule(pickupOrders);
       lucide.createIcons();
+      loadDatabaseOrders();
+      // Refresh from MySQL so newly placed customer orders appear automatically.
+      window.setInterval(loadDatabaseOrders, 10000);
     });
   </script>
 </body>

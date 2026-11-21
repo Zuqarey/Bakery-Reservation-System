@@ -353,11 +353,25 @@ button{font-family:inherit;cursor:pointer}
 <script>
 const $=id=>document.getElementById(id);
 const money=n=>"RM "+Number(n||0).toFixed(2);
-const name=sessionStorage.getItem("cozyBakeCustomerName")||localStorage.getItem("cozyBakeCustomerName")||"Customer";
-const email=sessionStorage.getItem("cozyBakeCustomerEmail")||localStorage.getItem("cozyBakeCustomerEmail")||"";
+let customerEmail="";
+let notifications=[];
+let bookings=[];
 
-$("greeting").textContent="Welcome, "+name+"!";
-$("sidebarCustomerName").textContent=name;
+async function loadCustomer(){
+ try{
+  const res=await fetch("getcustomer.php",{credentials:"same-origin",cache:"no-store"});
+  const data=await res.json();
+  if(!res.ok||!data.loggedIn) throw new Error("Customer session is not active. Please log in again.");
+  const name=data.name||data.customer||"Customer";
+  customerEmail=data.email||"";
+  $("greeting").textContent="Welcome, "+name+"!";
+  $("sidebarCustomerName").textContent=name;
+ }catch(e){
+  console.error("Customer session:",e);
+  $("greeting").textContent="Welcome, Customer!";
+  $("sidebarCustomerName").textContent="Customer";
+ }
+}
 
 function read(key){
  try{return JSON.parse(localStorage.getItem(key)||"[]")}
@@ -367,225 +381,70 @@ function read(key){
 function show(id){
  document.querySelectorAll(".page-section").forEach(p=>p.classList.toggle("active",p.id===id));
  document.querySelectorAll(".nav-item[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===id));
-
- $("page-title").textContent=({
-  "dashboard":"DASHBOARD",
-  "orders":"ORDER HISTORY",
-  "cart":"MY CART",
-  "booking-history":"BOOKING HISTORY",
-  "upcoming-booking":"UPCOMING BOOKING"
- })[id]||id.toUpperCase();
-
+ $("page-title").textContent=({"dashboard":"DASHBOARD","orders":"ORDER HISTORY","cart":"MY CART","booking-history":"BOOKING HISTORY","upcoming-booking":"UPCOMING BOOKING"})[id]||id.toUpperCase();
  if(id==="cart")renderCart();
  if(id==="orders")loadOrders();
  if(id.includes("booking"))loadBookings();
 }
 
 function fillRows(id,rows,cols){
- const el=$(id);
- el.innerHTML="";
-
- if(!rows.length){
-  const tr=el.insertRow(),td=tr.insertCell();
-  td.colSpan=cols;
-  td.textContent="No records found.";
-  return;
- }
-
- rows.forEach(row=>{
-  const tr=el.insertRow();
-  row.forEach(v=>tr.insertCell().textContent=v??"—");
- });
+ const el=$(id);el.innerHTML="";
+ if(!rows.length){const tr=el.insertRow(),td=tr.insertCell();td.colSpan=cols;td.textContent="No records found.";return;}
+ rows.forEach(row=>{const tr=el.insertRow();row.forEach(v=>tr.insertCell().textContent=v??"—");});
 }
 
 function renderCart(){
- const cart=read("cozyBakeCart");
- let total=0,count=0;
- $("cart-list").innerHTML="";
-
- cart.forEach(i=>{
-  const qty=Number(i.quantity||0),price=Number(i.price||0)*qty;
-  total+=price;
-  count+=qty;
-
-  const row=document.createElement("div");
-  row.className="cart-row";
-
-  const item=document.createElement("span");
-  const amount=document.createElement("b");
-
-  item.textContent=(i.name||"Product")+" × "+qty;
-  amount.textContent=money(price);
-
-  row.append(item,amount);
-  $("cart-list").append(row);
- });
-
+ const cart=read("cozyBakeCart");let total=0,count=0;$("cart-list").innerHTML="";
+ cart.forEach(i=>{const qty=Number(i.quantity||0),price=Number(i.price||0)*qty;total+=price;count+=qty;const row=document.createElement("div");row.className="cart-row";const item=document.createElement("span"),amount=document.createElement("b");item.textContent=(i.name||"Product")+" × "+qty;amount.textContent=money(price);row.append(item,amount);$("cart-list").append(row);});
  if(!cart.length)$("cart-list").textContent="Your cart is empty.";
-
- $("cart-total").textContent=money(total);
- $("cart-count").textContent=count;
- $("checkoutt").style.display=cart.length?"inline-block":"none";
+ $("cart-total").textContent=money(total);$("cart-count").textContent=count;$("checkoutt").style.display=cart.length?"inline-block":"none";
 }
-
-let notifications=[];
 
 function renderNotifications(){
- const list=$("notificationList");
- const badge=$("notificationCount");
-
- list.innerHTML="";
- badge.textContent=notifications.length>9?"9+":notifications.length;
- badge.style.display=notifications.length?"grid":"none";
-
- if(!notifications.length){
-  list.innerHTML='<p class="empty">No notifications yet.</p>';
-  return;
- }
-
- notifications.slice(0,8).forEach(n=>{
-  const row=document.createElement("div");
-  row.className="notif-item";
-
-  const icon=document.createElement("div");
-  icon.className="notif-icon";
-  icon.textContent=n.icon;
-
-  const body=document.createElement("div");
-  body.className="notif-body";
-
-  const h=document.createElement("h5");
-  h.textContent=n.title;
-
-  const p=document.createElement("p");
-  p.textContent=n.detail;
-
-  body.append(h,p);
-  row.append(icon,body);
-
-  row.onclick=()=>{
-   $("notifPopover").classList.remove("open");
-   show(n.target);
-  };
-
-  list.append(row);
- });
+ const list=$("notificationList"),badge=$("notificationCount");list.innerHTML="";badge.textContent=notifications.length>9?"9+":notifications.length;badge.style.display=notifications.length?"grid":"none";
+ if(!notifications.length){list.innerHTML='<p class="empty">No notifications yet.</p>';return;}
+ notifications.slice(0,8).forEach(n=>{const row=document.createElement("div");row.className="notif-item";const icon=document.createElement("div");icon.className="notif-icon";icon.textContent=n.icon;const body=document.createElement("div"),h=document.createElement("h5"),p=document.createElement("p");body.className="notif-body";h.textContent=n.title;p.textContent=n.detail;body.append(h,p);row.append(icon,body);row.onclick=()=>{$("notifPopover").classList.remove("open");show(n.target);};list.append(row);});
 }
-
-function toggleNotifications(){
- $("notifPopover").classList.toggle("open");
-}
+function toggleNotifications(){$("notifPopover").classList.toggle("open");}
 
 async function loadOrders(){
  try{
-  const res=await fetch("getorders.php",{
-   credentials:"same-origin",
-   cache:"no-store"
-  });
-
-  if(!res.ok)throw Error("Request failed");
-
-  const data=await res.json();
-
-  if(!data.success||!Array.isArray(data.orders))
-   throw Error("Invalid response");
-
-  $("total").textContent=data.orders.length;
-
-  fillRows("order-list",data.orders.map(o=>[
-   o.order_id,o.items,money(o.total),o.status
-  ]),4);
-
-  notifications=data.orders.slice(0,5).map(o=>({
-   icon:"▤",
-   title:"Order #"+o.order_id,
-   detail:"Order status: "+(o.status||"Updated"),
-   target:"orders"
-  }));
-
- }catch(e){
-  console.error(e);
-  $("total").textContent="0";
-  fillRows("order-list",[],4);
- }
-
+  const res=await fetch("getorders.php",{credentials:"same-origin",cache:"no-store"});
+  const data=await res.json();if(!res.ok||!data.success||!Array.isArray(data.orders))throw new Error(data.message||"Could not load orders.");
+  $("total").textContent=data.orders.length;fillRows("order-list",data.orders.map(o=>[o.order_id,o.items,money(o.total),o.status]),4);
+  const orderNotes=data.orders.slice(0,5).map(o=>({icon:"▤",title:"Order #"+o.order_id,detail:"Order status: "+(o.status||"Updated"),target:"orders"}));
+  notifications=[...orderNotes,...bookings.slice(0,5).map(b=>({icon:"▦",title:"Upcoming booking",detail:(b.outlet||"Cozy Bake")+" · "+b.date+" · "+b.time,target:"upcoming-booking"}))];
+ }catch(e){console.error(e);$("total").textContent="—";fillRows("order-list",[],4);}
  renderNotifications();
 }
 
-function loadBookings(){
- const bookings=read("cozyBakeBookings")
-  .filter(b=>!b.email||b.email===email)
-  .sort((a,b)=>(a.date+" "+a.time).localeCompare(b.date+" "+b.time));
-
- const now=new Date(),upcoming=[],history=[];
-
- bookings.forEach(b=>{
-  const d=new Date(b.date+"T"+(b.time||"00:00"));
-
-  if(d>=now&&!["Cancelled","Completed"].includes(b.status))
-   upcoming.push(b);
-  else history.push(b);
- });
-
- const rows=b=>b.map(x=>[
-  x.id,x.outlet,x.date,x.time,x.table,x.guests,x.status
- ]);
-
- fillRows("history-list",rows(history),7);
- fillRows("upcoming-list",rows(upcoming),7);
-
- const next=upcoming[0];
-
- $("upcoming").textContent=next?next.date:"—";
- $("next-booking").textContent=next?next.outlet+" · "+next.time:"No upcoming booking";
-
- const orderNotes=notifications.filter(n=>n.target==="orders");
-
- notifications=[
-  ...orderNotes,
-  ...upcoming.slice(0,5).map(b=>({
-   icon:"▦",
-   title:"Upcoming booking",
-   detail:(b.outlet||"Cozy Bake")+" · "+b.date+" · "+b.time,
-   target:"upcoming-booking"
-  }))
- ];
-
+async function loadBookings(){
+ try{
+  const res=await fetch("getreservations.php",{credentials:"same-origin",cache:"no-store"});
+  const data=await res.json();if(!res.ok||!data.success||!Array.isArray(data.reservations))throw new Error(data.message||"Could not load reservations.");
+  bookings=data.reservations;
+  const now=new Date(),upcoming=[],history=[];
+  bookings.forEach(b=>{const d=new Date(b.date+"T"+(b.time||"00:00"));if(d>=now&&! ["Cancelled","Completed"].includes(b.status))upcoming.push(b);else history.push(b);});
+  const rows=arr=>arr.map(x=>[x.id,x.outlet,x.date,x.time,x.table,x.guests,x.status]);
+  fillRows("history-list",rows(history),7);fillRows("upcoming-list",rows(upcoming),7);
+  const next=upcoming[0];$("upcoming").textContent=next?next.date:"—";$("next-booking").textContent=next?next.outlet+" · "+next.time:"No upcoming booking";
+  const orderNotes=notifications.filter(n=>n.target==="orders");
+  notifications=[...orderNotes,...upcoming.slice(0,5).map(b=>({icon:"▦",title:"Upcoming booking",detail:(b.outlet||"Cozy Bake")+" · "+b.date+" · "+b.time,target:"upcoming-booking"}))];
+ }catch(e){console.error("Customer reservations:",e);fillRows("history-list",[],7);fillRows("upcoming-list",[],7);$("upcoming").textContent="—";$("next-booking").textContent="Unable to load bookings.";}
  renderNotifications();
 }
 
 function logout(){
  if(!confirm("Are you sure you want to log out?"))return;
-
- [
-  "cozyBakeDemoLoggedIn",
-  "cozyBakeCustomerName",
-  "cozyBakeCustomerEmail",
-  "cozyBakeCustomerId",
-  "isLoggedIn",
-  "userEmail",
-  "userName",
-  "customer_id",
-  "cozyBakeUser"
- ].forEach(k=>{
-  sessionStorage.removeItem(k);
-  localStorage.removeItem(k);
- });
-
+ localStorage.removeItem("cozyBakeCart");
  location.href="logout.php";
 }
 
-document.addEventListener("click",e=>{
- if(!e.target.closest(".header-actions"))
-  $("notifPopover").classList.remove("open");
-});
-
-document.addEventListener("keydown",e=>{
- if(e.key==="Escape")
-  $("notifPopover").classList.remove("open");
-});
+document.addEventListener("click",e=>{if(!e.target.closest(".header-actions"))$("notifPopover").classList.remove("open");});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")$("notifPopover").classList.remove("open");});
 
 renderCart();
+loadCustomer();
 loadOrders();
 loadBookings();
 </script>

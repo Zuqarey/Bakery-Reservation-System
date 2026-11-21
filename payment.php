@@ -1,129 +1,158 @@
 <?php
 session_start();
-header('Content-Type: application/json');
-include 'db.php';
+header('Content-Type: application/json; charset=utf-8');
+require_once __DIR__ . '/db.php';
+date_default_timezone_set('Asia/Kuala_Lumpur');
+
+function respond($status, $body) {
+    http_response_code($status);
+    echo json_encode($body, JSON_UNESCAPED_UNICODE);
+    exit;
+}
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(['success' => false, 'message' => 'Kaedah permintaan tidak sah.']);
-    exit();
+    respond(405, ['success' => false, 'message' => 'Use POST to submit an order.']);
 }
 
-// dah dapat x nak pulang...pulang lah balik ni untuk chek gak
+/* Only authenticated customers may place orders. */
+if (empty($_SESSION['customer_logged_in']) || empty($_SESSION['customer_id'])) {
+    respond(401, ['success' => false, 'message' => 'Please log in before placing an order.']);
+}
+
 $raw = isset($_POST['paymentData']) ? $_POST['paymentData'] : file_get_contents('php://input');
 $data = json_decode($raw, true);
-
-if (!$data) {
-    echo json_encode(['success' => false, 'message' => 'Data pesanan tidak sah atau kosong.']);
-    exit();
+if (!is_array($data)) {
+    respond(400, ['success' => false, 'message' => 'Invalid or empty order data.']);
 }
 
-$customerName   = trim($data['customerName'] ?? '');
-$customerPhone  = trim($data['customerPhone'] ?? '');
-$customerEmail  = trim($data['customerEmail'] ?? '');
-$orderType      = $data['orderType'] ?? 'Self-Pickup';
-$outlet         = $data['outlet'] ?? '';
-$orderDate      = $data['orderDate'] ?? date('Y-m-d');
-$orderTime      = $data['orderTime'] ?? date('H:i');
-$specialNotes   = $data['specialInstructions'] ?? '';
-$paymentMethod  = $data['paymentMethod'] ?? 'Cash at Counter';
-$paymentStatus  = $data['paymentStatus'] ?? 'Pending Payment';
-$items          = $data['items'] ?? [];
-$total          = floatval($data['total'] ?? 0);
+$customerId = (int)$_SESSION['customer_id'];
+$orderType = trim((string)($data['orderType'] ?? 'Self-Pickup'));
+$outlet = trim((string)($data['outlet'] ?? ''));
+$orderDate = trim((string)($data['orderDate'] ?? ''));
+$orderTime = trim((string)($data['orderTime'] ?? ''));
+$notes = trim((string)($data['specialInstructions'] ?? ''));
+$paymentMethod = trim((string)($data['paymentMethod'] ?? 'Cash at Counter'));
+$paymentStatus = trim((string)($data['paymentStatus'] ?? 'Pending Payment'));
+$items = $data['items'] ?? [];
 
-if (empty($customerEmail) || empty($items)) {
-    echo json_encode(['success' => false, 'message' => 'Maklumat pelanggan atau troli tidak lengkap.']);
-    exit();
+if (!in_array($orderType, ['Self-Pickup', 'Dine-In'], true)) {
+    respond(422, ['success' => false, 'message' => 'Invalid order type.']);
+}
+if ($outlet === '' || $orderDate === '' || $orderTime === '') {
+    respond(422, ['success' => false, 'message' => 'Please provide outlet, date and time.']);
+}
+if (!in_array($paymentMethod, ['QR Payment', 'Cash at Counter'], true)) {
+    respond(422, ['success' => false, 'message' => 'Invalid payment method.']);
+}
+if (!in_array($paymentStatus, ['Pending Payment', 'Pending Verification'], true)) {
+    $paymentStatus = 'Pending Payment';
+}
+if (!is_array($items) || count($items) < 1 || count($items) > 50) {
+    respond(422, ['success' => false, 'message' => 'Your cart is empty or contains too many items.']);
 }
 
-$conn->begin_transaction();
+$dt = DateTime::createFromFormat('!Y-m-d H:i', $orderDate . ' ' . $orderTime);
+if (!$dt || $dt->format('Y-m-d H:i') !== $orderDate . ' ' . $orderTime ||
+    $dt->format('Y-m-d H:i') <= date('Y-m-d H:i')) {
+    respond(422, ['success' => false, 'message' => 'Please select a valid future pickup date and time.']);
+}
 
 try {
-    // 1. cek dalam db ade ark cus
-    $stmtCust = $conn->prepare("SELECT customer_id FROM customer WHERE email = ?");
-    $stmtCust->bind_param("s", $customerEmail);
-    $stmtCust->execute();
-    $resCust = $stmtCust->get_result();
-
-    if ($resCust->num_rows > 0) {
-        $customer = $resCust->fetch_assoc();
-        $customerId = $customer['customer_id'];
-    } else {
-        // security jer ni
-        $dummyPassword = password_hash(bin2hex(random_bytes(6)), PASSWORD_DEFAULT);
-        $stmtNewCust = $conn->prepare("INSERT INTO customer (full_name, email, password) VALUES (?, ?, ?)");
-        $stmtNewCust->bind_param("sss", $customerName, $customerEmail, $dummyPassword);
-        $stmtNewCust->execute();
-        $customerId = $conn->insert_id;
+    /* Verify customer and take contact details from the account, not the browser. */
+    $customerStmt = $conn->prepare('SELECT customer_id, full_name, email FROM customer WHERE customer_id = ? LIMIT 1');
+    $customerStmt->bind_param('i', $customerId);
+    $customerStmt->execute();
+    $customer = $customerStmt->get_result()->fetch_assoc();
+    if (!$customer) {
+        respond(401, ['success' => false, 'message' => 'Customer account not found. Please log in again.']);
     }
 
-    // 2. tarikh and masa
-    $pickupDatetime = date('Y-m-d H:i:s', strtotime("$orderDate $orderTime"));
-
-    // 3. insert dlm db
-    $stmtOrder = $conn->prepare("INSERT INTO orders (customer_id, staff_id, order_type, outlet, pickup_datetime, special_instructions, `date order`) VALUES (?, NULL, ?, ?, ?, ?, NOW())");
-    $stmtOrder->bind_param("issss", $customerId, $orderType, $outlet, $pickupDatetime, $specialNotes);
-    $stmtOrder->execute();
-    $orderId = $conn->insert_id;
-
-    // 4. sama masuk db
-    $stmtItem = $conn->prepare("INSERT INTO `order item` (order_id, product_id, quantity, unit_price) VALUES (?, ?, ?, ?)");
-
+    /* Resolve every cart item against the product table and use database prices. */
+    $verifiedItems = [];
+    $total = 0.0;
+    $productStmt = $conn->prepare('SELECT product_id, price, product_quantity FROM product WHERE product_name = ? AND is_active = 1 LIMIT 1');
     foreach ($items as $item) {
-        $prodName = $item['name'];
-        $qty = intval($item['quantity']);
-        $unitPrice = floatval($item['price']);
-
-        // nk cari produck
-        $stmtProd = $conn->prepare("SELECT product_id FROM product WHERE product_name = ?");
-        $stmtProd->bind_param("s", $prodName);
-        $stmtProd->execute();
-        $resProd = $stmtProd->get_result();
-
-        if ($resProd->num_rows > 0) {
-            $prod = $resProd->fetch_assoc();
-            $productId = $prod['product_id'];
-        } else {
-            // xde produck kita adakan kita buat dia bukan dia buat kita
-            $stmtNewProd = $conn->prepare("INSERT INTO product (product_name, price, product_quantity) VALUES (?, ?, 50)");
-            $stmtNewProd->bind_param("sd", $prodName, $unitPrice);
-            $stmtNewProd->execute();
-            $productId = $conn->insert_id;
+        $name = trim((string)($item['name'] ?? ''));
+        $qty = filter_var($item['quantity'] ?? null, FILTER_VALIDATE_INT);
+        if ($name === '' || $qty === false || $qty < 1 || $qty > 99) {
+            respond(422, ['success' => false, 'message' => 'A cart item has an invalid name or quantity.']);
         }
-
-        $stmtItem->bind_param("iiid", $orderId, $productId, $qty, $unitPrice);
-        $stmtItem->execute();
+        $productStmt->bind_param('s', $name);
+        $productStmt->execute();
+        $product = $productStmt->get_result()->fetch_assoc();
+        if (!$product) {
+            respond(422, ['success' => false, 'message' => 'Product "' . $name . '" was not found in the database.']);
+        }
+        if ((int)$product['product_quantity'] < $qty) {
+            respond(409, ['success' => false, 'message' => 'Insufficient stock for "' . $name . '".']);
+        }
+        $price = (float)$product['price'];
+        $verifiedItems[] = [
+            'product_id' => (int)$product['product_id'],
+            'quantity' => $qty,
+            'price' => $price
+        ];
+        $total += $price * $qty;
     }
 
-    // 5. masuk db payment
-    $stmtPay = $conn->prepare("INSERT INTO payment (order_id, total) VALUES (?, ?)");
-    $stmtPay->bind_param("id", $orderId, $total);
-    $stmtPay->execute();
-    $referenceId = $conn->insert_id;
+    if ($total <= 0) {
+        respond(422, ['success' => false, 'message' => 'Order total must be greater than zero.']);
+    }
 
-    // 6. payment m
-    $stmtMethode = $conn->prepare("INSERT INTO paymen_methode (reference_id, methode_name) VALUES (?, ?)");
-    $stmtMethode->bind_param("is", $referenceId, $paymentMethod);
-    $stmtMethode->execute();
+    $pickupDatetime = $dt->format('Y-m-d H:i:s');
+    $conn->begin_transaction();
 
-    // 7. masuk ker order ker order log x tau jadi ark
-    $receiptNo = "REC-" . date('Ymd') . "-" . str_pad($orderId, 4, '0', STR_PAD_LEFT);
-    $stmtLog = $conn->prepare("INSERT INTO order_log (reference_id, order_id, receipt_no, status_name) VALUES (?, ?, ?, ?)");
-    $stmtLog->bind_param("iiss", $referenceId, $orderId, $receiptNo, $paymentStatus);
-    $stmtLog->execute();
+    $orderStmt = $conn->prepare("INSERT INTO orders
+        (customer_id, staff_id, order_type, outlet, pickup_datetime, special_instructions, `date order`)
+        VALUES (?, NULL, ?, ?, ?, ?, NOW())");
+    $orderStmt->bind_param('issss', $customerId, $orderType, $outlet, $pickupDatetime, $notes);
+    $orderStmt->execute();
+    $orderId = (int)$conn->insert_id;
+
+    $itemStmt = $conn->prepare('INSERT INTO `order item` (order_id, product_id, quantity, unit_price) VALUES (?, ?, ?, ?)');
+    $stockStmt = $conn->prepare('UPDATE product SET product_quantity = product_quantity - ? WHERE product_id = ? AND product_quantity >= ?');
+    foreach ($verifiedItems as $item) {
+        $productId = $item['product_id'];
+        $qty = $item['quantity'];
+        $price = $item['price'];
+        $itemStmt->bind_param('iiid', $orderId, $productId, $qty, $price);
+        $itemStmt->execute();
+
+        $stockStmt->bind_param('iii', $qty, $productId, $qty);
+        $stockStmt->execute();
+        if ($stockStmt->affected_rows !== 1) {
+            throw new RuntimeException('Stock changed while placing the order. Please try again.');
+        }
+    }
+
+    $paymentStmt = $conn->prepare('INSERT INTO payment (order_id, total) VALUES (?, ?)');
+    $paymentStmt->bind_param('id', $orderId, $total);
+    $paymentStmt->execute();
+    $referenceId = (int)$conn->insert_id;
+
+    $methodStmt = $conn->prepare('INSERT INTO paymen_methode (reference_id, methode_name) VALUES (?, ?)');
+    $methodStmt->bind_param('is', $referenceId, $paymentMethod);
+    $methodStmt->execute();
+
+    $receiptNo = 'REC-' . date('Ymd') . '-' . str_pad((string)$orderId, 4, '0', STR_PAD_LEFT);
+    $logStmt = $conn->prepare('INSERT INTO order_log (reference_id, order_id, receipt_no, status_name) VALUES (?, ?, ?, ?)');
+    $logStmt->bind_param('iiss', $referenceId, $orderId, $receiptNo, $paymentStatus);
+    $logStmt->execute();
 
     $conn->commit();
-
-    echo json_encode([
-        'success'   => true,
-        'orderId'   => $orderId,
+    respond(201, [
+        'success' => true,
+        'orderId' => $orderId,
         'receiptNo' => $receiptNo,
-        'message'   => 'Pesanan berjaya didaftarkan ke pangkalan data.'
+        'total' => number_format($total, 2, '.', ''),
+        'message' => 'Order saved successfully.'
     ]);
-} catch (Exception $e) {
-    $conn->rollback();
-    echo json_encode([
-        'success' => false,
-        'message' => 'Ralat pangkalan data: ' . $e->getMessage()
-    ]);
+} catch (Throwable $e) {
+    if ($conn->errno === 0) {
+        // Transaction state is checked below; rollback is safe when a transaction is active.
+    }
+    try { $conn->rollback(); } catch (Throwable $ignored) {}
+    error_log('Checkout/payment error: ' . $e->getMessage());
+    respond(500, ['success' => false, 'message' => 'The order could not be saved. Check the PHP error log.']);
 }
 ?>

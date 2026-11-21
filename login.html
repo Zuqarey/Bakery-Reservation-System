@@ -369,19 +369,22 @@
         const email = document.getElementById("email").value.trim().toLowerCase();
         const nameInput = document.getElementById("Name");
         const emailPrefix = email.split("@")[0] || "Customer";
-        const displayName = (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : emailPrefix;
 
-        // Simpan ke sessionStorage supaya custdashboard.html mengenali pelanggan yang log masuk
-        sessionStorage.setItem("cozyBakeDemoLoggedIn", "true");
-        sessionStorage.setItem("cozyBakeCustomerName", displayName);
-        sessionStorage.setItem("cozyBakeCustomerEmail", email);
-
-        // Jika dibuka melalui Go Live (port 5500), terus redirect guna JavaScript
+        // PHP/MySQL authentication must run through XAMPP. Never grant admin access
+        // based on an email prefix or browser storage.
         if (window.location.port === "5500" || window.location.protocol === "file:") {
             if (event) event.preventDefault();
             if (emailPrefix.includes("admin")) {
-                window.top.location.href = "admin.html";
-            } else if (emailPrefix.includes("staff")) {
+                alert("Administrator login must use the XAMPP website so the account can be verified against the admin database.");
+                return false;
+            }
+
+            // Preserve the existing local demo flow for customer/staff previews only.
+            const displayName = (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : emailPrefix;
+            sessionStorage.setItem("cozyBakeDemoLoggedIn", "true");
+            sessionStorage.setItem("cozyBakeCustomerName", displayName);
+            sessionStorage.setItem("cozyBakeCustomerEmail", email);
+            if (emailPrefix.includes("staff")) {
                 window.top.location.href = "staff_dashboard.html";
             } else {
                 const params = new URLSearchParams(window.location.search);
@@ -392,14 +395,11 @@
             return false;
         }
 
-        // Jika dibuka melalui XAMPP (localhost), hantar ke PHP
         const form = document.getElementById("accountForm");
         form.action = (currentMode === "register") ? "signup.php" : "login.php";
-
         const params = new URLSearchParams(window.location.search);
         document.getElementById("loginRedirect").value =
             params.get("redirect") === "reservation.html" ? "reservation.html" : "";
-
         return true;
     }
 </script>

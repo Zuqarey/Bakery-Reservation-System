@@ -1,0 +1,389 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cozy Bake | Our Locations</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #FAF8F5;
+    color: #3D281B;
+    font-family: Arial, sans-serif;
+}
+
+.back-home {
+    position: absolute;
+    top: 35px;
+    left: 6%;
+    padding: 16px 20px;
+    background: white;
+    border: 1px solid #E4D2C2;
+    border-radius: 18px;
+    color: #3D281B;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.back-home:hover {
+    background: #F1E7DF;
+}
+
+.page-header {
+    text-align: center;
+    padding: 40px 20px 65px;
+    border-bottom: 1px solid #E4D2C2;
+}
+
+.small-title {
+    color: #B58D6D;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 4px;
+}
+
+.page-header h1 {
+    font-family: Georgia, serif;
+    font-size: clamp(50px, 7vw, 85px);
+    font-weight: normal;
+    line-height: 1;
+    margin: 25px 0;
+}
+
+.page-header p {
+    color: #9B7968;
+    font-size: 15px;
+    line-height: 1.8;
+}
+
+.locations-section {
+    padding: 75px 6%;
+}
+
+.section-heading {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.section-heading h2 {
+    font-family: Georgia, serif;
+    font-weight: normal;
+    font-size: clamp(36px, 5vw, 65px);
+    margin: 20px 0;
+}
+
+.section-heading p {
+    color: #A88472;
+}
+
+.locations-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 30px;
+}
+
+.location-card {
+    background: #fffdfa;
+    border: 1px solid #E8D9CC;
+    border-radius: 28px;
+    overflow: hidden;
+}
+
+.location-image {
+    width: 100%;
+    height: 255px;
+    object-fit: cover;
+    display: block;
+}
+
+.location-content {
+    padding: 30px;
+}
+
+.city {
+    color: #B58D6D;
+    letter-spacing: 3px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.location-content h3 {
+    font-family: Georgia, serif;
+    font-size: 32px;
+    font-weight: normal;
+    margin: 15px 0 20px;
+}
+
+.map-frame {
+    width: 100%;
+    height: 190px;
+    border: 0;
+    border-radius: 18px;
+}
+
+.address {
+    color: #A88472;
+    font-size: 13px;
+    line-height: 2;
+    min-height: 70px;
+}
+
+.phone {
+    color: #9C6346;
+    font-size: 14px;
+    font-weight: bold;
+    margin: 20px 0 25px;
+}
+
+.location-buttons {
+    display: flex;
+    gap: 15px;
+}
+
+.location-buttons a,
+.location-buttons button {
+    flex: 1;
+    padding: 17px 10px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.directions {
+    background: #B58D6D;
+    color: white;
+    border: 1px solid #B58D6D;
+}
+
+.hours-btn {
+    background: transparent;
+    color: #B58D6D;
+    border: 1px solid #B58D6D;
+}
+
+.store-hours {
+    display: none;
+    background: #F1E7DF;
+    border-radius: 15px;
+    padding: 15px;
+    margin-top: 20px;
+    color: #795B4D;
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+.store-hours.show {
+    display: block;
+}
+
+@media (max-width: 1000px) {
+    .locations-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 650px) {
+    .back-home {
+        position: static;
+        display: inline-block;
+        margin: 20px;
+    }
+
+    .locations-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .locations-section {
+        padding: 50px 5%;
+    }
+
+    .location-content {
+        padding: 22px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<a href="index.html" class="back-home">
+    ← Return to Home
+</a>
+
+<header class="page-header">
+    <div class="small-title">COZY BAKE</div>
+    <h1>Visit Our<br>Outlets</h1>
+    <p>
+        Step in for a fresh pastry, a celebration cake,
+        or a quiet moment over something<br>sweet.
+    </p>
+</header>
+
+<section class="locations-section">
+
+    <div class="section-heading">
+        <div class="small-title">
+            FIND YOUR NEAREST COZY BAKE
+        </div>
+        <h2>Made fresh, closer to you</h2>
+        <p>
+            Three welcoming bakeries, each serving
+            the same little moments of joy.
+        </p>
+    </div>
+
+    <div class="locations-grid">
+
+        <!-- QUEENSBAY MALL -->
+        <div class="location-card">
+            <img src="queensbay.jpg"
+                 class="location-image"
+                 alt="Queensbay Mall Outlet">
+
+            <div class="location-content">
+                <div class="city">Penang</div>
+                <h3>Queensbay Mall</h3>
+
+                <iframe class="map-frame"
+                    title="Queensbay Mall Map"
+                    loading="lazy"
+                    src="https://maps.google.com/maps?q=Queensbay%20Mall%20Penang&output=embed">
+                </iframe>
+
+                <p class="address">
+                    Lot 2F-45, Queensbay Mall,
+                    100 Persiaran Bayan Indah,
+                    11900 Bayan Lepas, Penang
+                </p>
+
+                <p class="phone">+60 4-611 8068</p>
+
+                <div class="location-buttons">
+                    <a class="directions"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       href="https://www.google.com/maps/search/?api=1&query=Queensbay+Mall+Penang">
+                        Get directions
+                    </a>
+
+                    <button class="hours-btn"
+                        onclick="toggleHours('hours1')">
+                        Store hours
+                    </button>
+                </div>
+
+                <div class="store-hours" id="hours1">
+                    Store hours have not been confirmed.
+                </div>
+            </div>
+        </div>
+
+        <!-- AMAN CENTRAL -->
+        <div class="location-card">
+            <img src="amancentral.jpg"
+                 class="location-image"
+                 alt="Aman Central Outlet">
+
+            <div class="location-content">
+                <div class="city">Alor Setar, Kedah</div>
+                <h3>Aman Central</h3>
+
+                <iframe class="map-frame"
+                    title="Aman Central Map"
+                    loading="lazy"
+                    src="https://maps.google.com/maps?q=Aman%20Central%20Alor%20Setar&output=embed">
+                </iframe>
+
+                <p class="address">
+                    Lot 3-28, Aman Central,
+                    No. 1 Lebuhraya Darul Aman,
+                    05100 Alor Setar, Kedah
+                </p>
+
+                <p class="phone">+60 4-731 2148</p>
+
+                <div class="location-buttons">
+                    <a class="directions"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       href="https://www.google.com/maps/search/?api=1&query=Aman+Central+Alor+Setar">
+                        Get directions
+                    </a>
+
+                    <button class="hours-btn"
+                        onclick="toggleHours('hours2')">
+                        Store hours
+                    </button>
+                </div>
+
+                <div class="store-hours" id="hours2">
+                    Store hours have not been confirmed.
+                </div>
+            </div>
+        </div>
+
+        <!-- KANGAR JAYA MALL -->
+        <div class="location-card">
+            <img src="kangarjaya.jpg"
+                 class="location-image"
+                 alt="Kangar Jaya Mall Outlet">
+
+            <div class="location-content">
+                <div class="city">Kangar, Perlis</div>
+                <h3>Kangar Jaya Mall</h3>
+
+                <iframe class="map-frame"
+                    title="Kangar Jaya Mall Map"
+                    loading="lazy"
+                    src="https://maps.google.com/maps?q=Kangar%20Jaya%20Mall%20Perlis&output=embed">
+                </iframe>
+
+                <p class="address">
+                    Lot 12, Jalan Kangar Jaya 4,
+                    Taman Kangar Jaya,
+                    01000 Kangar, Perlis
+                </p>
+
+                <p class="phone">+60 4-31332006</p>
+
+                <div class="location-buttons">
+                    <a class="directions"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       href="https://www.google.com/maps/search/?api=1&query=Kangar+Jaya+Mall+Perlis">
+                        Get directions
+                    </a>
+
+                    <button class="hours-btn"
+                        onclick="toggleHours('hours3')">
+                        Store hours
+                    </button>
+                </div>
+
+                <div class="store-hours" id="hours3">
+                    Store hours have not been confirmed.
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<script>
+function toggleHours(id) {
+    document.getElementById(id).classList.toggle("show");
+}
+</script>
+
+</body>
+</html>

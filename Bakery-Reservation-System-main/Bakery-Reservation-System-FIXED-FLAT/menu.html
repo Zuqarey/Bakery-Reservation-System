@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cozy Bake | Our Menu</title>
+<style>
+:root{--cream:#FAF8F5;--brown:#3D281B;--accent:#B58D6D;--soft:#F1E7DF;--line:#E4D1C2}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--brown);font-family:Arial,sans-serif}
+button{font:inherit;cursor:pointer}
+.top{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:25px 6% 0}
+.welcome{color:var(--accent);font-weight:bold}
+.cart-btn{background:var(--soft);border:0;padding:15px 25px;border-radius:15px;font-weight:bold}
+header{text-align:center;padding:35px 20px}
+header h1{font:normal clamp(42px,7vw,75px) Georgia,serif;margin:15px}
+header p,.category{color:var(--accent)}
+.filters{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;background:var(--soft);padding:18px;margin:0 6% 35px;border-radius:15px}
+.filters button{border:0;background:transparent;padding:12px 25px;border-radius:25px}
+.filters .active,.filters button:hover{background:var(--accent);color:white}
+.products{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;max-width:1250px;margin:auto;padding:15px 6% 60px}
+.card{background:white;border-radius:20px;overflow:hidden;box-shadow:0 5px 20px #3d281b12}
+.image{height:240px;position:relative;cursor:pointer}
+.image img{width:100%;height:100%;object-fit:cover}
+.badge{position:absolute;top:15px;left:15px;background:var(--accent);color:white;padding:8px 12px;border-radius:20px;font-size:11px}
+.details{padding:22px}
+.details h3{margin:0 0 12px}
+.description{color:#806B5D;font-size:13px;line-height:1.7;min-height:65px}
+.actions{display:flex;gap:10px}
+.btn{flex:1;border:0;border-radius:12px;padding:13px;font-weight:bold;background:var(--accent);color:white}
+.light{background:var(--soft);color:var(--brown)}
+.back{display:block;width:fit-content;margin:0 auto 55px;padding:15px 30px;background:var(--brown);color:white;text-decoration:none;border-radius:25px}
+.modal{display:none;position:fixed;inset:0;z-index:1000;background:#0009;justify-content:center;align-items:center;padding:20px}
+.modal.show{display:flex}
+.popup{position:relative;background:white;border-radius:22px;padding:28px;width:100%;max-width:600px;max-height:90vh;overflow:auto}
+.close{position:absolute;top:15px;right:20px;border:0;border-radius:50%;width:35px;height:35px;font-size:23px}
+#quick-image{width:100%;height:260px;object-fit:cover;border-radius:15px}
+.quantity,.cart-row,.total{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:20px 0}
+.quantity button{background:var(--soft);border:0;border-radius:8px;padding:8px 15px}
+.cart-row{border-bottom:1px solid var(--line);padding:12px 0}
+.cart-row h4{margin:0 0 8px}
+.cart-row p{color:var(--accent)}
+.total{font-size:21px;font-weight:bold}
+.remove{border:0;background:none;color:#B14F4F}
+.login-head{background:linear-gradient(110deg,#946659,#ba9181);color:white;padding:30px}
+.login-head h2{font:normal 36px Georgia,serif}
+.login-body{text-align:center;padding:35px}
+.login-body h3{font:normal 30px Georgia,serif}
+.login-body p{color:#a47e70;line-height:1.6}
+.login-form{max-width:420px;margin:auto}
+.login-form input{display:block;width:100%;padding:15px;margin:12px 0;border:1px solid var(--line);border-radius:10px}
+.login-form .btn{width:100%}
+.switch{border:0;background:none;color:var(--accent);text-decoration:underline}
+[hidden]{display:none!important}
+@media(max-width:900px){.products{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.products{grid-template-columns:1fr}.actions{flex-direction:column}.popup{padding:20px}.top{flex-wrap:wrap}}
+</style>
+</head>
+<body>
+
+<div class="top">
+    <span class="welcome" id="welcome">Welcome to Cozy Bake!</span>
+    <button class="cart-btn" onclick="openModal('cart')">
+        🛒 My Cart (<span id="cart-count">0</span>)
+    </button>
+</div>
+
+<header>
+    <p>FRESHLY BAKED WITH LOVE</p>
+    <h1>Our Menu</h1>
+    <p>Discover your favourite sweet treats at Cozy Bake.</p>
+</header>
+
+<nav class="filters">
+    <button class="active" onclick="filterProducts('All',this)">All</button>
+    <button onclick="filterProducts('Cakes',this)">Cakes</button>
+    <button onclick="filterProducts('Pastries',this)">Pastries</button>
+    <button onclick="filterProducts('Cookies',this)">Cookies</button>
+   <button onclick="filterProducts('Best Seller',this)">Best Seller</button>
+    <button onclick="filterProducts('Special',this)">Special</button>
+</nav>
+
+<div class="products" id="products"></div>
+<a href="index.html" class="back">← Return to Home</a>
+
+<!-- QUICK VIEW -->
+<div class="modal" id="quick" onclick="if(event.target===this)closeModal()">
+    <div class="popup">
+        <button class="close" onclick="closeModal()">×</button>
+        <img id="quick-image" alt="Product">
+        <h2 id="quick-name"></h2>
+        <p id="quick-category"></p>
+        <p id="quick-description"></p>
+        <h3 id="quick-price"></h3>
+        <div class="quantity">
+            <strong>Quantity:</strong>
+            <button onclick="changeQuick(-1)">−</button>
+            <span id="quick-qty">1</span>
+            <button onclick="changeQuick(1)">+</button>
+        </div>
+        <button class="btn" id="quick-add" onclick="addQuick()">🛒 Add to Cart</button>
+    </div>
+</div>
+
+<!-- CART -->
+<div class="modal" id="cart" onclick="if(event.target===this)closeModal()">
+    <div class="popup">
+        <button class="close" onclick="closeModal()">×</button>
+        <h2>🛒 Your Shopping Cart</h2>
+        <div id="cart-items"></div>
+        <div class="total">
+            <span>Total:</span><span id="cart-total">RM 0.00</span>
+        </div>
+        <button class="btn" style="width:100%" onclick="checkout()">
+            Proceed to Checkout
+        </button>
+    </div>
+</div>
+
+<!-- LOGIN -->
+<div class="modal" id="login" onclick="if(event.target===this)closeModal()">
+    <div class="popup" style="padding:0;max-width:840px">
+        <div class="login-head">
+            <button class="close" onclick="closeModal()">×</button>
+            <small>COZY BAKE</small>
+            <h2>Your Cozy Bake Account</h2>
+        </div>
+
+        <div class="login-body">
+            <div id="choice">
+                <div style="font-size:55px">👤</div>
+                <p>BEFORE WE GET STARTED</p>
+                <h3>Already have an account?</h3>
+                <p>Log in to continue, or create an account to save your orders.</p>
+                <div class="actions">
+                    <button class="btn" onclick="showPanel('login-form')">YES, LOG IN</button>
+                    <button class="btn light" onclick="showPanel('register-form')">NO, REGISTER</button>
+                </div>
+                <p><button class="switch" onclick="closeModal()">Continue browsing as guest</button></p>
+            </div>
+
+            <div id="login-form" hidden>
+                <h3>Welcome Back!</h3>
+                <p>Log in to your Cozy Bake account.</p>
+                <form class="login-form" method="POST" action="login.php">
+                    <input type="email" name="email" placeholder="Email address" required>
+                    <input type="password" name="password" placeholder="Password" required>
+                    <button class="btn" type="submit">LOG IN</button>
+                </form>
+                <p><button class="switch" onclick="showPanel('register-form')">Create an account</button></p>
+            </div>
+
+            <div id="register-form" hidden>
+                <h3>Create an Account</h3>
+                <form class="login-form" method="POST" action="signup.php">
+                    <input type="text" name="name" placeholder="Full name" required>
+                    <input type="email" name="email" placeholder="Email address" required>
+                    <input type="password" name="password" placeholder="Create password" minlength="6" required>
+                    <button class="btn" type="submit">REGISTER</button>
+                </form>
+                <p><button class="switch" onclick="showPanel('login-form')">Already have an account?</button></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const money=n=>"RM "+Number(n).toFixed(2);
+let products=[];
+
+async function loadProducts(){
+    const holder=$("products");
+    holder.textContent="Loading products...";
+    try{
+        const response=await fetch("menu.php",{cache:"no-store"});
+        if(!response.ok) throw new Error("HTTP "+response.status);
+        const data=await response.json();
+        if(!Array.isArray(data)) throw new Error(data.error||"Unexpected response from menu.php");
+        products=data;
+        holder.replaceChildren();
+        if(products.length===0){
+            holder.textContent="No products found. Please add products in the product table.";
+            return;
+        }
+        displayProducts();
+    }catch(error){
+        console.error("Product loading failed:",error);
+        holder.textContent="Unable to load products: "+error.message;
+    }
+}
+let cart=[],customer=null,selected=0,quickQty=1;
+
+try {
+    cart=JSON.parse(localStorage.getItem("cozyBakeCart")||"[]");
+    if(!Array.isArray(cart))cart=[];
+} catch {cart=[];}
+
+//Ni sambung ke PHP
+async function loadCustomer(){
+    try {
+        const response=await fetch("getcustomer.php",{
+            credentials:"same-origin",
+            cache:"no-store"
+        });
+        if(!response.ok)throw Error("Not logged in");
+
+        const data=await response.json();
+        if(data.loggedIn===true){
+            customer=data;
+            $("welcome").textContent="Welcome Back, "+data.name+"! 🤎";
+            sessionStorage.setItem("cozyBakeCustomerName",data.name);
+            sessionStorage.setItem("cozyBakeCustomerEmail",data.email);
+        }
+    } catch(error){
+        customer=null;
+        $("welcome").textContent="Welcome to Cozy Bake!";
+        sessionStorage.removeItem("cozyBakeCustomerName");
+        sessionStorage.removeItem("cozyBakeCustomerEmail");
+    }
+}
+
+function openModal(id){
+    if(id==="cart")renderCart();
+    $(id).classList.add("show");
+}
+function closeModal(){
+    document.querySelectorAll(".modal").forEach(m=>m.classList.remove("show"));
+}
+function showPanel(id){
+    ["choice","login-form","register-form"].forEach(x=>$(x).hidden=x!==id);
+}
+function requestLogin(){
+    if(customer)return false;
+    closeModal();
+    showPanel("choice");
+    openModal("login");
+    return true;
+}
+
+/* PHP CART */
+async function syncPHP(file,data){
+    try{
+        const r=await fetch(file,{
+            method:"POST",credentials:"same-origin",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify(data)
+        });
+        if(!r.ok)throw Error("PHP error");
+        const result=await r.json();
+        if(!result.success)throw Error(result.message||"Failed");
+    }catch(e){console.warn("PHP sync unavailable:",e);}
+}
+
+/* CART */
+//Sambung ke PHP 
+function saveCart(){
+    localStorage.setItem("cozyBakeCart",JSON.stringify(cart));
+    $("cart-count").textContent=cart.reduce((n,x)=>n+x.quantity,0);
+    renderCart();
+}
+
+function addToCart(name,qty=1){
+    const p=products.find(x=>x[0]===name);
+    if(!p)return;
+    if(requestLogin())return;
+
+    const item=cart.find(x=>x.name===name);
+    if(item)item.quantity+=qty;
+    else cart.push({name,price:p[1],quantity:qty});
+
+    saveCart();
+    closeModal();
+    openModal("cart");
+    syncPHP("addtocart.php",{name,price:p[1],quantity:qty});
+}
+
+function changeCart(i,n){
+    const item=cart[i];
+    if(!item)return;
+    item.quantity+=n;
+    if(item.quantity<=0)return removeCart(i);
+    saveCart();
+    syncPHP("updatecart.php",{name:item.name,quantity:item.quantity});
+}
+
+function removeCart(i){
+    const [item]=cart.splice(i,1);
+    if(!item)return;
+    saveCart();
+    syncPHP("removecart.php",{name:item.name});
+}
+
+function renderCart(){
+    const holder=$("cart-items");
+    holder.replaceChildren();
+    let total=0;
+
+    if(!cart.length)holder.textContent="Your cart is empty.";
+
+    cart.forEach((item,i)=>{
+        total+=item.price*item.quantity;
+        const row=document.createElement("div");
+        row.className="cart-row";
+
+        const info=document.createElement("div");
+        const name=document.createElement("h4");
+        name.textContent=item.name;
+        const price=document.createElement("p");
+        price.textContent=money(item.price)+" each";
+        const remove=document.createElement("button");
+        remove.className="remove";
+        remove.textContent="Remove";
+        remove.onclick=()=>removeCart(i);
+        info.append(name,price,remove);
+
+        const controls=document.createElement("div");
+        controls.className="quantity";
+
+        const minus=document.createElement("button");
+        minus.textContent="−";
+        minus.onclick=()=>changeCart(i,-1);
+        const qty=document.createElement("span");
+        qty.textContent=item.quantity;
+        const plus=document.createElement("button");
+        plus.textContent="+";
+        plus.onclick=()=>changeCart(i,1);
+
+        controls.append(minus,qty,plus);
+        row.append(info,controls);
+        holder.append(row);
+    });
+
+    $("cart-total").textContent=money(total);
+}
+
+function checkout(){
+    if(!cart.length)return alert("Your cart is empty.");
+    if(requestLogin())return;
+    location.href="checkoutt.html";
+}
+
+/* PRODUCTS */
+function displayProducts(){
+    const holder=$("products");
+
+    products.forEach((p,i)=>{
+        const card=document.createElement("div");
+        card.className="card";
+        card.dataset.category=p[2];
+
+        card.innerHTML=`
+        <div class="image">
+            <img src="${p[3]}" alt="${p[0]}">
+            ${i===0?'<span class="badge">BEST SELLER</span>':""}
+        </div>
+        <div class="details">
+            <h3>${p[0]}</h3>
+            <p class="description">${p[4]}</p>
+            <p class="category">${p[2]}</p>
+            <h4>${money(p[1])}</h4>
+            <div class="actions">
+                <button class="btn light">👁 Quick View</button>
+                <button class="btn add">🛒 Add to Cart</button>
+            </div>
+        </div>`;
+
+        card.querySelector(".image").onclick=()=>quickView(i);
+        card.querySelector(".light").onclick=()=>quickView(i);
+        card.querySelector(".add").onclick=()=>addToCart(p[0]);
+        holder.append(card);
+    });
+}
+
+
+function filterProducts(category,btn){
+    document.querySelectorAll(".filters button").forEach(b=>{
+        b.classList.remove("active");
+    });
+
+    btn.classList.add("active");
+
+    document.querySelectorAll(".card").forEach((card,i)=>{
+        const product=products[i];
+
+        const show=
+            category==="All" ||
+            (category==="Best Seller" && i===0) ||
+            product[2]===category;
+
+        card.style.display=show?"block":"none";
+    });
+}
+
+
+/* QUICK VIEW */
+function quickView(i){
+    selected=i;
+    quickQty=1;
+    const p=products[i];
+    $("quick-image").src=p[3];
+    $("quick-name").textContent=p[0];
+    $("quick-category").textContent=p[2];
+    $("quick-description").textContent=p[4];
+    updateQuick();
+    openModal("quick");
+}
+
+function updateQuick(){
+    const p=products[selected];
+    $("quick-qty").textContent=quickQty;
+    $("quick-price").textContent=money(p[1])+" each";
+    $("quick-add").textContent="🛒 Add to Cart — "+money(p[1]*quickQty);
+}
+
+function changeQuick(n){
+    quickQty=Math.max(1,quickQty+n);
+    updateQuick();
+}
+
+function addQuick(){
+    addToCart(products[selected][0],quickQty);
+}
+
+document.addEventListener("keydown",e=>{
+    if(e.key==="Escape")closeModal();
+});
+
+loadProducts();
+saveCart();
+loadCustomer();
+</script>
+</body>
+</html>

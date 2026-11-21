@@ -134,16 +134,19 @@ made with thoughtful ingredients and a little extra care.
 <script>
 const $=id=>document.getElementById(id);
 
-const products=[
-"Strawberry Cloud Cake","Morning Croissant","Macaron",
-"Creampuff Strawberry","Strawberry Cheese Cake",
-"Cheesy Kunafa Pistachio","Chocolate Chip Cookies",
-"Redvelvet Cookies","Dark Chocolate Cookies","Blueberry Cookies",
-"Harumanis Mango Cake","Harumanis Cream Puff",
-"Kaya Butter Croissant","Gula Melaka Cheesecake",
-"Pandan Coconut Cookies","Dragon Cake","Durian Cake",
-"Cendol Cheesecake","Salted Caramel Brownies","Lemon Blueberry Cake"
-];
+let products=[];
+
+async function loadHomeProducts(){
+    try{
+        const response=await fetch("menu.php",{cache:"no-store"});
+        if(!response.ok) throw new Error("HTTP "+response.status);
+        const data=await response.json();
+        if(!Array.isArray(data)) throw new Error(data.error||"Unexpected response");
+        products=data.map(row=>String(row[0]));
+    }catch(error){
+        console.error("Could not load homepage product search:",error);
+    }
+}
 
 function closeModal(){
 document.querySelectorAll(".modal").forEach(x=>x.classList.remove("show"));
@@ -168,7 +171,8 @@ function openAccountPage() {
     if (!email) {
         location.href = "login.html";
     } else if (email.split("@")[0].includes("admin")) {
-        location.href = "admin.html";
+        // Admin access must go through the PHP session guard, never static admin.html.
+        location.href = "admin_dashboard.php";
     } else if (email.split("@")[0].includes("staff")) {
         location.href = "staff_dashboard.html";
     } else {
@@ -180,6 +184,16 @@ function openAccountPage() {
 async function checkActiveSession() {
     let email = sessionStorage.getItem("cozyBakeCustomerEmail") || localStorage.getItem("cozyBakeCustomerEmail") || "";
     let name = sessionStorage.getItem("cozyBakeCustomerName") || localStorage.getItem("cozyBakeCustomerName") || "";
+
+    // Do not treat an old admin email in browser storage as an active login.
+    if (email && email.split("@")[0].toLowerCase().includes("admin")) {
+        ["cozyBakeCustomerEmail", "cozyBakeCustomerName", "cozyBakeCustomerId", "cozyBakeDemoLoggedIn", "isLoggedIn", "userEmail", "userName", "customer_id", "cozyBakeUser"].forEach(key => {
+            sessionStorage.removeItem(key);
+            localStorage.removeItem(key);
+        });
+        email = "";
+        name = "";
+    }
 
     try {
         const r = await fetch("getcustomer.php", { credentials: "same-origin", cache: "no-store" });
@@ -210,6 +224,7 @@ document.addEventListener("keydown",e=>{
 if(e.key==="Escape")closeModal();
 });
 
+loadHomeProducts();
 checkActiveSession();
 </script>
 </body>

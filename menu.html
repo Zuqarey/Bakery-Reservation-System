@@ -167,6 +167,28 @@ header p,.category{color:var(--accent)}
 <script>
 const $=id=>document.getElementById(id);
 const money=n=>"RM "+Number(n).toFixed(2);
+let products=[];
+
+async function loadProducts(){
+    const holder=$("products");
+    holder.textContent="Loading products...";
+    try{
+        const response=await fetch("menu.php",{cache:"no-store"});
+        if(!response.ok) throw new Error("HTTP "+response.status);
+        const data=await response.json();
+        if(!Array.isArray(data)) throw new Error(data.error||"Unexpected response from menu.php");
+        products=data;
+        holder.replaceChildren();
+        if(products.length===0){
+            holder.textContent="No products found. Please add products in the product table.";
+            return;
+        }
+        displayProducts();
+    }catch(error){
+        console.error("Product loading failed:",error);
+        holder.textContent="Unable to load products: "+error.message;
+    }
+}
 let cart=[],customer=null,selected=0,quickQty=1;
 
 try {
@@ -404,7 +426,7 @@ document.addEventListener("keydown",e=>{
     if(e.key==="Escape")closeModal();
 });
 
-displayProducts();
+loadProducts();
 saveCart();
 loadCustomer();
 </script>

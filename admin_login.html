@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cozy Bake | Admin Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:#f5eee5;color:#34251d;font-family:'DM Sans',sans-serif}.panel{width:min(420px,100%);background:#fffdf9;border:1px solid #e8d9c8;border-radius:22px;padding:38px;box-shadow:0 18px 50px #51351b18}.brand{text-align:center;color:#9b633b;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase}.panel h1{text-align:center;font:40px 'Instrument Serif',serif;margin:10px 0 6px}.sub{text-align:center;color:#88786c;font-size:13px;margin:0 0 28px}.field{margin:16px 0}.field label{display:block;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px}.field input{width:100%;padding:13px 14px;border:1px solid #dfd1c2;border-radius:10px;font:14px 'DM Sans',sans-serif}.field input:focus{outline:2px solid #c18b5b;outline-offset:1px}.submit{width:100%;border:0;border-radius:999px;padding:14px;background:#8d5735;color:white;font-weight:700;letter-spacing:1px;cursor:pointer;margin-top:10px}.submit:hover{background:#503321}.foot{text-align:center;color:#9b8c80;font-size:11px;margin-top:22px}
+</style>
+</head>
+<body>
+<main class="panel">
+  <div class="brand">Cozy Bake · Admin Portal</div>
+  <h1>Welcome Back</h1>
+  <p class="sub">Sign in with your administrator account</p>
+  <form action="admin_login.php" method="post" autocomplete="on">
+    <div class="field"><label for="email">Email Address</label><input id="email" name="email" type="email" autocomplete="username" required></div>
+    <div class="field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required></div>
+    <button class="submit" type="submit">SIGN IN</button>
+  </form>
+  <div class="foot">Authorized administrators only</div>
+</main>
+</body>
+</html>

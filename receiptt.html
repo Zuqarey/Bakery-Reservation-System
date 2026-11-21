@@ -130,7 +130,7 @@ const branches={
 };
 
 // tukar false if backend dah siap
-const DEMO_MODE=true;
+const DEMO_MODE=false;
 
 // LOGIN CHECK + AUTO-FILL
 async function loadCustomer(){
@@ -139,7 +139,7 @@ async function loadCustomer(){
   const email=sessionStorage.getItem("cozyBakeCustomerEmail");
 
   if(!email){
-   location.replace("login.html?redirect=checkout.html");
+   location.replace("login.html?redirect=checkoutt.html");
    return;
   }
   $("name").value=name||"Customer";
@@ -153,7 +153,7 @@ async function loadCustomer(){
   const data=await res.json();
 
   if(!res.ok||data.loggedIn!==true){
-   location.replace("login.html?redirect=checkout.html");
+   location.replace("login.html?redirect=checkoutt.html");
    return;
   }
 
@@ -256,7 +256,7 @@ $("checkoutForm").addEventListener("submit",async e=>{
  }
 
  if(!$("name").value||!$("email").value){
-  location.href="login.html?redirect=checkout.html";
+  location.href="login.html?redirect=checkoutt.html";
   return;
  }
 

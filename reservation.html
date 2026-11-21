@@ -136,35 +136,24 @@ const names=[
 ];
 
 const seats=id=>Math.ceil(Number(id.slice(1))/5)*2;
-const read=()=>JSON.parse(localStorage.getItem("cozyBakeBookings")||"[]");
-let email=sessionStorage.getItem("cozyBakeCustomerEmail") || localStorage.getItem("cozyBakeCustomerEmail");
-let name=sessionStorage.getItem("cozyBakeCustomerName") || localStorage.getItem("cozyBakeCustomerName");
+let email="";
+let name="";
 
 async function loadCustomer(){
-  if (email) {
-    $("name").value = name || email.split("@")[0];
-    $("email").value = email;
-    update();
-  }
   try{
-    const res=await fetch("getcustomer.php",{credentials:"same-origin"});
-    if (res.ok) {
-      const data=await res.json();
-      if(data.loggedIn===true){
-        email = data.email || email;
-        name = data.name || data.customer || name;
-        $("name").value = name;
-        $("email").value = email;
-        sessionStorage.setItem("cozyBakeCustomerEmail", email);
-        sessionStorage.setItem("cozyBakeCustomerName", name);
-        update();
-        return;
-      }
+    const res=await fetch("getcustomer.php",{credentials:"same-origin",cache:"no-store"});
+    const data=await res.json();
+    if(!res.ok || data.loggedIn!==true || !data.email){
+      location.replace("login.html?redirect=reservation.html");
+      return;
     }
-  }catch(e){}
-
-  if(!email){
-    location.replace("login.html?redirect=reservation.html");
+    email=data.email;
+    name=data.name || data.customer || email.split("@")[0];
+    $("name").value=name;
+    $("email").value=email;
+    update();
+  }catch(e){
+    $("message").textContent="Unable to verify your login. Please refresh or log in again.";
   }
 }
 
@@ -197,10 +186,8 @@ function update(){
 }
 
 function booked(d,id){
- return read().some(b=>
-  b.outlet===d.outlet&&b.date===d.date&&
-  b.time===d.time&&b.table===id&&b.status!=="Cancelled"
- );
+ // Final table availability is checked by MySQL when the reservation is submitted.
+ return false;
 }
 
 function filterTables(){
@@ -212,7 +199,7 @@ function filterTables(){
   const unavailable=booked(d,id),small=capacity<d.guests;
   const option=new Option(
    `${id} — ${name} (${capacity} seats) — ${
-    unavailable?"Unavailable":small?"Too small":"Available"
+    small?"Too small":"Availability checked when submitted"
    }`,id
   );
   option.disabled=unavailable||small;
@@ -238,14 +225,19 @@ $("date").min=new Date(Date.now()-new Date().getTimezoneOffset()*60000)
 form.addEventListener("submit",async e=>{
  e.preventDefault();
  const d=getData(),msg=$("message");
- msg.textContent="";
+ msg.textContent="Saving your reservation...";
+ msg.style.color="#725C4E";
 
  if(!d.name||!d.email){
-  location.href="login.html?redirect=reservation.html";
+  msg.textContent="Please log in again before making a reservation.";
   return;
  }
- if(!d.table||seats(d.table)<d.guests||booked(d,d.table)){
-  msg.textContent="Please select an available table.";
+ if(!d.phone||!d.outlet||!d.date||!d.time||!d.table){
+  msg.textContent="Please complete all required reservation fields.";
+  return;
+ }
+ if(!d.table||seats(d.table)<d.guests){
+  msg.textContent="Please select a table with enough seats.";
   return;
  }
  if(new Date(d.date+"T"+d.time)<=new Date()){
@@ -253,26 +245,35 @@ form.addEventListener("submit",async e=>{
   return;
  }
 
- // Simpan ke dalam localStorage supaya custdashboard.html boleh memaparkan tempahan
- const bookings=read();
- bookings.push({...d,id:"RES"+Date.now(),status:"Pending"});
- localStorage.setItem("cozyBakeBookings",JSON.stringify(bookings));
-
- // Cuba hantar juga ke reservation.php jika wujud
+ const submitButton=form.querySelector('button[type="submit"]');
+ submitButton.disabled=true;
  try{
-  await fetch("reservation.php",{
+  const response=await fetch("reservation.php",{
    method:"POST",
    credentials:"same-origin",
    headers:{"Content-Type":"application/json"},
-   body:JSON.stringify(d)
+   body:JSON.stringify(d),
+   cache:"no-store"
   });
- }catch(err){}
-
- // Redirect ke custdashboard.html#bookings (bukan customerdashboard.html)
- location.href="custdashboard.html#bookings";
+  const result=await response.json();
+  if(!response.ok || result.success!==true){
+   throw new Error(result.message || "The reservation could not be saved.");
+  }
+  msg.style.color="green";
+  msg.textContent=`Reservation ${result.reservation.id} saved successfully. Status: ${result.reservation.status}.`;
+  form.reset();
+  $("name").value=name;
+  $("email").value=email;
+  $("guests").value="2";
+  filterTables();
+ }catch(error){
+  msg.style.color="#B42318";
+  msg.textContent=error.message || "Unable to save the reservation. Please try again.";
+ }finally{
+  submitButton.disabled=false;
+ }
 });
 
-filterTables();
 loadCustomer();
 </script>
 </body>
