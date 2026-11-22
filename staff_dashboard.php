@@ -22,13 +22,13 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
 }
 ?>
 <!DOCTYPE html>
-<html lang="ms">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cozy Bake - Staff Portal (All-in-One)</title>
+  <title>Cozy Bake — Staff Portal</title>
+  <link rel="stylesheet" href="cozy-theme.css">
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script>
     tailwind.config = {
@@ -36,19 +36,19 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
         extend: {
           colors: {
             cozy: {
-              bg: '#f4ede4',
-              wood: '#3a2214',
-              accent: '#e89849',
-              border: '#eeded1',
-              darkCard: '#4A2A18',
-              orangeCard: '#F09B53',
-              textDark: '#3d2b1f',
-              textMuted: '#8c7a6b'
+              bg: '#F5EDE3',
+              wood: '#5C2C16',
+              accent: '#EB9E55',
+              border: '#EFE6DC',
+              darkCard: '#5C2C16',
+              orangeCard: '#EB9E55',
+              textDark: '#2C1A11',
+              textMuted: '#8C7A6B'
             }
           },
           fontFamily: {
-            sans: ['Plus Jakarta Sans', 'sans-serif'],
-            script: ['Caveat', 'cursive']
+            sans: ['DM Sans', 'sans-serif'],
+            script: ['Pacifico', 'cursive']
           }
         }
       }
@@ -56,18 +56,18 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
   </script>
   <style>
     :root {
-      --wood: #3a2214;
-      --bg: #f4ede4;
-      --accent: #e89849;
-      --border: #eeded1;
+      --wood: #5C2C16;
+      --bg: #F5EDE3;
+      --accent: #EB9E55;
+      --border: #EFE6DC;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-    body { display: flex; height: 100vh; background: var(--bg); color: #3d2b1f; overflow: hidden; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'DM Sans', sans-serif; }
+    body { display: flex; height: 100vh; background: var(--bg); color: #2C1A11; overflow: hidden; }
 
     /* Sidebar Auto-Expand Bila Hover & Saiz Simbol 24px */
     .sidebar {
       width: 75px;
-      background: linear-gradient(180deg, #422717, #29150a);
+      background: linear-gradient(180deg, #5A351D 0%, #432512 50%, #5A351D 100%);
       display: flex;
       flex-direction: column;
       align-items: stretch;
@@ -130,9 +130,9 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
       pointer-events: none;
     }
     .brand-label {
-      font-family: 'Caveat', cursive;
-      font-size: 1.75rem;
-      font-weight: 700;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
       color: #fff;
       opacity: 0;
       transform: translateX(-8px);
@@ -147,14 +147,15 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
 
     /* Layout Utama */
     .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-    header { height: 70px; display: flex; justify-content: space-between; align-items: center; padding: 0 32px; border-bottom: 1px solid rgba(0,0,0,0.05); flex-shrink: 0; }
-    .view-section { display: none; flex: 1; padding: 24px 32px; overflow-y: auto; flex-direction: column; gap: 18px; }
+    header { height: 76px; background: #FDFBF7; display: flex; justify-content: space-between; align-items: center; padding: 0 38px; border-bottom: 1px solid #EFE6DC; flex-shrink: 0; }
+    #topbar-title { font-family: 'Oswald', sans-serif !important; font-size: 18px !important; letter-spacing: 0.6px; font-weight: 600 !important; }
+    .view-section { display: none; flex: 1; padding: 32px 38px; overflow-y: auto; flex-direction: column; gap: 22px; }
     .view-section.active { display: flex; }
 
     /* Komponen & Tipografi */
-    .title { font-family: 'Caveat', cursive; font-size: 3rem; color: var(--wood); line-height: 1; }
+    .title { font-family: 'Pacifico', cursive; font-size: 38px; font-weight: 400; color: #3B1D0E; line-height: 1.2; margin: 4px 0; }
     .filters { display: flex; gap: 10px; flex-wrap: wrap; }
-    .pill { padding: 8px 18px; border-radius: 20px; background: #fff; border: 1px solid var(--border); font-weight: 700; font-size: 0.8rem; cursor: pointer; transition: 0.2s; }
+    .pill { padding: 10px 20px; border-radius: 999px; background: #fff; border: 1px solid var(--border); font-weight: 600; font-size: 12.5px; letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer; transition: 0.2s; }
     .pill.active { background: var(--wood); color: #fff; border-color: var(--wood); }
 
     /* Kad & Grid Orders */
@@ -222,7 +223,7 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
       <i data-lucide="calendar"></i>
       <span class="nav-label">Schedule</span>
     </button>
-    <button class="nav-btn logout" onclick="if(confirm('Adakah anda pasti mahu log keluar?')) window.location.href='staff_logout.php'">
+    <button class="nav-btn logout" onclick="openLogoutModal()">
       <i data-lucide="log-out"></i>
       <span class="nav-label">Log Out</span>
     </button>
@@ -259,36 +260,36 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
       </div>
 
       <!-- Kad Statistik Interaktif -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div onclick="openOrdersWithFilter('NEW')" class="bg-white p-5 rounded-2xl shadow-sm border-2 border-transparent hover:border-cozy-accent cursor-pointer transition flex items-center gap-4">
-          <div class="p-3 bg-amber-50 text-amber-800 rounded-xl"><i data-lucide="shopping-bag"></i></div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div onclick="openOrdersWithFilter('NEW')" class="bg-[#EB9E55] text-[#2C1A11] p-6 rounded-[20px] shadow-sm hover:-translate-y-1 hover:shadow-md cursor-pointer transition flex items-center gap-4">
+          <div class="p-3 bg-white/30 text-[#2C1A11] rounded-xl"><i data-lucide="shopping-bag"></i></div>
           <div>
-            <p class="text-xs uppercase font-bold text-cozy-textMuted">Active Orders</p>
-            <h3 id="dash-active-orders" class="text-2xl font-extrabold mt-0.5">—</h3>
+            <p class="text-[11px] uppercase font-bold tracking-wider opacity-85">Active Orders</p>
+            <h3 id="dash-active-orders" class="text-3xl font-bold mt-1">—</h3>
           </div>
         </div>
 
-        <div onclick="openOrdersWithFilter('COMPLETED')" class="bg-white p-5 rounded-2xl shadow-sm border-2 border-transparent hover:border-cozy-accent cursor-pointer transition flex items-center gap-4">
-          <div class="p-3 bg-emerald-50 text-emerald-800 rounded-xl"><i data-lucide="check-circle-2"></i></div>
+        <div onclick="openOrdersWithFilter('COMPLETED')" class="bg-white p-6 rounded-[20px] shadow-sm hover:-translate-y-1 hover:shadow-md cursor-pointer transition flex items-center gap-4">
+          <div class="p-3 bg-[#DCECE3] text-[#286646] rounded-xl"><i data-lucide="check-circle-2"></i></div>
           <div>
-            <p class="text-xs uppercase font-bold text-cozy-textMuted">Completed Today</p>
-            <h3 id="dash-completed-orders" class="text-2xl font-extrabold mt-0.5">—</h3>
+            <p class="text-[11px] uppercase font-bold tracking-wider text-cozy-textMuted">Completed Today</p>
+            <h3 id="dash-completed-orders" class="text-3xl font-bold mt-1">—</h3>
           </div>
         </div>
 
-        <div onclick="switchPage('ingredients'); filterIngredientsByStat('low');" class="bg-white p-5 rounded-2xl shadow-sm border-2 border-transparent hover:border-cozy-accent cursor-pointer transition flex items-center gap-4">
-          <div class="p-3 bg-rose-50 text-rose-800 rounded-xl"><i data-lucide="alert-triangle"></i></div>
+        <div onclick="switchPage('ingredients'); filterIngredientsByStat('low');" class="bg-[#5C2C16] text-white p-6 rounded-[20px] shadow-sm hover:-translate-y-1 hover:shadow-md cursor-pointer transition flex items-center gap-4">
+          <div class="p-3 bg-white/15 text-white rounded-xl"><i data-lucide="alert-triangle"></i></div>
           <div>
-            <p class="text-xs uppercase font-bold text-cozy-textMuted">Low Stock Pantry</p>
-            <h3 id="dash-low-stock" class="text-2xl font-extrabold mt-0.5">—</h3>
+            <p class="text-[11px] uppercase font-bold tracking-wider text-white/80">Low Stock Pantry</p>
+            <h3 id="dash-low-stock" class="text-3xl font-bold mt-1">—</h3>
           </div>
         </div>
 
-        <div onclick="switchPage('schedule')" class="bg-white p-5 rounded-2xl shadow-sm border-2 border-transparent hover:border-cozy-accent cursor-pointer transition flex items-center gap-4">
-          <div class="p-3 bg-orange-50 text-orange-800 rounded-xl"><i data-lucide="flame"></i></div>
+        <div onclick="switchPage('schedule')" class="bg-white p-6 rounded-[20px] shadow-sm hover:-translate-y-1 hover:shadow-md cursor-pointer transition flex items-center gap-4">
+          <div class="p-3 bg-[#FDE5CE] text-[#9C5116] rounded-xl"><i data-lucide="flame"></i></div>
           <div>
-            <p class="text-xs uppercase font-bold text-cozy-textMuted">Upcoming Pickups</p>
-            <h3 id="dash-upcoming-pickups" class="text-2xl font-extrabold mt-0.5">—</h3>
+            <p class="text-[11px] uppercase font-bold tracking-wider text-cozy-textMuted">Upcoming Pickups</p>
+            <h3 id="dash-upcoming-pickups" class="text-3xl font-bold mt-1">—</h3>
           </div>
         </div>
       </div>
@@ -374,22 +375,22 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
       </div>
 
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div onclick="filterIngredientsByStat('all')" class="bg-cozy-darkCard text-white p-5 rounded-3xl cursor-pointer hover:opacity-95">
+        <div onclick="filterIngredientsByStat('all')" class="kpi-card bg-cozy-darkCard text-white p-5 rounded-3xl cursor-pointer">
           <h3 class="text-xs font-extrabold text-white/70 uppercase">ALL INGREDIENTS</h3>
           <div class="text-4xl font-black my-2">55</div>
           <p class="text-xs text-white/70">Tracked in the pantry</p>
         </div>
-        <div onclick="filterIngredientsByStat('low')" class="bg-cozy-orangeCard text-white p-5 rounded-3xl cursor-pointer hover:opacity-95">
+        <div onclick="filterIngredientsByStat('low')" class="kpi-card bg-cozy-orangeCard text-white p-5 rounded-3xl cursor-pointer">
           <h3 class="text-xs font-extrabold text-white/85 uppercase">LOW STOCK</h3>
           <div class="text-4xl font-black my-2">9</div>
           <p class="text-xs text-white/85">Below par level</p>
         </div>
-        <div onclick="filterIngredientsByStat('expiring')" class="bg-white p-5 rounded-3xl cursor-pointer hover:bg-white/90">
+        <div onclick="filterIngredientsByStat('expiring')" class="kpi-card bg-white p-5 rounded-3xl cursor-pointer">
           <h3 class="text-xs font-extrabold text-cozy-textMuted uppercase">EXPIRING SOON</h3>
           <div class="text-4xl font-black text-cozy-darkCard my-2">3</div>
           <p class="text-xs text-cozy-textMuted">Use within 5 days</p>
         </div>
-        <div onclick="filterIngredientsByStat('expired')" class="bg-white p-5 rounded-3xl cursor-pointer hover:bg-white/90">
+        <div onclick="filterIngredientsByStat('expired')" class="kpi-card bg-white p-5 rounded-3xl cursor-pointer">
           <h3 class="text-xs font-extrabold text-cozy-textMuted uppercase">EXPIRED</h3>
           <div class="text-4xl font-black text-cozy-darkCard my-2">4</div>
           <p class="text-xs text-cozy-textMuted">Remove from the line</p>
@@ -426,14 +427,60 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
     </section>
   </div>
 
-  <!-- Butang Bantuan Terapung -->
-  <div onclick="alert('Cozy Bake Staff Portal — Halakan cursor ke sidebar kiri untuk melihat nama setiap menu.')" style="position:fixed; bottom:24px; right:24px; width:36px; height:36px; background:#29150a; color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; cursor:pointer; z-index:50;">?</div>
+  <!-- Floating Help Button -->
+  <div onclick="alert('Cozy Bake Staff Portal — Hover over the left sidebar to see menu labels.')" style="position:fixed; bottom:24px; right:24px; width:36px; height:36px; background:#5C2C16; color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; cursor:pointer; z-index:50; box-shadow:0 6px 16px rgba(92,44,22,0.25);">?</div>
+
+  <!-- Log Out Confirmation Modal -->
+  <div id="logoutConfirmModal" style="position:fixed; inset:0; background:rgba(32,18,10,0.55); display:none; align-items:center; justify-content:center; z-index:300; padding:16px;">
+    <div style="width:min(400px,100%); background:#FDFBF7; border-radius:22px; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,0.3);">
+      <div style="background:#B58E6B; color:#FFF; padding:22px 26px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <small style="display:block; font-size:10px; letter-spacing:1.4px; text-transform:uppercase; opacity:0.9;">STAFF SESSION</small>
+          <h3 style="font-family:'Instrument Serif',serif; font-size:28px; font-weight:400;">Log out of portal?</h3>
+        </div>
+        <button type="button" onclick="closeLogoutModal()" style="width:32px; height:32px; border-radius:50%; border:1px solid rgba(255,255,255,0.4); background:transparent; color:#FFF; cursor:pointer; font-size:16px;">✕</button>
+      </div>
+      <div style="padding:24px 26px;">
+        <p style="font-size:14px; color:#8C7A6B; line-height:1.5;">You're on the first page of the Staff Portal. Would you like to log out?</p>
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+          <button type="button" onclick="closeLogoutModal()" style="background:#EFE5D8; color:#2C1A11; border:none; padding:9px 18px; border-radius:999px; font-size:11px; font-weight:700; letter-spacing:0.8px; text-transform:uppercase; cursor:pointer;">STAY HERE</button>
+          <a href="staff_logout.php" style="background:transparent; color:#A93226; border:1px solid #E6B0AA; padding:9px 16px; border-radius:999px; font-size:11px; font-weight:700; text-decoration:none; display:inline-flex; align-items:center;">YES, LOG OUT</a>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script>
     // ==========================================
-    // FUNGSI TUKAR HALAMAN (SPA ROUTER)
+    // SPA ROUTER + BROWSER BACK BUTTON HISTORY
     // ==========================================
-    function switchPage(pageId) {
+    const STAFF_TITLES = {
+      dashboard: 'Dashboard',
+      inventory: 'Inventory',
+      orders: 'Orders',
+      ingredients: 'Ingredients',
+      schedule: 'Schedule'
+    };
+    let currentStaffPage = 'dashboard';
+
+    function openLogoutModal() {
+      const m = document.getElementById('logoutConfirmModal');
+      if (m) m.style.display = 'flex';
+    }
+    function closeLogoutModal() {
+      const m = document.getElementById('logoutConfirmModal');
+      if (m) m.style.display = 'none';
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeLogoutModal();
+    });
+    document.addEventListener('click', (e) => {
+      if (e.target && e.target.id === 'logoutConfirmModal') closeLogoutModal();
+    });
+
+    function switchPage(pageId, pushHistory = true) {
+      if (!STAFF_TITLES[pageId]) pageId = 'dashboard';
       document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
 
@@ -441,16 +488,32 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
       const activeBtn = document.getElementById('nav-' + pageId);
       if (activeBtn) activeBtn.classList.add('active');
 
-      const titles = {
-        dashboard: 'Dashboard',
-        inventory: 'Inventory',
-        orders: 'Orders',
-        ingredients: 'Ingredients',
-        schedule: 'Schedule'
-      };
-      document.getElementById('topbar-title').textContent = titles[pageId] || 'Dashboard';
+      document.getElementById('topbar-title').textContent = STAFF_TITLES[pageId] || 'Dashboard';
+      if (pushHistory && pageId !== currentStaffPage) {
+        history.pushState({ page: pageId }, '', '#' + pageId);
+      }
+      currentStaffPage = pageId;
       lucide.createIcons();
     }
+
+    window.addEventListener('popstate', (e) => {
+      if (e.state && e.state.guard) {
+        history.pushState({ page: currentStaffPage }, '', '#' + currentStaffPage);
+        openLogoutModal();
+        return;
+      }
+      const hashPage = location.hash.replace('#', '');
+      const pageId = (e.state && e.state.page) || (STAFF_TITLES[hashPage] ? hashPage : 'dashboard');
+      switchPage(pageId, false);
+    });
+
+    (function initStaffHistory() {
+      const hashPage = location.hash.replace('#', '');
+      const initialPage = STAFF_TITLES[hashPage] ? hashPage : 'dashboard';
+      history.replaceState({ guard: true }, '', '#' + initialPage);
+      history.pushState({ page: initialPage }, '', '#' + initialPage);
+      if (initialPage !== 'dashboard') switchPage(initialPage, false);
+    })();
 
     function openOrdersWithFilter(filterName) {
       switchPage('orders');

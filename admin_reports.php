@@ -13,6 +13,9 @@ try {
       COALESCE(SUM(p.total),0) AS all_time
       FROM payment p INNER JOIN orders o ON o.order_id=p.order_id";
     $summary = $conn->query($summarySql)->fetch_assoc();
+    $orderCounts = $conn->query("SELECT COALESCE(SUM(CASE WHEN DATE(`date order`) = CURDATE() THEN 1 ELSE 0 END), 0) AS orders_today, COUNT(*) AS total_orders FROM orders")->fetch_assoc();
+    $summary['orders_today'] = (int)($orderCounts['orders_today'] ?? 0);
+    $summary['total_orders'] = (int)($orderCounts['total_orders'] ?? 0);
     $months = [];
     $monthSql = "SELECT DATE_FORMAT(o.`date order`, '%b %Y') AS month, DATE_FORMAT(o.`date order`, '%Y-%m') AS sort_month, COALESCE(SUM(p.total),0) AS revenue
       FROM payment p INNER JOIN orders o ON o.order_id=p.order_id

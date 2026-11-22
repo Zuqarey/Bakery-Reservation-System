@@ -4,7 +4,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Cozy Bake | Customer Portal</title>
+<title>Cozy Bake — Customer Portal</title>
+<link rel="stylesheet" href="cozy-theme.css">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;600;700&family=Oswald:wght@500;600&family=Pacifico&display=swap" rel="stylesheet">
 
 <style>
@@ -20,9 +21,9 @@ button{font-family:inherit;cursor:pointer}
 .brand-icon{min-width:24px}
 .brand-text,.portal-info,.nav-label{opacity:0;transition:.2s}
 .sidebar:hover .brand-text,.sidebar:hover .portal-info,.sidebar:hover .nav-label{opacity:1}
-.portal-info{padding:16px 10px 8px;white-space:nowrap}
+.portal-info{padding:16px 10px 8px;width:206px;white-space:normal}
 .portal-info small{display:block;font-size:10px;letter-spacing:1.4px;color:#D2B49C}
-.portal-info strong{font-size:15px;color:white}
+.portal-info strong{display:block;font-size:14px;line-height:1.3;color:white;overflow-wrap:break-word}
 .nav-list{list-style:none;display:flex;flex-direction:column;gap:8px;margin-top:10px}
 .nav-item{display:flex;align-items:center;gap:14px;padding:12px;width:100%;border:0;border-radius:12px;background:transparent;color:#E6D7C8;text-decoration:none;white-space:nowrap;font-size:14px;text-align:left}
 .nav-item:hover,.nav-item.active{background:#ffffff29;color:white}
@@ -350,6 +351,26 @@ button{font-family:inherit;cursor:pointer}
 </main>
 </div>
 
+<!-- Log Out Confirmation Modal -->
+<div id="logoutConfirmModal" style="position:fixed;inset:0;background:rgba(32,18,10,.55);display:none;align-items:center;justify-content:center;z-index:300;padding:16px">
+ <div style="width:min(400px,100%);background:#FDFBF7;border-radius:22px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.3)">
+  <div style="background:#B58E6B;color:#FFF;padding:22px 26px;display:flex;justify-content:space-between;align-items:center">
+   <div>
+    <small style="display:block;font-size:10px;letter-spacing:1.4px;text-transform:uppercase;opacity:.9">CUSTOMER SESSION</small>
+    <h3 style="font-family:'Instrument Serif',serif;font-size:28px;font-weight:400">Log out of portal?</h3>
+   </div>
+   <button type="button" onclick="closeLogoutModal()" style="width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,.4);background:transparent;color:#FFF;cursor:pointer;font-size:16px">✕</button>
+  </div>
+  <div style="padding:24px 26px">
+   <p style="font-size:14px;color:#8C7A6B;line-height:1.5">You're already on the first page of your dashboard. Would you like to log out?</p>
+   <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px">
+    <button type="button" onclick="closeLogoutModal()" style="background:#EFE5D8;color:#2C1A11;border:none;padding:9px 18px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;cursor:pointer">STAY HERE</button>
+    <a href="logout.php" style="background:transparent;color:#A93226;border:1px solid #E6B0AA;padding:9px 16px;border-radius:999px;font-size:11px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center">YES, LOG OUT</a>
+   </div>
+  </div>
+ </div>
+</div>
+
 <script>
 const $=id=>document.getElementById(id);
 const money=n=>"RM "+Number(n||0).toFixed(2);
@@ -378,14 +399,54 @@ function read(key){
  catch{return[]}
 }
 
-function show(id){
+const CUST_PAGES=["dashboard","orders","cart","booking-history","upcoming-booking"];
+let currentCustPage="dashboard";
+
+function openLogoutModal(){$("logoutConfirmModal").style.display="flex";}
+function closeLogoutModal(){$("logoutConfirmModal").style.display="none";}
+
+document.addEventListener("keydown",e=>{
+ if(e.key==="Escape"){
+  closeLogoutModal();
+  $("notifPopover").classList.remove("open");
+ }
+});
+document.addEventListener("click",e=>{
+ if(e.target&&e.target.id==="logoutConfirmModal")closeLogoutModal();
+ const pop=$("notifPopover");
+ if(pop&&pop.classList.contains("open")&&!e.target.closest("#notifPopover")&&!e.target.closest(".bell-btn"))pop.classList.remove("open");
+});
+
+function show(id,pushHistory=true){
+ if(!CUST_PAGES.includes(id))id="dashboard";
  document.querySelectorAll(".page-section").forEach(p=>p.classList.toggle("active",p.id===id));
  document.querySelectorAll(".nav-item[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===id));
  $("page-title").textContent=({"dashboard":"DASHBOARD","orders":"ORDER HISTORY","cart":"MY CART","booking-history":"BOOKING HISTORY","upcoming-booking":"UPCOMING BOOKING"})[id]||id.toUpperCase();
+ if(pushHistory&&id!==currentCustPage)history.pushState({page:id},"","#"+id);
+ currentCustPage=id;
  if(id==="cart")renderCart();
  if(id==="orders")loadOrders();
  if(id.includes("booking"))loadBookings();
 }
+
+window.addEventListener("popstate",e=>{
+ if(e.state&&e.state.guard){
+  history.pushState({page:currentCustPage},"","#"+currentCustPage);
+  openLogoutModal();
+  return;
+ }
+ const hashPage=location.hash.replace("#","");
+ const pageId=(e.state&&e.state.page)||(CUST_PAGES.includes(hashPage)?hashPage:"dashboard");
+ show(pageId,false);
+});
+
+(function initCustHistory(){
+ const hashPage=location.hash.replace("#","");
+ const initialPage=CUST_PAGES.includes(hashPage)?hashPage:"dashboard";
+ history.replaceState({guard:true},"","#"+initialPage);
+ history.pushState({page:initialPage},"","#"+initialPage);
+ if(initialPage!=="dashboard")show(initialPage,false);
+})();
 
 function fillRows(id,rows,cols){
  const el=$(id);el.innerHTML="";
