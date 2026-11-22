@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (empty($_SESSION['admin_logged_in']) || ($_SESSION['role'] ?? '') !== 'admin') {
-    header('Location: admin_login.html');
+    header('Location: login.html');
     exit;
 }
 $htmlPath = __DIR__ . '/admin.html';
