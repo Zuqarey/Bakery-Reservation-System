@@ -2,8 +2,35 @@
 session_start();
 include 'db.php';
 
-function redirectTop($url) {
-    echo "<script>window.top.location.href = '" . htmlspecialchars($url, ENT_QUOTES) . "';</script>";
+function redirectWithCustomerSession($url, $name, $email, $custId) {
+    $jsUrl = json_encode($url, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+    $jsName = json_encode($name, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+    $jsEmail = json_encode($email, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+    $safeId = (int)$custId;
+    $jsIdStr = json_encode((string)$safeId);
+
+    echo "<!DOCTYPE html><html><head><meta charset=\"utf-8\"><script>
+        const userData = {
+            id: $safeId,
+            customer_id: $safeId,
+            name: $jsName,
+            email: $jsEmail,
+            role: 'customer',
+            loggedIn: true
+        };
+        [sessionStorage, localStorage].forEach(store => {
+            store.setItem('cozyBakeDemoLoggedIn', 'true');
+            store.setItem('cozyBakeCustomerName', $jsName);
+            store.setItem('cozyBakeCustomerEmail', $jsEmail);
+            store.setItem('cozyBakeCustomerId', $jsIdStr);
+            store.setItem('isLoggedIn', 'true');
+            store.setItem('userEmail', $jsEmail);
+            store.setItem('userName', $jsName);
+            store.setItem('customer_id', $jsIdStr);
+            store.setItem('cozyBakeUser', JSON.stringify(userData));
+        });
+        window.top.location.href = $jsUrl;
+    </script></head><body>Redirecting...</body></html>";
     exit();
 }
 
@@ -12,7 +39,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = strtolower(trim($_POST['email'] ?? ''));
     $password = trim($_POST['password'] ?? '');
     $redirect = $_POST['redirect'] ?? '';
-    $redirectPage = ($redirect === 'reservation.html') ? 'reservation.html' : 'index.html';
+    $allowedRedirects = ['reservation.html', 'customcake.html', 'checkoutt.html', 'menu.html', 'custdashboard.html', 'index.html'];
+    $redirectPage = in_array($redirect, $allowedRedirects, true) ? $redirect : 'custdashboard.html';
 
     if (empty($name) || empty($email) || empty($password)) {
         echo "<script>alert('Sila isi nama, e-mel, dan kata laluan.'); window.history.back();</script>";
@@ -36,46 +64,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!$stmtUser->execute()) {
         die("Ralat pendaftaran user: " . $conn->error);
     }
-    $newUserId = $conn->insert_id;
+    $newUserId = (int)$conn->insert_id;
 
-    $_SESSION['user_id'] = $newUserId;
-    $_SESSION['user_name'] = $name;
-    $_SESSION['user_email'] = $email;
-
-    // Semak bahagian sebelum '@' untuk perkataan 'admin' atau 'staff'
-    $emailPrefix = explode('@', $email)[0];
-    $isAdminEmail = (strpos($emailPrefix, 'admin') !== false);
-    $isStaffEmail = (strpos($emailPrefix, 'staff') !== false);
-
-    // 2. Agihkan mengikut kandungan emel
-    if ($isAdminEmail) {
-        $stmtAdmin = $conn->prepare("INSERT INTO admin (user_id) VALUES (?)");
-        $stmtAdmin->bind_param("i", $newUserId);
-        $stmtAdmin->execute();
-        $_SESSION['role'] = 'admin';
-        $_SESSION['admin_id'] = $conn->insert_id;
-        $_SESSION['admin_logged_in'] = true;
-        redirectTop("admin.html");
-
-    } elseif ($isStaffEmail) {
-        $stmtStaff = $conn->prepare("INSERT INTO staff (user_id, status) VALUES (?, 'Active')");
-        $stmtStaff->bind_param("i", $newUserId);
-        $stmtStaff->execute();
-        $staffId = $conn->insert_id;
-
-        $_SESSION['role'] = 'staff';
-        $_SESSION['staff_logged_in'] = true;
-        $_SESSION['staff_id'] = $staffId;
-        $_SESSION['staff_name'] = $name;
-        redirectTop("staff_dashboard.html");
-
-    } else {
-        $stmtCust = $conn->prepare("INSERT INTO customer (user_id, full_name, email, password) VALUES (?, ?, ?, ?)");
-        $stmtCust->bind_param("isss", $newUserId, $name, $email, $hashedPass);
-        $stmtCust->execute();
-        $_SESSION['role'] = 'customer';
-        $_SESSION['customer_id'] = $conn->insert_id;
-        redirectTop($redirectPage);
+    // 2. Public registration always creates a customer account (staff/admin are managed in the Admin Portal)
+    $stmtCust = $conn->prepare("INSERT INTO customer (user_id, full_name, email, password) VALUES (?, ?, ?, ?)");
+    $stmtCust->bind_param("isss", $newUserId, $name, $email, $hashedPass);
+    if (!$stmtCust->execute()) {
+        die("Ralat pendaftaran customer: " . $conn->error);
     }
+    $customerId = (int)$conn->insert_id;
+
+    session_regenerate_id(true);
+    $_SESSION = [];
+    $_SESSION['logged_in'] = true;
+    $_SESSION['customer_logged_in'] = true;
+    $_SESSION['role'] = 'customer';
+    $_SESSION['user_id'] = $newUserId;
+    $_SESSION['customer_id'] = $customerId;
+    $_SESSION['id'] = $customerId;
+    $_SESSION['user_name'] = $name;
+    $_SESSION['customer_name'] = $name;
+    $_SESSION['full_name'] = $name;
+    $_SESSION['name'] = $name;
+    $_SESSION['user_email'] = $email;
+    $_SESSION['customer_email'] = $email;
+    $_SESSION['email'] = $email;
+
+    redirectWithCustomerSession($redirectPage, $name, $email, $customerId);
 }
 ?>

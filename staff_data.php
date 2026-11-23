@@ -1,7 +1,7 @@
 <?php
 session_start();
 header('Content-Type: application/json; charset=utf-8');
-if (empty($_SESSION['staff_logged_in']) || empty($_SESSION['staff_id'])) {
+if (empty($_SESSION['staff_logged_in']) || empty($_SESSION['staff_id']) || ($_SESSION['role'] ?? '') !== 'staff') {
     http_response_code(401);
     echo json_encode(['success' => false, 'message' => 'Please log in as staff.']);
     exit;
@@ -42,6 +42,7 @@ try {
                 o.status AS status
             FROM orders o
             LEFT JOIN customer c ON c.customer_id = o.customer_id
+            WHERE UPPER(COALESCE(o.status, 'NEW')) <> 'CANCELLED'
             ORDER BY o.`date order` DESC, o.order_id DESC";
     $ordersResult = $conn->query($sql);
     $orders = [];

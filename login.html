@@ -401,8 +401,10 @@
         const form = document.getElementById("accountForm");
         form.action = (currentMode === "register") ? "signup.php" : "login.php";
         const params = new URLSearchParams(window.location.search);
+        const allowedRedirects = ["reservation.html", "customcake.html", "checkoutt.html", "menu.html", "custdashboard.html", "index.html"];
+        const requestedRedirect = params.get("redirect") || "";
         document.getElementById("loginRedirect").value =
-            params.get("redirect") === "reservation.html" ? "reservation.html" : "";
+            allowedRedirects.includes(requestedRedirect) ? requestedRedirect : "";
         return true;
     }
 </script>

@@ -278,7 +278,6 @@ function addToCart(name,qty=1){
     saveCart();
     closeModal();
     openModal("cart");
-    syncPHP("addtocart.php",{name,price:p[1],quantity:qty});
 }
 
 function changeCart(i,n){
@@ -287,14 +286,12 @@ function changeCart(i,n){
     item.quantity+=n;
     if(item.quantity<=0)return removeCart(i);
     saveCart();
-    syncPHP("updatecart.php",{name:item.name,quantity:item.quantity});
 }
 
 function removeCart(i){
     const [item]=cart.splice(i,1);
     if(!item)return;
     saveCart();
-    syncPHP("removecart.php",{name:item.name});
 }
 
 function renderCart(){

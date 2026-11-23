@@ -67,19 +67,50 @@ try {
         respond(401, ['success' => false, 'message' => 'Customer account not found. Please log in again.']);
     }
 
-    /* Resolve every cart item against the product table and use database prices. */
+    /* Resolve every cart item against the product table and use database prices.
+       Custom cakes from customcake.html are mapped to an internal Custom Cake product row
+       and their customization summary is appended to special_instructions for the kitchen. */
     $verifiedItems = [];
+    $customCakeNotes = [];
     $total = 0.0;
     $productStmt = $conn->prepare('SELECT product_id, price, product_quantity FROM product WHERE product_name = ? AND is_active = 1 LIMIT 1');
     foreach ($items as $item) {
         $name = trim((string)($item['name'] ?? ''));
         $qty = filter_var($item['quantity'] ?? null, FILTER_VALIDATE_INT);
+        $isCustomCake = (($item['type'] ?? '') === 'customcake')
+            || (stripos($name, 'Custom ') === 0 && stripos($name, 'Cake') !== false);
         if ($name === '' || $qty === false || $qty < 1 || $qty > 99) {
             respond(422, ['success' => false, 'message' => 'A cart item has an invalid name or quantity.']);
         }
         $productStmt->bind_param('s', $name);
         $productStmt->execute();
         $product = $productStmt->get_result()->fetch_assoc();
+        if (!$product && $isCustomCake) {
+            $customPrice = filter_var($item['price'] ?? null, FILTER_VALIDATE_FLOAT);
+            if ($customPrice === false || $customPrice < 10 || $customPrice > 5000) {
+                respond(422, ['success' => false, 'message' => 'Invalid custom cake price.']);
+            }
+            $lookupCustom = $conn->prepare("SELECT product_id FROM product WHERE product_name = 'Custom Cake' LIMIT 1");
+            $lookupCustom->execute();
+            $customRow = $lookupCustom->get_result()->fetch_assoc();
+            if ($customRow) {
+                $customProductId = (int)$customRow['product_id'];
+            } else {
+                $createCustom = $conn->prepare("INSERT INTO product (product_name, price, product_quantity, category, description, image_path, is_active) VALUES ('Custom Cake', 0.00, 999, 'Custom Cake', 'Made-to-order custom cake', '', 0)");
+                $createCustom->execute();
+                $customProductId = (int)$conn->insert_id;
+            }
+            $details = trim((string)($item['details'] ?? ''));
+            $customCakeNotes[] = $details !== '' ? ($name . ' (' . $details . ')') : $name;
+            $verifiedItems[] = [
+                'product_id' => $customProductId,
+                'quantity' => $qty,
+                'price' => (float)$customPrice,
+                'skip_stock' => true
+            ];
+            $total += (float)$customPrice * $qty;
+            continue;
+        }
         if (!$product) {
             respond(422, ['success' => false, 'message' => 'Product "' . $name . '" was not found in the database.']);
         }
@@ -90,9 +121,15 @@ try {
         $verifiedItems[] = [
             'product_id' => (int)$product['product_id'],
             'quantity' => $qty,
-            'price' => $price
+            'price' => $price,
+            'skip_stock' => false
         ];
         $total += $price * $qty;
+    }
+
+    if ($customCakeNotes) {
+        $customNoteLine = 'Custom Cake: ' . implode('; ', $customCakeNotes);
+        $notes = $notes !== '' ? ($notes . ' | ' . $customNoteLine) : $customNoteLine;
     }
 
     if ($total <= 0) {
@@ -118,6 +155,9 @@ try {
         $itemStmt->bind_param('iiid', $orderId, $productId, $qty, $price);
         $itemStmt->execute();
 
+        if (!empty($item['skip_stock'])) {
+            continue;
+        }
         $stockStmt->bind_param('iii', $qty, $productId, $qty);
         $stockStmt->execute();
         if ($stockStmt->affected_rows !== 1) {

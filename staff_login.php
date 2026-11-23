@@ -37,7 +37,7 @@ try {
     $result = $stmt->get_result();
 
     if (!$result || $result->num_rows !== 1) {
-        staffLoginFailure('No staff account was found for that email.');
+        staffLoginFailure('Incorrect email or password.');
     }
 
     $staff = $result->fetch_assoc();
@@ -52,6 +52,7 @@ try {
     }
 
     session_regenerate_id(true);
+    $_SESSION = [];
     $_SESSION['staff_logged_in'] = true;
     $_SESSION['role'] = 'staff';
     $_SESSION['staff_id'] = (int)$staff['staff_id'];

@@ -11,49 +11,51 @@ if (!isset($conn) || !$conn || $conn->connect_error) {
 }
 
 $redirect = $_POST['redirect'] ?? '';
-$redirectPage = ($redirect === 'reservation.html') ? 'reservation.html' : 'custdashboard.html';
+$allowedRedirects = ['reservation.html', 'customcake.html', 'checkoutt.html', 'menu.html', 'custdashboard.html', 'index.html'];
+$redirectPage = in_array($redirect, $allowedRedirects, true) ? $redirect : 'custdashboard.html';
 
 // Simpan ke dalam KEDUA-DUA sessionStorage dan localStorage supaya semua halaman (menu, cart, checkout) kenal user!
 function redirectWithSession($url, $name = '', $email = '', $custId = 1, $role = 'customer') {
-    $safeUrl = htmlspecialchars($url, ENT_QUOTES);
-    $safeName = htmlspecialchars($name, ENT_QUOTES);
-    $safeEmail = htmlspecialchars($email, ENT_QUOTES);
+    $jsUrl = json_encode($url, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+    $jsName = json_encode($name, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+    $jsEmail = json_encode($email, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
     $safeId = (int)$custId;
-    $safeRole = htmlspecialchars($role, ENT_QUOTES);
+    $jsIdStr = json_encode((string)$safeId);
+    $jsRole = json_encode($role, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
 
-    echo "<!DOCTYPE html><html><head><script>
+    echo "<!DOCTYPE html><html><head><meta charset=\"utf-8\"><script>
         const userData = {
             id: $safeId,
             customer_id: $safeId,
-            name: '$safeName',
-            email: '$safeEmail',
-            role: '$safeRole',
+            name: $jsName,
+            email: $jsEmail,
+            role: $jsRole,
             loggedIn: true
         };
 
         // Simpan dalam sessionStorage
         sessionStorage.setItem('cozyBakeDemoLoggedIn', 'true');
-        sessionStorage.setItem('cozyBakeCustomerName', '$safeName');
-        sessionStorage.setItem('cozyBakeCustomerEmail', '$safeEmail');
-        sessionStorage.setItem('cozyBakeCustomerId', '$safeId');
+        sessionStorage.setItem('cozyBakeCustomerName', $jsName);
+        sessionStorage.setItem('cozyBakeCustomerEmail', $jsEmail);
+        sessionStorage.setItem('cozyBakeCustomerId', $jsIdStr);
         sessionStorage.setItem('isLoggedIn', 'true');
-        sessionStorage.setItem('userEmail', '$safeEmail');
-        sessionStorage.setItem('userName', '$safeName');
-        sessionStorage.setItem('customer_id', '$safeId');
+        sessionStorage.setItem('userEmail', $jsEmail);
+        sessionStorage.setItem('userName', $jsName);
+        sessionStorage.setItem('customer_id', $jsIdStr);
         sessionStorage.setItem('cozyBakeUser', JSON.stringify(userData));
 
-        // Simpan juga dalam localStorage (jika menu.html / checkout.html menyemak localStorage)
+        // Simpan juga dalam localStorage (jika menu.html / checkoutt.html menyemak localStorage)
         localStorage.setItem('cozyBakeDemoLoggedIn', 'true');
-        localStorage.setItem('cozyBakeCustomerName', '$safeName');
-        localStorage.setItem('cozyBakeCustomerEmail', '$safeEmail');
-        localStorage.setItem('cozyBakeCustomerId', '$safeId');
+        localStorage.setItem('cozyBakeCustomerName', $jsName);
+        localStorage.setItem('cozyBakeCustomerEmail', $jsEmail);
+        localStorage.setItem('cozyBakeCustomerId', $jsIdStr);
         localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('userEmail', '$safeEmail');
-        localStorage.setItem('userName', '$safeName');
-        localStorage.setItem('customer_id', '$safeId');
+        localStorage.setItem('userEmail', $jsEmail);
+        localStorage.setItem('userName', $jsName);
+        localStorage.setItem('customer_id', $jsIdStr);
         localStorage.setItem('cozyBakeUser', JSON.stringify(userData));
 
-        window.top.location.href = '$safeUrl';
+        window.top.location.href = $jsUrl;
     </script></head><body>Redirecting...</body></html>";
     exit();
 }
@@ -139,7 +141,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['staff_name'] = $staff['name'];
             $_SESSION['user_name'] = $staff['name'];
             $_SESSION['user_email'] = $staff['email'];
-            redirectWithSession('staff_dashboard.html', $staff['name'], $staff['email'], (int)$staff['staff_id'], 'staff');
+            redirectWithSession('staff_dashboard.php', $staff['name'], $staff['email'], (int)$staff['staff_id'], 'staff');
         }
         $staffStmt->close();
     }
@@ -159,24 +161,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             if ($res && $res->num_rows > 0) {
                 $user = $res->fetch_assoc();
-                $storedPass = $user['password'];
+                $storedPass = (string)$user['password'];
 
-                if (password_verify($password, $storedPass) || $password === $storedPass || $password === '12345678') {
+                $validPassword = password_verify($password, $storedPass)
+                    || (!str_starts_with($storedPass, '$') && hash_equals($storedPass, $password));
+
+                if ($validPassword) {
                     $customerName = $user['name'];
                     $userId = (int)$user['user_id'];
                 } else {
-                    echo "<script>alert('Kata laluan salah!'); window.location.href='login.html';</script>";
+                    echo "<script>alert('Incorrect email or password.'); window.location.href='login.html';</script>";
                     exit();
                 }
             } else {
-                // Cipta user baru jika belum wujud
-                $hashed = password_hash($password, PASSWORD_DEFAULT);
-                $stmtIns = $conn->prepare("INSERT INTO `user` (`name`, `email`, `password`) VALUES (?, ?, ?)");
-                if ($stmtIns) {
-                    $stmtIns->bind_param("sss", $customerName, $email, $hashed);
-                    $stmtIns->execute();
-                    $userId = (int)$conn->insert_id;
-                }
+                echo "<script>alert('No account found for that email. Please create an account first.'); window.location.href='login.html';</script>";
+                exit();
             }
         }
 
@@ -204,7 +203,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // Set kesemua variasi nama session PHP yang mungkin disemak oleh fail cart/order rakan anda
+    // Reset session and set kesemua variasi nama session PHP yang mungkin disemak oleh fail cart/order rakan anda
+    session_regenerate_id(true);
+    $_SESSION = [];
     $_SESSION['logged_in'] = true;
     $_SESSION['customer_logged_in'] = true;
     $_SESSION['role'] = 'customer';

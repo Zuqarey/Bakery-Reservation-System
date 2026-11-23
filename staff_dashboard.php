@@ -249,7 +249,7 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
           <i data-lucide="bell" style="width:18px; height:18px;"></i>
           <span style="position:absolute; top:-2px; right:-2px; background:#c0392b; color:#fff; font-size:0.6rem; width:15px; height:15px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700;">3</span>
         </div>
-        <div style="width:38px; height:38px; background:var(--wood); color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700;">A</div>
+        <div style="width:38px; height:38px; background:var(--wood); color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700;"><?= htmlspecialchars(strtoupper(mb_substr(trim((string)($_SESSION['staff_name'] ?? 'S')), 0, 1)), ENT_QUOTES, 'UTF-8') ?></div>
       </div>
     </header>
 
@@ -259,7 +259,7 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
     <section id="view-dashboard" class="view-section active">
       <div>
         <span style="font-size:0.75rem; font-weight:800; color:#9a6845; letter-spacing:1px; text-transform:uppercase;">Staff Portal</span>
-        <div class="title">Welcome back, Aina!</div>
+        <div class="title">Welcome back, <?= htmlspecialchars(trim((string)($_SESSION['staff_name'] ?? 'Staff')), ENT_QUOTES, 'UTF-8') ?>!</div>
         <p style="font-size:0.88rem; color:#8c7a6b; margin-top:4px;">Here is today's bakery overview. Click any card below to jump to its section.</p>
       </div>
 
@@ -381,22 +381,22 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div onclick="filterIngredientsByStat('all')" class="kpi-card bg-cozy-darkCard text-white p-5 rounded-3xl cursor-pointer">
           <h3 class="text-xs font-extrabold text-white/70 uppercase">ALL INGREDIENTS</h3>
-          <div class="text-4xl font-black my-2">55</div>
+          <div id="ing-stat-total" class="text-4xl font-black my-2">—</div>
           <p class="text-xs text-white/70">Tracked in the pantry</p>
         </div>
         <div onclick="filterIngredientsByStat('low')" class="kpi-card bg-cozy-orangeCard text-white p-5 rounded-3xl cursor-pointer">
           <h3 class="text-xs font-extrabold text-white/85 uppercase">LOW STOCK</h3>
-          <div class="text-4xl font-black my-2">9</div>
+          <div id="ing-stat-low" class="text-4xl font-black my-2">—</div>
           <p class="text-xs text-white/85">Below par level</p>
         </div>
         <div onclick="filterIngredientsByStat('expiring')" class="kpi-card bg-white p-5 rounded-3xl cursor-pointer">
           <h3 class="text-xs font-extrabold text-cozy-textMuted uppercase">EXPIRING SOON</h3>
-          <div class="text-4xl font-black text-cozy-darkCard my-2">3</div>
+          <div id="ing-stat-expiring" class="text-4xl font-black text-cozy-darkCard my-2">—</div>
           <p class="text-xs text-cozy-textMuted">Use within 5 days</p>
         </div>
         <div onclick="filterIngredientsByStat('expired')" class="kpi-card bg-white p-5 rounded-3xl cursor-pointer">
           <h3 class="text-xs font-extrabold text-cozy-textMuted uppercase">EXPIRED</h3>
-          <div class="text-4xl font-black text-cozy-darkCard my-2">4</div>
+          <div id="ing-stat-expired" class="text-4xl font-black text-cozy-darkCard my-2">—</div>
           <p class="text-xs text-cozy-textMuted">Remove from the line</p>
         </div>
       </div>
@@ -404,7 +404,7 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
       <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
         <div class="flex items-center gap-3">
           <button id="tab-pantry" onclick="switchIngredientTab('pantry')" class="pill active">PANTRY STOCK</button>
-          <button id="tab-recipes" onclick="switchIngredientTab('recipes')" class="pill">PRODUCT RECIPES · 4</button>
+          <button id="tab-recipes" onclick="switchIngredientTab('recipes')" class="pill">PRODUCT RECIPES · 0</button>
         </div>
         <input type="text" id="ing-search" oninput="renderIngredients()" placeholder="Search ingredients..." class="px-5 py-2.5 bg-white rounded-full text-sm focus:outline-none">
       </div>
@@ -603,59 +603,52 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
     }
 
     // ==========================================
-    // DATA & LOGIK 1: INVENTORY
+    // DATA & LOGIK 1: INVENTORY (LIVE MYSQL)
     // ==========================================
-    const inventoryData = [
-      { id: 1, name: "Strawberry Cloud", category: "Cake", stock: 8, img: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=150&auto=format&fit=crop&q=80" },
-      { id: 2, name: "Morning Croissant", category: "Savory", stock: 23, img: "https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=150&auto=format&fit=crop&q=80" },
-      { id: 3, name: "Pistachio Stack", category: "Sweets", stock: 14, img: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=150&auto=format&fit=crop&q=80" },
-      { id: 4, name: "Country Rolls", category: "Bread", stock: 4, img: "https://images.unsplash.com/photo-1586444248902-2f64eddc13df?w=150&auto=format&fit=crop&q=80" },
-      { id: 5, name: "Sourdough Loaf", category: "Bread", stock: 12, img: "https://images.unsplash.com/photo-1589367920969-ab8e050bbc04?w=150&auto=format&fit=crop&q=80" },
-      { id: 6, name: "Chocolate Layer Cake", category: "Cake", stock: 6, img: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=150&auto=format&fit=crop&q=80" },
-      { id: 7, name: "French Macarons", category: "Sweets", stock: 20, img: "https://images.unsplash.com/photo-1569864358642-9d1684040f43?w=150&auto=format&fit=crop&q=80" },
-      { id: 8, name: "Berry Tart", category: "Tart", stock: 9, img: "https://images.unsplash.com/photo-1519869325930-281384150729?w=150&auto=format&fit=crop&q=80" },
-      { id: 9, name: "Cheesecake Slice", category: "Cake", stock: 15, img: "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=150&auto=format&fit=crop&q=80" },
-      { id: 10, name: "Baguette", category: "Bread", stock: 18, img: "https://images.unsplash.com/photo-1597079910443-60c43fc4f729?w=150&auto=format&fit=crop&q=80" },
-      { id: 11, name: "Rainbow Donut Box", category: "Sweets", stock: 7, img: "https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?w=150&auto=format&fit=crop&q=80" },
-      { id: 12, name: "Glazed Donut", category: "Sweets", stock: 24, img: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=150&auto=format&fit=crop&q=80" },
-      { id: 13, name: "Fudge Brownies", category: "Sweets", stock: 16, img: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=150&auto=format&fit=crop&q=80" },
-      { id: 14, name: "Apple Pie", category: "Tart", stock: 5, img: "https://images.unsplash.com/photo-1621743478914-cc8a86d7e7b5?w=150&auto=format&fit=crop&q=80" },
-      { id: 15, name: "Fresh Scones", category: "Savory", stock: 14, img: "https://images.unsplash.com/photo-1589119908995-c6837fa14848?w=150&auto=format&fit=crop&q=80" },
-      { id: 16, name: "Choc Chip Cookies", category: "Sweets", stock: 22, img: "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=150&auto=format&fit=crop&q=80" },
-      { id: 17, name: "Chocolate Cupcake", category: "Cake", stock: 19, img: "https://images.unsplash.com/photo-1576618148400-f54bed99fcfd?w=150&auto=format&fit=crop&q=80" },
-      { id: 18, name: "Rustic Boule", category: "Bread", stock: 8, img: "https://images.unsplash.com/photo-1549931319-a545dcf3bc73?w=150&auto=format&fit=crop&q=80" },
-      { id: 19, name: "Salted Caramel Cookies", category: "Cookies", stock: 18, img: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=150&auto=format&fit=crop&q=80" },
-      { id: 20, name: "Dark Chocolate Fudge Cookies", category: "Cookies", stock: 16, img: "https://images.unsplash.com/photo-1618923850107-d1a234d7a73a?w=150&auto=format&fit=crop&q=80" },
-      { id: 21, name: "Blueberry Bliss Cookies", category: "Cookies", stock: 14, img: "https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=150&auto=format&fit=crop&q=80" },
-      { id: 22, name: "Red Velvet with White Chocolate Cookies", category: "Cookies", stock: 15, img: "https://images.unsplash.com/photo-1619149651177-b09092806f1a?w=150&auto=format&fit=crop&q=80" },
-      { id: 23, name: "Matcha Oatmeal Chocolate Chip", category: "Cookies", stock: 13, img: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=150&auto=format&fit=crop&q=80" }
-    ];
+    let inventoryData = [];
+
+    function syncInventoryCategories() {
+      const sel = document.getElementById('inv-category');
+      if (!sel) return;
+      const current = sel.value || 'ALL';
+      const cats = [...new Set(inventoryData.map(i => i.category).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+      sel.innerHTML = '<option value="ALL">All Categories</option>' + cats.map(c => `<option value="${escapeScheduleText(c)}">${escapeScheduleText(c)}</option>`).join('');
+      if (current === 'ALL' || cats.includes(current)) sel.value = current;
+    }
 
     function renderInventory() {
       const q = document.getElementById('inv-search').value.toLowerCase().trim();
       const cat = document.getElementById('inv-category').value;
       const filtered = inventoryData.filter(i => (i.name.toLowerCase().includes(q) || i.category.toLowerCase().includes(q)) && (cat === 'ALL' || i.category === cat));
-      document.getElementById('inv-count-badge').textContent = `${filtered.length} items`;
+      document.getElementById('inv-count-badge').textContent = `${filtered.length} item${filtered.length === 1 ? '' : 's'}`;
+
+      if (!filtered.length) {
+        document.getElementById('inventory-list').innerHTML = '<div class="p-6 text-center text-sm text-cozy-textMuted">No inventory products found.</div>';
+        return;
+      }
 
       document.getElementById('inventory-list').innerHTML = filtered.map(item => {
         const isLow = item.stock <= 5;
+        const imgHtml = item.img
+          ? `<img src="${escapeScheduleText(item.img)}" alt="${escapeScheduleText(item.name)}" class="w-14 h-14 rounded-2xl object-cover bg-cozy-bg" onerror="this.style.display='none'">`
+          : `<div class="w-14 h-14 rounded-2xl bg-cozy-bg flex items-center justify-center text-xl">🥐</div>`;
         return `
           <div class="flex items-center justify-between p-3.5 rounded-2xl border border-gray-100 bg-white hover:border-gray-300 transition">
             <div class="flex items-center space-x-4">
-              <img src="${item.img}" alt="${item.name}" class="w-14 h-14 rounded-2xl object-cover bg-cozy-bg">
+              ${imgHtml}
               <div>
-                <h3 class="font-bold text-base">${item.name}</h3>
-                <p class="text-xs text-cozy-textMuted">${item.category}</p>
+                <h3 class="font-bold text-base">${escapeScheduleText(item.name)}</h3>
+                <p class="text-xs text-cozy-textMuted">${escapeScheduleText(item.category)}</p>
               </div>
             </div>
             <div class="flex items-center space-x-4">
               <span class="px-3 py-1 rounded-full text-[11px] font-extrabold ${isLow ? 'bg-[#FCEBEA] text-[#D9534F]' : 'bg-[#EAF4E8] text-[#4A7C43]'}">
-                ${isLow ? 'LOW STOCK' : 'IN STOCK'}
+                ${item.stock <= 0 ? 'OUT OF STOCK' : (isLow ? 'LOW STOCK' : 'IN STOCK')}
               </span>
               <div class="flex items-center space-x-3">
-                <button onclick="updateStock(${item.id}, -1)" class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-100 font-bold">-</button>
-                <span class="w-6 text-center font-bold">${item.stock}</span>
-                <button onclick="updateStock(${item.id}, 1)" class="w-8 h-8 rounded-full bg-cozy-wood text-white flex items-center justify-center hover:opacity-90 font-bold">+</button>
+                <button onclick="updateStock(${Number(item.id)}, -1)" class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-100 font-bold">-</button>
+                <span class="w-8 text-center font-bold">${Number(item.stock)}</span>
+                <button onclick="updateStock(${Number(item.id)}, 1)" class="w-8 h-8 rounded-full bg-cozy-wood text-white flex items-center justify-center hover:opacity-90 font-bold">+</button>
               </div>
             </div>
           </div>
@@ -663,11 +656,22 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
       }).join('');
     }
 
-    function updateStock(id, delta) {
-      const item = inventoryData.find(p => p.id === id);
-      if (item && item.stock + delta >= 0) {
+    async function updateStock(id, delta) {
+      const item = inventoryData.find(p => Number(p.id) === Number(id));
+      if (!item || item.stock + delta < 0) return;
+      try {
+        const response = await fetch('staff_action.php', {
+          method: 'POST', credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'update_stock', product_id: Number(id), delta: Number(delta) })
+        });
+        const result = await response.json();
+        if (!response.ok || !result.success) throw new Error(result.message || 'Stock update failed.');
         item.stock += delta;
         renderInventory();
+        loadDashboardOverview();
+      } catch (error) {
+        alert('Could not update stock: ' + error.message);
       }
     }
 
@@ -695,6 +699,15 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
         const response = await fetch('staff_data.php', { credentials: 'same-origin', cache: 'no-store' });
         const data = await response.json();
         if (!response.ok || !data.success) throw new Error(data.message || 'Could not load orders.');
+        inventoryData = (data.inventory || []).map(p => ({
+          id: Number(p.product_id),
+          name: p.product_name || 'Product',
+          category: p.category || 'Uncategorized',
+          stock: Number(p.product_quantity || 0),
+          img: p.image_path || ''
+        }));
+        syncInventoryCategories();
+        renderInventory();
         ordersData = (data.orders || []).map(row => {
           const status = String(row.status || 'NEW').toUpperCase();
           const validStatus = ['NEW','PREPARING','READY','COMPLETED'].includes(status) ? status : 'NEW';
@@ -716,7 +729,7 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
         renderOrders();
         if (document.getElementById('sched-pickup-tab')?.classList.contains('active')) renderPickupSchedule();
       } catch (error) {
-        listEl.innerHTML = `<div style="background:#fff;padding:24px;border-radius:14px;color:#a33;">Unable to load database orders: ${error.message}</div>`;
+        listEl.innerHTML = `<div style="background:#fff;padding:24px;border-radius:14px;color:#a33;">Unable to load database orders: ${escapeScheduleText(error.message)}</div>`;
       }
     }
 
@@ -749,6 +762,7 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
         const result = await response.json();
         if (!response.ok || !result.success) throw new Error(result.message || 'Status update failed.');
         await loadDatabaseOrders();
+        await loadDashboardOverview();
       } catch (error) {
         alert('Could not update order status: ' + error.message);
       }
@@ -763,7 +777,6 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
         COMPLETED: ordersData.filter(o => o.status === 'COMPLETED').length
       };
       document.getElementById('dash-active-orders').textContent = counts.NEW + counts.PREPARING + counts.READY;
-      document.getElementById('dash-completed-orders').textContent = counts.COMPLETED;
       document.getElementById('order-filters').innerHTML = Object.keys(counts).map(k =>
         `<button class="pill ${currentOrderFilter === k ? 'active' : ''}" onclick="setOrderFilter('${k}')">${k} · ${counts[k]}</button>`
       ).join('');
@@ -773,12 +786,12 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
         listEl.innerHTML = '<div style="background:#fff;padding:24px;border-radius:14px;text-align:center;color:#8c7a6b;">No orders for this status.</div>';
       } else {
         listEl.innerHTML = filtered.map(o => `
-          <div class="order-card ${o.id === selectedOrderId ? 'selected' : ''}" onclick="selectOrder('${o.id}')">
+          <div class="order-card ${o.id === selectedOrderId ? 'selected' : ''}" onclick="selectOrder('${escapeScheduleText(o.id)}')">
             <div style="display:flex;gap:12px;align-items:center;">
               <div style="width:40px;height:40px;background:#f7ebe1;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#9a6845;"><i data-lucide="receipt" style="width:18px;height:18px;"></i></div>
-              <div><h4 style="font-size:0.95rem;font-weight:700;">#${o.id} <span style="font-size:0.75rem;color:#8c7a6b;font-weight:500;">${o.time}</span></h4>
-              <div style="font-size:0.85rem;color:#555;">${o.customer}</div><div style="font-size:0.78rem;color:#8c7a6b;">${o.summary}</div></div>
-            </div><div style="text-align:right;"><div style="font-weight:700;">${o.total}</div><span class="badge badge-${o.status}">${o.status}</span></div>
+              <div><h4 style="font-size:0.95rem;font-weight:700;">#${escapeScheduleText(o.id)} <span style="font-size:0.75rem;color:#8c7a6b;font-weight:500;">${escapeScheduleText(o.time)}</span></h4>
+              <div style="font-size:0.85rem;color:#555;">${escapeScheduleText(o.customer)}</div><div style="font-size:0.78rem;color:#8c7a6b;">${escapeScheduleText(o.summary)}</div></div>
+            </div><div style="text-align:right;"><div style="font-weight:700;">${escapeScheduleText(o.total)}</div><span class="badge badge-${escapeScheduleText(o.status)}">${escapeScheduleText(o.status)}</span></div>
           </div>`).join('');
       }
       const ord = ordersData.find(o => o.id === selectedOrderId);
@@ -789,43 +802,58 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
         const stepCount = { NEW: 1, PREPARING: 2, READY: 3, COMPLETED: 4 }[ord.status];
         const nextLabel = { NEW: 'Move to Preparing', PREPARING: 'Move to Ready', READY: 'Move to Completed', COMPLETED: 'Order Completed' }[ord.status];
         panel.innerHTML = `
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;"><div><span style="font-size:0.68rem;font-weight:800;color:#8c7a6b;text-transform:uppercase;">Order Details</span><div class="title" style="font-size:2.4rem;">#${ord.id}</div></div><span class="badge badge-${ord.status}">${ord.status}</span></div>
-          <div class="info-grid"><div class="info-box"><span>Customer</span><b>${ord.customer}</b></div><div class="info-box"><span>Placed At</span><b>${ord.time}</b></div><div class="info-box"><span>Channel</span><b>${ord.channel}</b></div><div class="info-box"><span>Payment</span><b>${ord.payment}</b></div></div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;"><div><span style="font-size:0.68rem;font-weight:800;color:#8c7a6b;text-transform:uppercase;">Order Details</span><div class="title" style="font-size:2.4rem;">#${escapeScheduleText(ord.id)}</div></div><span class="badge badge-${escapeScheduleText(ord.status)}">${escapeScheduleText(ord.status)}</span></div>
+          <div class="info-grid"><div class="info-box"><span>Customer</span><b>${escapeScheduleText(ord.customer)}</b></div><div class="info-box"><span>Placed At</span><b>${escapeScheduleText(ord.time)}</b></div><div class="info-box"><span>Channel</span><b>${escapeScheduleText(ord.channel)}</b></div><div class="info-box"><span>Payment</span><b>${escapeScheduleText(ord.payment)}</b></div></div>
           <div style="border-top:1px dashed var(--border);padding-top:12px;font-size:0.9rem;"><div style="font-size:0.72rem;font-weight:800;color:#9a6845;text-transform:uppercase;margin-bottom:8px;">Items</div>
-          ${ord.items.map(i => `<div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span>${i.name}</span><span>${i.price}</span></div>`).join('')}
-          <div style="display:flex;justify-content:space-between;font-weight:700;font-size:1.05rem;margin-top:10px;border-top:1px solid var(--border);padding-top:10px;"><span>Total</span><span>${ord.total}</span></div></div>
-          ${ord.note ? `<div style="background:#fff8d6;border-radius:14px;padding:12px 16px;margin:14px 0;"><div style="font-size:0.72rem;font-weight:800;color:#9a6845;text-transform:uppercase;margin-bottom:4px;">Kitchen Note</div><div style="font-size:0.88rem;color:#554433;">${ord.note}</div></div>` : ''}
+          ${ord.items.map(i => `<div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span>${escapeScheduleText(i.name)}</span><span>${escapeScheduleText(i.price)}</span></div>`).join('')}
+          <div style="display:flex;justify-content:space-between;font-weight:700;font-size:1.05rem;margin-top:10px;border-top:1px solid var(--border);padding-top:10px;"><span>Total</span><span>${escapeScheduleText(ord.total)}</span></div></div>
+          ${ord.note ? `<div style="background:#fff8d6;border-radius:14px;padding:12px 16px;margin:14px 0;"><div style="font-size:0.72rem;font-weight:800;color:#9a6845;text-transform:uppercase;margin-bottom:4px;">Kitchen Note</div><div style="font-size:0.88rem;color:#554433;">${escapeScheduleText(ord.note)}</div></div>` : ''}
           <div class="progress-tracker">${[1,2,3,4].map(s => `<div class="progress-step ${s <= stepCount ? 'fill' : ''}"></div>`).join('')}</div>
           <div style="display:flex;justify-content:space-between;font-size:0.65rem;font-weight:700;color:#8c7a6b;text-transform:uppercase;margin-bottom:15px;"><span>New</span><span>Preparing</span><span>Ready</span><span>Completed</span></div>
-          ${ord.status === 'COMPLETED' ? '<button class="btn-disabled" disabled>Order Completed</button>' : `<button class="btn-action" onclick="advanceOrderStatus('${ord.id}')">${nextLabel}</button>`}`;
+          ${ord.status === 'COMPLETED' ? '<button class="btn-disabled" disabled>Order Completed</button>' : `<button class="btn-action" onclick="advanceOrderStatus('${escapeScheduleText(ord.id)}')">${nextLabel}</button>`}`;
       }
       lucide.createIcons();
     }
 
     // ==========================================
-    // DATA & LOGIK 3: INGREDIENTS & RECIPES
+    // DATA & LOGIK 3: INGREDIENTS & RECIPES (LIVE MYSQL)
     // ==========================================
-    const pantryItems = [
-      { name: "Unsalted Butter", category: "Dairy", quantity: "12 kg", status: "expiring", statusText: "Expiring in 3 days" },
-      { name: "Organic Bread Flour", category: "Dry Goods", quantity: "150 kg", status: "ok", statusText: "In Stock" },
-      { name: "Granulated Sugar", category: "Dry Goods", quantity: "4 kg", status: "low", statusText: "Low Stock (Below 10kg)" },
-      { name: "Heavy Cream 35%", category: "Dairy", quantity: "2 L", status: "expired", statusText: "Expired yesterday" },
-      { name: "Dark Chocolate 70%", category: "Chocolate", quantity: "8 kg", status: "low", statusText: "Low Stock" },
-      { name: "Fresh Strawberries", category: "Produce", quantity: "1.5 kg", status: "expiring", statusText: "Expiring in 2 days" },
-      { name: "Whole Milk", category: "Dairy", quantity: "0 L", status: "expired", statusText: "Expired" },
-      { name: "Active Dry Yeast", category: "Baking Supplies", quantity: "250 g", status: "low", statusText: "Low Stock" },
-      { name: "Vanilla Extract", category: "Flavors", quantity: "300 ml", status: "ok", statusText: "In Stock" }
-    ];
-
-    const recipeItems = [
-      { name: "Strawberry Cloud Cake", category: "Cake", ingredientsCount: 6, prepTime: "45 mins" },
-      { name: "Artisan Sourdough Loaf", category: "Bread", ingredientsCount: 4, prepTime: "24 hrs" },
-      { name: "French Butter Croissant", category: "Savory", ingredientsCount: 5, prepTime: "12 hrs" },
-      { name: "Dark Chocolate Fudge Brownie", category: "Sweets", ingredientsCount: 7, prepTime: "30 mins" }
-    ];
+    let pantryItems = [];
+    let recipeItems = [];
 
     let ingTab = 'pantry';
     let ingFilter = 'all';
+
+    async function loadIngredients() {
+      try {
+        const res = await fetch('staff_ingredients.php', { credentials: 'same-origin', cache: 'no-store' });
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.message || 'Could not load pantry data.');
+        pantryItems = (data.ingredients || []).map(i => ({
+          name: i.name || '',
+          category: i.category || 'General',
+          quantity: i.quantity_display || String(i.quantity || ''),
+          status: i.status || 'ok',
+          statusText: i.status_text || 'In Stock'
+        }));
+        recipeItems = (data.recipes || []).map(r => ({
+          name: r.name || '',
+          category: r.category || 'General',
+          ingredientsCount: Number(r.ingredients_count || 0),
+          prepTime: r.prep_time || '—'
+        }));
+        const st = data.stats || {};
+        document.getElementById('ing-stat-total').textContent = st.total ?? pantryItems.length;
+        document.getElementById('ing-stat-low').textContent = st.low ?? 0;
+        document.getElementById('ing-stat-expiring').textContent = st.expiring ?? 0;
+        document.getElementById('ing-stat-expired').textContent = st.expired ?? 0;
+        document.getElementById('tab-recipes').textContent = `PRODUCT RECIPES · ${st.recipe_count ?? recipeItems.length}`;
+        renderIngredients();
+      } catch (error) {
+        console.error('Staff ingredients:', error);
+        document.getElementById('ingredients-list-container').innerHTML = `<div class="bg-white p-4 rounded-2xl text-red-700 text-sm">Could not load pantry data: ${escapeScheduleText(error.message)}</div>`;
+      }
+    }
 
     function switchIngredientTab(tab) {
       ingTab = tab;
@@ -845,6 +873,10 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
 
       if (ingTab === 'pantry') {
         const filtered = pantryItems.filter(i => (i.name.toLowerCase().includes(q) || i.category.toLowerCase().includes(q)) && (ingFilter === 'all' || i.status === ingFilter));
+        if (!filtered.length) {
+          container.innerHTML = '<div class="bg-white p-6 rounded-2xl text-center text-sm text-cozy-textMuted">No pantry ingredients match this filter.</div>';
+          return;
+        }
         container.innerHTML = filtered.map(item => {
           let badgeBg = "bg-green-100 text-green-800";
           if (item.status === 'low') badgeBg = "bg-amber-100 text-amber-800";
@@ -853,25 +885,29 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
           return `
             <div class="bg-white p-4 rounded-2xl flex items-center justify-between shadow-sm">
               <div>
-                <h4 class="font-bold text-base">${item.name}</h4>
-                <span class="text-xs text-cozy-textMuted">${item.category}</span>
+                <h4 class="font-bold text-base">${escapeScheduleText(item.name)}</h4>
+                <span class="text-xs text-cozy-textMuted">${escapeScheduleText(item.category)}</span>
               </div>
               <div class="flex items-center space-x-4">
-                <span class="px-3 py-1 rounded-full text-xs font-bold ${badgeBg}">${item.statusText}</span>
-                <span class="font-black text-cozy-darkCard text-lg w-20 text-right">${item.quantity}</span>
+                <span class="px-3 py-1 rounded-full text-xs font-bold ${badgeBg}">${escapeScheduleText(item.statusText)}</span>
+                <span class="font-black text-cozy-darkCard text-lg w-24 text-right">${escapeScheduleText(item.quantity)}</span>
               </div>
             </div>
           `;
         }).join('');
       } else {
         const filtered = recipeItems.filter(i => i.name.toLowerCase().includes(q));
+        if (!filtered.length) {
+          container.innerHTML = '<div class="bg-white p-6 rounded-2xl text-center text-sm text-cozy-textMuted">No product recipes found.</div>';
+          return;
+        }
         container.innerHTML = filtered.map(item => `
           <div class="bg-white p-4 rounded-2xl flex items-center justify-between shadow-sm">
             <div>
-              <h4 class="font-bold text-base">${item.name}</h4>
-              <span class="text-xs text-cozy-textMuted">${item.category} · Prep: ${item.prepTime}</span>
+              <h4 class="font-bold text-base">${escapeScheduleText(item.name)}</h4>
+              <span class="text-xs text-cozy-textMuted">${escapeScheduleText(item.category)} · Prep: ${escapeScheduleText(item.prepTime)}</span>
             </div>
-            <span class="font-extrabold text-xs bg-cozy-bg px-3 py-1.5 rounded-full">${item.ingredientsCount} Ingredients Required</span>
+            <span class="font-extrabold text-xs bg-cozy-bg px-3 py-1.5 rounded-full">${Number(item.ingredientsCount)} Ingredients Required</span>
           </div>
         `).join('');
       }
@@ -1020,10 +1056,9 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
     // INITIALIZE SEMUA VIEW SEMASA MULA DIBUKA
     // ==========================================
     window.addEventListener('DOMContentLoaded', () => {
-      renderInventory();
       loadDashboardOverview();
       loadDatabaseOrders();
-      renderIngredients();
+      loadIngredients();
       renderPickupSchedule();
       lucide.createIcons();
     });
