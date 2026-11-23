@@ -223,7 +223,11 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
       <i data-lucide="calendar"></i>
       <span class="nav-label">Schedule</span>
     </button>
-    <button class="nav-btn logout" onclick="openLogoutModal()">
+    <button class="nav-btn" style="margin-top:auto;" onclick="openChangePasswordModal()">
+      <i data-lucide="lock"></i>
+      <span class="nav-label">Change Password</span>
+    </button>
+    <button class="nav-btn logout" style="margin-top:4px;" onclick="openLogoutModal()">
       <i data-lucide="log-out"></i>
       <span class="nav-label">Log Out</span>
     </button>
@@ -450,6 +454,35 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
     </div>
   </div>
 
+  <!-- Change Password Modal -->
+  <div id="changePasswordModal" style="position:fixed; inset:0; background:rgba(32,18,10,0.55); display:none; align-items:center; justify-content:center; z-index:300; padding:16px;">
+    <div style="width:min(440px,100%); background:#FDFBF7; border-radius:22px; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,0.3);">
+      <div style="background:#B58E6B; color:#FFF; padding:22px 26px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <small style="display:block; font-size:10px; letter-spacing:1.4px; text-transform:uppercase; opacity:0.9;">STAFF SECURITY</small>
+          <h3 style="font-family:'Instrument Serif',serif; font-size:28px; font-weight:400;">Change password</h3>
+        </div>
+        <button type="button" onclick="closeChangePasswordModal()" style="width:32px; height:32px; border-radius:50%; border:1px solid rgba(255,255,255,0.4); background:transparent; color:#FFF; cursor:pointer; font-size:16px;">✕</button>
+      </div>
+      <form id="changePasswordForm" style="padding:24px 26px; display:flex; flex-direction:column; gap:14px;">
+        <div>
+          <label for="currentPassword" style="display:block; font-size:10.5px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; margin-bottom:6px; color:#2C1A11;">CURRENT PASSWORD</label>
+          <input id="currentPassword" type="password" autocomplete="current-password" placeholder="Enter current password" required style="width:100%; padding:12px 14px; border-radius:10px; border:1px solid #DFD3C6; background:#FFF; font-size:14px;">
+        </div>
+        <div>
+          <label for="newPassword" style="display:block; font-size:10.5px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; margin-bottom:6px; color:#2C1A11;">NEW PASSWORD</label>
+          <input id="newPassword" type="password" minlength="8" autocomplete="new-password" placeholder="At least 8 characters" required style="width:100%; padding:12px 14px; border-radius:10px; border:1px solid #DFD3C6; background:#FFF; font-size:14px;">
+        </div>
+        <div>
+          <label for="confirmPassword" style="display:block; font-size:10.5px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; margin-bottom:6px; color:#2C1A11;">CONFIRM NEW PASSWORD</label>
+          <input id="confirmPassword" type="password" minlength="8" autocomplete="new-password" placeholder="Re-enter new password" required style="width:100%; padding:12px 14px; border-radius:10px; border:1px solid #DFD3C6; background:#FFF; font-size:14px;">
+        </div>
+        <p id="changePasswordMsg" role="alert" style="font-size:12px; margin:2px 0;"></p>
+        <button id="changePasswordBtn" type="submit" style="width:100%; background:#B58E6B; color:#FFF; border:none; padding:12px 20px; border-radius:999px; font-size:12px; font-weight:700; letter-spacing:0.8px; text-transform:uppercase; cursor:pointer;">UPDATE PASSWORD</button>
+      </form>
+    </div>
+  </div>
+
   <script>
     // ==========================================
     // SPA ROUTER + BROWSER BACK BUTTON HISTORY
@@ -471,12 +504,61 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
       const m = document.getElementById('logoutConfirmModal');
       if (m) m.style.display = 'none';
     }
+    function openChangePasswordModal() {
+      const f = document.getElementById('changePasswordForm');
+      const msg = document.getElementById('changePasswordMsg');
+      const m = document.getElementById('changePasswordModal');
+      if (f) f.reset();
+      if (msg) msg.textContent = '';
+      if (m) m.style.display = 'flex';
+    }
+    function closeChangePasswordModal() {
+      const m = document.getElementById('changePasswordModal');
+      if (m) m.style.display = 'none';
+    }
 
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeLogoutModal();
+      if (e.key === 'Escape') {
+        closeLogoutModal();
+        closeChangePasswordModal();
+      }
     });
     document.addEventListener('click', (e) => {
       if (e.target && e.target.id === 'logoutConfirmModal') closeLogoutModal();
+      if (e.target && e.target.id === 'changePasswordModal') closeChangePasswordModal();
+    });
+
+    document.getElementById('changePasswordForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const msg = document.getElementById('changePasswordMsg');
+      const btn = document.getElementById('changePasswordBtn');
+      const current_password = document.getElementById('currentPassword').value;
+      const new_password = document.getElementById('newPassword').value;
+      const confirm_password = document.getElementById('confirmPassword').value;
+      if (new_password.length < 8) { msg.style.color = '#922B21'; msg.textContent = 'New password must be at least 8 characters.'; return; }
+      if (new_password !== confirm_password) { msg.style.color = '#922B21'; msg.textContent = 'New password and confirmation do not match.'; return; }
+      btn.disabled = true;
+      msg.style.color = '#8C7A6B';
+      msg.textContent = 'Updating password…';
+      try {
+        const res = await fetch('staff_change_password.php', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ current_password, new_password, confirm_password })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.message || 'Could not update password.');
+        msg.style.color = '#286646';
+        msg.textContent = data.message || 'Password updated successfully.';
+        this.reset();
+        setTimeout(closeChangePasswordModal, 1000);
+      } catch (err) {
+        msg.style.color = '#922B21';
+        msg.textContent = err.message || 'Could not update password.';
+      } finally {
+        btn.disabled = false;
+      }
     });
 
     function switchPage(pageId, pushHistory = true) {

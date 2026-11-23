@@ -155,28 +155,35 @@ return;
 await saveCake(d,action);
 }
 
-async function saveCake(d,action){
-try{
-let r=await fetch("addtocart.php",{
-method:"POST",credentials:"same-origin",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify(d)
-});
-let result=await r.json();
-if(!r.ok||result.success!==true)throw Error("PHP cart failed");
+function saveCake(d, action) {
+    try {
+        let cart = JSON.parse(
+            localStorage.getItem("cozyBakeCart") || "[]"
+        );
 
-let cart=JSON.parse(localStorage.getItem("cozyBakeCart")||"[]");
-cart.push({...d,id:Date.now()});
-localStorage.setItem("cozyBakeCart",JSON.stringify(cart));
-sessionStorage.removeItem("pendingCake");
-sessionStorage.removeItem("pendingAction");
+        cart.push({
+            ...d,
+            id: Date.now()
+        });
 
-if(action==="checkout"){
-    location.href="checkoutt.html";
-}else{
-    alert("Custom cake added to cart!");
-}
-}catch(e){console.error(e);alert("Unable to add cake. Check addtocart.php.");}
+        localStorage.setItem(
+            "cozyBakeCart",
+            JSON.stringify(cart)
+        );
+
+        sessionStorage.removeItem("pendingCake");
+        sessionStorage.removeItem("pendingAction");
+
+        if (action === "checkout") {
+            location.href = "checkoutt.html";
+        } else {
+            alert("Custom cake added to cart!");
+        }
+
+    } catch (e) {
+        console.error(e);
+        alert("Unable to add custom cake to cart.");
+    }
 }
 
 async function resume(){
