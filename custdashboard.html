@@ -190,6 +190,14 @@ button{font-family:inherit;cursor:pointer}
 
 <ul class="nav-list bottom-nav">
  <li>
+  <button class="nav-item" type="button" onclick="openChangePasswordModal()">
+   <span class="nav-icon">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+   </span>
+   <span class="nav-label">Change Password</span>
+  </button>
+ </li>
+ <li>
   <button class="nav-item" onclick="logout()">
    <span class="nav-icon">⇥</span>
    <span class="nav-label">Log Out</span>
@@ -371,6 +379,35 @@ button{font-family:inherit;cursor:pointer}
  </div>
 </div>
 
+<!-- Change Password Modal -->
+<div id="changePasswordModal" style="position:fixed;inset:0;background:rgba(32,18,10,.55);display:none;align-items:center;justify-content:center;z-index:300;padding:16px">
+ <div style="width:min(440px,100%);background:#FDFBF7;border-radius:22px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.3)">
+  <div style="background:#B58E6B;color:#FFF;padding:22px 26px;display:flex;justify-content:space-between;align-items:center">
+   <div>
+    <small style="display:block;font-size:10px;letter-spacing:1.4px;text-transform:uppercase;opacity:.9">ACCOUNT SECURITY</small>
+    <h3 style="font-family:'Instrument Serif',serif;font-size:28px;font-weight:400">Change password</h3>
+   </div>
+   <button type="button" onclick="closeChangePasswordModal()" style="width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,.4);background:transparent;color:#FFF;cursor:pointer;font-size:16px">✕</button>
+  </div>
+  <form id="changePasswordForm" style="padding:24px 26px;display:flex;flex-direction:column;gap:14px">
+   <div>
+    <label for="currentPassword" style="display:block;font-size:10.5px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:6px;color:#2C1A11">CURRENT PASSWORD</label>
+    <input id="currentPassword" type="password" autocomplete="current-password" placeholder="Enter current password" required style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #DFD3C6;background:#FFF;font-family:'DM Sans',sans-serif;font-size:14px">
+   </div>
+   <div>
+    <label for="newPassword" style="display:block;font-size:10.5px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:6px;color:#2C1A11">NEW PASSWORD</label>
+    <input id="newPassword" type="password" minlength="6" autocomplete="new-password" placeholder="At least 6 characters" required style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #DFD3C6;background:#FFF;font-family:'DM Sans',sans-serif;font-size:14px">
+   </div>
+   <div>
+    <label for="confirmPassword" style="display:block;font-size:10.5px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:6px;color:#2C1A11">CONFIRM NEW PASSWORD</label>
+    <input id="confirmPassword" type="password" minlength="6" autocomplete="new-password" placeholder="Re-enter new password" required style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #DFD3C6;background:#FFF;font-family:'DM Sans',sans-serif;font-size:14px">
+   </div>
+   <p id="changePasswordMsg" role="alert" style="font-size:12px;margin:2px 0"></p>
+   <button id="changePasswordBtn" type="submit" class="btn" style="width:100%;margin:4px 0 0">UPDATE PASSWORD</button>
+  </form>
+ </div>
+</div>
+
 <script>
 const $=id=>document.getElementById(id);
 const money=n=>"RM "+Number(n||0).toFixed(2);
@@ -404,17 +441,46 @@ let currentCustPage="dashboard";
 
 function openLogoutModal(){$("logoutConfirmModal").style.display="flex";}
 function closeLogoutModal(){$("logoutConfirmModal").style.display="none";}
+function openChangePasswordModal(){
+ $("changePasswordForm").reset();
+ $("changePasswordMsg").textContent="";
+ $("changePasswordModal").style.display="flex";
+}
+function closeChangePasswordModal(){$("changePasswordModal").style.display="none";}
 
 document.addEventListener("keydown",e=>{
  if(e.key==="Escape"){
   closeLogoutModal();
+  closeChangePasswordModal();
   $("notifPopover").classList.remove("open");
  }
 });
 document.addEventListener("click",e=>{
  if(e.target&&e.target.id==="logoutConfirmModal")closeLogoutModal();
+ if(e.target&&e.target.id==="changePasswordModal")closeChangePasswordModal();
  const pop=$("notifPopover");
  if(pop&&pop.classList.contains("open")&&!e.target.closest("#notifPopover")&&!e.target.closest(".bell-btn"))pop.classList.remove("open");
+});
+
+$("changePasswordForm").addEventListener("submit",async function(e){
+ e.preventDefault();
+ const msg=$("changePasswordMsg"),btn=$("changePasswordBtn");
+ const current_password=$("currentPassword").value;
+ const new_password=$("newPassword").value;
+ const confirm_password=$("confirmPassword").value;
+ if(new_password.length<6){msg.style.color="#922B21";msg.textContent="New password must be at least 6 characters.";return;}
+ if(new_password!==confirm_password){msg.style.color="#922B21";msg.textContent="New password and confirmation do not match.";return;}
+ btn.disabled=true;msg.style.color="#8C7A6B";msg.textContent="Updating password…";
+ try{
+  const res=await fetch("customer_change_password.php",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({current_password,new_password,confirm_password})});
+  const data=await res.json();
+  if(!res.ok||!data.success)throw new Error(data.message||"Could not update password.");
+  msg.style.color="#286646";msg.textContent=data.message||"Password updated successfully.";
+  this.reset();
+  setTimeout(closeChangePasswordModal,1000);
+ }catch(err){
+  msg.style.color="#922B21";msg.textContent=err.message||"Could not update password.";
+ }finally{btn.disabled=false;}
 });
 
 function show(id,pushHistory=true){
