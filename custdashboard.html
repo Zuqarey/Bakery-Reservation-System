@@ -419,7 +419,11 @@ async function loadCustomer(){
  try{
   const res=await fetch("getcustomer.php",{credentials:"same-origin",cache:"no-store"});
   const data=await res.json();
-  if(!res.ok||!data.loggedIn) throw new Error("Customer session is not active. Please log in again.");
+  if(!res.ok||!data.loggedIn){
+   ["cozyBakeCustomerEmail","cozyBakeCustomerName","cozyBakeCustomerId","cozyBakeDemoLoggedIn","isLoggedIn","userEmail","userName","customer_id","cozyBakeUser"].forEach(k=>{sessionStorage.removeItem(k);localStorage.removeItem(k);});
+   window.location.href="login.html?redirect=custdashboard.html";
+   return;
+  }
   const name=data.name||data.customer||"Customer";
   customerEmail=data.email||"";
   $("greeting").textContent="Welcome, "+name+"!";

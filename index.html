@@ -175,7 +175,7 @@ function openAccountPage() {
         // Admin access must go through the PHP session guard, never static admin.html.
         location.href = "admin_dashboard.php";
     } else if (email.split("@")[0].includes("staff")) {
-        location.href = "staff_dashboard.html";
+        location.href = "staff_dashboard.php";
     } else {
         location.href = "custdashboard.html";
     }
@@ -185,15 +185,18 @@ function openAccountPage() {
 async function checkActiveSession() {
     let email = sessionStorage.getItem("cozyBakeCustomerEmail") || localStorage.getItem("cozyBakeCustomerEmail") || "";
     let name = sessionStorage.getItem("cozyBakeCustomerName") || localStorage.getItem("cozyBakeCustomerName") || "";
-
-    // Do not treat an old admin email in browser storage as an active login.
-    if (email && email.split("@")[0].toLowerCase().includes("admin")) {
+    const clearStoredUser = () => {
         ["cozyBakeCustomerEmail", "cozyBakeCustomerName", "cozyBakeCustomerId", "cozyBakeDemoLoggedIn", "isLoggedIn", "userEmail", "userName", "customer_id", "cozyBakeUser"].forEach(key => {
             sessionStorage.removeItem(key);
             localStorage.removeItem(key);
         });
         email = "";
         name = "";
+    };
+
+    // Do not treat an old admin email in browser storage as an active login.
+    if (email && email.split("@")[0].toLowerCase().includes("admin")) {
+        clearStoredUser();
     }
 
     try {
@@ -207,6 +210,8 @@ async function checkActiveSession() {
                 sessionStorage.setItem("cozyBakeCustomerName", name);
                 localStorage.setItem("cozyBakeCustomerEmail", email);
                 localStorage.setItem("cozyBakeCustomerName", name);
+            } else if (email && !email.split("@")[0].toLowerCase().includes("staff")) {
+                clearStoredUser();
             }
         }
     } catch (e) {}

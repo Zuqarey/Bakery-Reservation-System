@@ -1,10 +1,10 @@
 <?php
 session_start();
 header('Content-Type: application/json; charset=utf-8');
-require_once __DIR__ . '/db.php';
 if (empty($_SESSION['staff_logged_in']) || empty($_SESSION['staff_id']) || ($_SESSION['role'] ?? '') !== 'staff') {
     http_response_code(401); echo json_encode(['success'=>false,'message'=>'Staff login required']); exit;
 }
+require_once __DIR__ . '/db.php';
 $activeStaffCheck = $conn->prepare("SELECT status FROM staff WHERE staff_id = ? LIMIT 1");
 $activeStaffId = (int)$_SESSION['staff_id'];
 $activeStaffCheck->bind_param('i', $activeStaffId);
@@ -17,7 +17,7 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
     echo json_encode(['success' => false, 'message' => 'This staff account is no longer active. Please contact an administrator.']);
     exit;
 }
-function fail_json($message) { http_response_code(500); echo json_encode(['success'=>false,'message'=>$message]); exit; }
+function fail_json($message) { error_log('Staff ingredients API error: ' . $message); http_response_code(500); echo json_encode(['success'=>false,'message'=>'Could not load pantry and recipe data.']); exit; }
 $ingredients=[]; $recipes=[];
 $sql="SELECT ingredient_id, name, category, quantity, unit, status, status_text FROM ingredients ORDER BY ingredient_id";
 $result=$conn->query($sql); if(!$result) fail_json($conn->error);

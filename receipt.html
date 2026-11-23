@@ -134,10 +134,8 @@ let r=null;
 try{r=JSON.parse(sessionStorage.getItem("cozyBakeReceipt"))}catch{}
 
 function addRow(box,label,value){
-$(box).innerHTML+="";
 const d=document.createElement("div");
 d.className="detail";
-d.innerHTML="";
 const a=document.createElement("span"),b=document.createElement("strong");
 a.textContent=label;
 b.textContent=value||"-";
@@ -154,13 +152,17 @@ $("date").textContent=new Date(r.submittedAt||Date.now()).toLocaleString("en-MY"
 $("status").textContent=r.paymentStatus||"Pending Payment";
 
 const id=String(r.orderId||"-");
-[
-["Order Number",/^\d+$/.test(id)?id.padStart(4,"0"):id],
+const orderRows=[
+["Order Number",/^\d+$/.test(id)?id.padStart(4,"0"):id]
+];
+if(r.receiptNo) orderRows.push(["Receipt Number",r.receiptNo]);
+orderRows.push(
 ["Order Type",r.orderType],
 ["Outlet",r.outlet],
 ["Preferred Date",r.orderDate],
 ["Preferred Time",r.orderTime]
-].forEach(x=>addRow("order-info",...x));
+);
+orderRows.forEach(x=>addRow("order-info",...x));
 
 [
 ["Full Name",r.customerName],

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+D<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -302,14 +302,12 @@ function changeCart(i,n){
     item.quantity+=n;
     if(item.quantity<=0)return removeCart(i);
     saveCart();
-    syncPHP("updatecart.php",{name:item.name,quantity:item.quantity});
 }
 
 function removeCart(i){
     const [item]=cart.splice(i,1);
     if(!item)return;
     saveCart();
-    syncPHP("removecart.php",{name:item.name});
 }
 
 function renderCart(){
