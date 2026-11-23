@@ -272,13 +272,28 @@ function addToCart(name,qty=1){
     if(requestLogin())return;
 
     const item=cart.find(x=>x.name===name);
-    if(item)item.quantity+=qty;
-    else cart.push({name,price:p[1],quantity:qty});
+
+    if(item){
+        item.quantity+=qty;
+    } else {
+        cart.push({
+            name: p[0],
+            price: Number(p[1]),
+            quantity: qty,
+            available_branch: p[5] || "All"
+        });
+    }
 
     saveCart();
     closeModal();
     openModal("cart");
-    syncPHP("addtocart.php",{name,price:p[1],quantity:qty});
+
+    syncPHP("addtocart.php",{
+        name: p[0],
+        price: p[1],
+        quantity: qty,
+        available_branch: p[5] || "All"
+    });
 }
 
 function changeCart(i,n){

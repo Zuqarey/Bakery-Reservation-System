@@ -284,77 +284,184 @@ async function checkCustomerLogin(){
    "Unable to verify your login. Please open Cozy Bake through a PHP-enabled server.";
  }
 }
-
 // SPECIAL MENU BRANCHES
-const branchMap={
- Perlis:["Cozy Bake Kangar"],
- Kedah:["Cozy Bake Alor Setar"],
- Penang:["Cozy Bake Penang"]
+const outletBranches = {
+    "Aman Central Kedah": "Kedah",
+    "Kangar Jaya Mall Perlis": "Perlis",
+    "Queensbay Mall Penang": "Penang"
 };
 
+let productBranchMap = {};
 
-$("checkout-form").addEventListener("submit",function(e){
- e.preventDefault();
+async function loadBranchAvailability() {
+    const outlet = $("outlet");
 
- const error=$("checkout-error");
- error.textContent="";
+    try {
+        const response = await fetch("menu.php", {
+            cache: "no-store"
+        });
 
- if(!loggedIn){
-  error.textContent="Please log in before checkout.";
-  return;
- }
+        if (!response.ok) throw Error("Cannot load menu.php");
 
- if(!items.length){
-  error.textContent="Your cart is empty.";
-  return;
- }
+        const result = await response.json();
 
- const date=$("orderDate").value;
- const time=$("orderTime").value;
- const currentDate=todayString();
- const now=new Date();
+        const products = Array.isArray(result)
+            ? result
+            : result.products;
 
- if(date<currentDate){
-  error.textContent="Please select a valid date.";
-  return;
- }
+        if (!Array.isArray(products)) {
+            throw Error("Invalid product data");
+        }
 
- const currentTime=
-  String(now.getHours()).padStart(2,"0")+":"+
-  String(now.getMinutes()).padStart(2,"0");
+        products.forEach(p => {
+            const name = Array.isArray(p)
+                ? p[0]
+                : p.product_name;
 
- if(date===currentDate&&time<=currentTime){
-  error.textContent="Please select a future pickup or visit time.";
-  return;
- }
+            const branch = Array.isArray(p)
+                ? p[5]
+                : p.available_branch;
 
- const outlet=$("outlet").value;
+            productBranchMap[name] = branch || "All";
+        });
 
- for(const item of items){
-  if(item.state&&branchMap[item.state]&&!branchMap[item.state].includes(outlet)){
-   error.textContent=
-    item.name+" is only available at "+item.state+" branch.";
-   return;
-  }
- }
+        const restricted = items.map(item =>
+            item.available_branch ||
+            productBranchMap[item.name] ||
+            "All"
+        ).filter(branch => branch !== "All");
 
- const checkoutData={
-  customerName:$("customerName").value.trim(),
-  customerEmail:$("customerEmail").value.trim(),
-  customerPhone:$("customerPhone").value.trim(),
-  orderType:document.querySelector('[name="orderType"]:checked').value,
-  outlet,
-  orderDate:date,
-  orderTime:time,
-  specialInstructions:$("specialInstructions").value.trim(),
-  items,
-  total:Number(total.toFixed(2))
- };
+        const validBranch = restricted.length
+            ? restricted.every(b => b === restricted[0])
+                ? restricted[0]
+                : null
+            : "All";
 
- sessionStorage.setItem("cozyBakeCheckout",JSON.stringify(checkoutData));
+        [...outlet.options].forEach(option => {
 
- //payment
- location.href="paymentt.html";
+    if (!option.value) return;
+
+    const branch = outletBranches[option.value];
+
+    const unavailable =
+        validBranch === null ||
+        (validBranch !== "All" &&
+         branch !== validBranch);
+
+    option.disabled = unavailable;
+    option.hidden = unavailable;
+});
+
+        if (outlet.value &&
+            outlet.selectedOptions[0].disabled) {
+            outlet.value = "";
+        }
+
+        if (validBranch === null) {
+            $("checkout-error").textContent =
+                "Your cart contains products from different restricted branches. Please order separately.";
+        }
+
+    } catch (error) {
+        console.error(error);
+
+        [...outlet.options].forEach(option => {
+            if (option.value) option.disabled = true;
+        });
+
+        $("checkout-error").textContent =
+            "Unable to verify product branches. Please refresh checkout.";
+
+        throw error;
+    }
+}
+
+const branchReady = loadBranchAvailability();
+
+
+$("checkout-form").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const error = $("checkout-error");
+    error.textContent = "";
+
+    if (!loggedIn) {
+        error.textContent = "Please log in before checkout.";
+        return;
+    }
+
+    if (!items.length) {
+        error.textContent = "Your cart is empty.";
+        return;
+    }
+
+    const date = $("orderDate").value;
+    const time = $("orderTime").value;
+
+    if (date < todayString()) {
+        error.textContent = "Please select a valid date.";
+        return;
+    }
+
+    const now = new Date();
+    const currentTime =
+        String(now.getHours()).padStart(2, "0") + ":" +
+        String(now.getMinutes()).padStart(2, "0");
+
+    if (date === todayString() && time <= currentTime) {
+        error.textContent = "Please select a future pickup or visit time.";
+        return;
+    }
+
+    try {
+        await branchReady;
+    } catch {
+        return;
+    }
+
+    const outlet = $("outlet").value;
+    const selectedBranch = outletBranches[outlet];
+
+    if (!selectedBranch) {
+        error.textContent = "Please select an available outlet.";
+        return;
+    }
+
+    for (const item of items) {
+        const branch =
+            item.available_branch ||
+            productBranchMap[item.name] ||
+            "All";
+
+        if (branch !== "All" && branch !== selectedBranch) {
+            error.textContent =
+                item.name + " is only available at " + branch + ".";
+
+            return;
+        }
+    }
+
+    const checkoutData = {
+        customerName: $("customerName").value.trim(),
+        customerEmail: $("customerEmail").value.trim(),
+        customerPhone: $("customerPhone").value.trim(),
+        orderType: document.querySelector(
+            '[name="orderType"]:checked'
+        ).value,
+        outlet,
+        orderDate: date,
+        orderTime: time,
+        specialInstructions: $("specialInstructions").value.trim(),
+        items,
+        total: Number(total.toFixed(2))
+    };
+
+    sessionStorage.setItem(
+        "cozyBakeCheckout",
+        JSON.stringify(checkoutData)
+    );
+
+    location.href = "paymentt.html";
 });
 
 displayCart();
