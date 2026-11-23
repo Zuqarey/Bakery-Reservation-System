@@ -78,6 +78,8 @@ try {
     while ($item = $lowStock->fetch_assoc()) {
         $qty = (int)$item['product_quantity'];
         $notifications[] = [
+            'type' => 'stock',
+            'product_id' => (int)$item['product_id'],
             'icon' => '⚠️',
             'title' => $qty === 0 ? 'Product out of stock' : 'Low stock alert',
             'details' => $item['product_name'] . ' — ' . $qty . ' remaining',
@@ -93,6 +95,9 @@ try {
     if (!$pending) throw new RuntimeException('Could not load pending-order alerts.');
     while ($item = $pending->fetch_assoc()) {
         $notifications[] = [
+            'type' => 'order',
+            'order_id' => (int)$item['order_id'],
+            'receipt_no' => (string)$item['receipt_no'],
             'icon' => '🧾',
             'title' => 'Order awaiting review',
             'details' => 'Receipt ' . $item['receipt_no'] . ' — ' . $item['status_name'],

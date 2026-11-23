@@ -59,15 +59,18 @@
     .avatar-circle { width: 38px; height: 38px; border-radius: 50%; background: var(--espresso); color: #FFF; font-weight: 600; font-size: 15px; display: flex; align-items: center; justify-content: center; }
 
     /* NOTIFICATIONS */
-    .notif-popover { position: absolute; top: 54px; right: 0; width: 340px; background: #FDFBF7; border-radius: 18px; box-shadow: 0 14px 36px rgba(44, 26, 17, 0.16); border: 1px solid var(--border-soft); padding: 20px; display: none; z-index: 200; }
-    .notif-popover.open { display: block; }
-    .notif-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px; }
+    .notif-popover { position: absolute; top: 54px; right: 0; width: 340px; max-height: calc(100vh - 96px); background: #FDFBF7; border-radius: 18px; box-shadow: 0 14px 36px rgba(44, 26, 17, 0.16); border: 1px solid var(--border-soft); padding: 20px; display: none; flex-direction: column; overflow: hidden; z-index: 200; }
+    .notif-popover.open { display: flex; }
+    .notif-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px; flex-shrink: 0; }
     .notif-header small { display: block; font-size: 10px; letter-spacing: 1.2px; color: #A05A2C; font-weight: 700; text-transform: uppercase; }
     .notif-header h4 { font-family: 'Instrument Serif', serif; font-size: 22px; font-weight: 400; }
-    .notif-item { display: flex; gap: 12px; padding: 12px 0; border-top: 1px solid var(--border-soft); cursor: pointer; }
+    #adminNotificationsList { overflow-y: auto; flex: 1; min-height: 0; padding-right: 4px; }
+    .notif-item { display: flex; gap: 12px; padding: 12px 8px; border-top: 1px solid var(--border-soft); border-radius: 10px; cursor: pointer; transition: background 0.15s ease; }
+    .notif-item:hover { background: #F4E7D7; }
     .notif-icon { width: 36px; height: 36px; border-radius: 10px; background: #F4E7D7; display: flex; align-items: center; justify-content: center; color: var(--espresso); flex-shrink: 0; }
     .notif-body h5 { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
     .notif-body p { font-size: 11.5px; color: var(--text-muted); line-height: 1.35; }
+    .row-highlight { background: #FDE5CE !important; transition: background 0.6s ease; }
 
     /* CONTENT CORE */
     .content-container { padding: 32px 38px 60px; max-width: 1400px; width: 100%; }
@@ -844,7 +847,7 @@
       document.getElementById('kpiOrdersToday').textContent = ordersToday;
       document.getElementById('kpiOrdersTodaySub').textContent = `${totalOrders} total order${totalOrders === 1 ? '' : 's'} recorded`;
       const ledger = document.getElementById('adminReportLedger');
-      ledger.innerHTML = data.ledger.length ? data.ledger.map(r => `<tr><td><strong>${r.receipt_no ? escapeHtml(r.receipt_no) : '#'+escapeHtml(r.order_id)}</strong></td><td>${escapeHtml(r.order_date || '—')}</td><td>${escapeHtml(r.customer_name || 'Unknown customer')}</td><td>${escapeHtml(r.outlet || '—')}</td><td>${escapeHtml(r.order_type || '—')}</td><td><strong>${money(r.total)}</strong></td><td>${escapeHtml(r.status_name || 'Unspecified')}</td></tr>`).join('') : '<tr><td colspan="7">No order records found yet.</td></tr>';
+      ledger.innerHTML = data.ledger.length ? data.ledger.map(r => `<tr data-order-id="${Number(r.order_id)}"><td><strong>${r.receipt_no ? escapeHtml(r.receipt_no) : '#'+escapeHtml(r.order_id)}</strong></td><td>${escapeHtml(r.order_date || '—')}</td><td>${escapeHtml(r.customer_name || 'Unknown customer')}</td><td>${escapeHtml(r.outlet || '—')}</td><td>${escapeHtml(r.order_type || '—')}</td><td><strong>${money(r.total)}</strong></td><td>${escapeHtml(r.status_name || 'Unspecified')}</td></tr>`).join('') : '<tr><td colspan="7">No order records found yet.</td></tr>';
       window.adminMonthlyRevenueData = data.months || [];
       const canvas = document.getElementById('profitChart');
       if (canvas && window.Chart) {
@@ -941,6 +944,31 @@
     document.getElementById('bestSellerSummary').textContent = `${top.units_sold} units sold · ${money(top.revenue)} revenue`;
   }
 
+  function handleNotificationClick(n) {
+    const popover = document.getElementById('notifPopover');
+    if (popover) popover.classList.remove('open');
+
+    if (n.type === 'stock') {
+      switchTab('catalog', 'MENU & CATALOG', document.querySelectorAll('.sidebar .nav-item')[1]);
+      if (n.product_id && typeof window.openProductModal === 'function') {
+        window.openProductModal(n.product_id);
+      }
+      return;
+    }
+
+    if (n.type === 'order') {
+      switchTab('reports', 'FINANCIAL REPORTS', document.querySelectorAll('.sidebar .nav-item')[3]);
+      if (n.order_id) {
+        const row = document.querySelector(`#adminReportLedger tr[data-order-id="${Number(n.order_id)}"]`);
+        if (row) {
+          row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          row.classList.add('row-highlight');
+          setTimeout(() => row.classList.remove('row-highlight'), 2500);
+        }
+      }
+    }
+  }
+
   function renderNotifications(items) {
     const list = document.getElementById('adminNotificationsList');
     const badge = document.getElementById('notificationCount');
@@ -950,7 +978,17 @@
       list.innerHTML = '<div class="notif-item"><div class="notif-icon">✓</div><div class="notif-body"><h5>You’re all caught up</h5><p>No low-stock or pending-order alerts right now.</p></div></div>';
       return;
     }
-    list.innerHTML = items.map(n => `<div class="notif-item"><div class="notif-icon">${safe(n.icon)}</div><div class="notif-body"><h5>${safe(n.title)}</h5><p>${safe(n.details)} · ${safe(n.time)}</p></div></div>`).join('');
+    list.innerHTML = items.map((n, i) => `<div class="notif-item" role="button" tabindex="0" data-notif-index="${i}"><div class="notif-icon">${safe(n.icon)}</div><div class="notif-body"><h5>${safe(n.title)}</h5><p>${safe(n.details)} · ${safe(n.time)}</p></div></div>`).join('');
+    list.querySelectorAll('[data-notif-index]').forEach(el => {
+      const open = () => {
+        const item = items[Number(el.dataset.notifIndex)];
+        if (item) handleNotificationClick(item);
+      };
+      el.addEventListener('click', open);
+      el.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+      });
+    });
   }
 
   async function loadAdminInsights() {
