@@ -193,6 +193,23 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
     @media (max-width: 800px) { .schedule-row { grid-template-columns: 1fr 1fr; gap: 8px; } }
     .row-details { display: none; grid-column: 1 / -1; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); color: #8c7a6b; font-size: 0.8rem; }
     .schedule-row.expanded .row-details { display: block; }
+
+    /* Notification Popover */
+    .staff-notif-wrap { position: relative; }
+    .staff-notif-btn { position: relative; width: 38px; height: 38px; background: #ebdcd0; color: #5C2C16; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s; }
+    .staff-notif-btn:hover { background: #e1cbb9; }
+    .staff-notif-badge { position: absolute; top: -3px; right: -3px; background: #c0392b; color: #fff; font-size: 0.62rem; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 999px; display: none; align-items: center; justify-content: center; font-weight: 700; border: 2px solid #fff; }
+    .staff-notif-popover { display: none; position: absolute; top: 48px; right: 0; width: 340px; max-width: calc(100vw - 32px); background: #fff; border: 1px solid var(--border); border-radius: 18px; box-shadow: 0 16px 36px rgba(44, 26, 17, 0.16); z-index: 250; overflow: hidden; }
+    .staff-notif-popover.open { display: block; }
+    .staff-notif-head { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: #FDFBF7; }
+    .staff-notif-head h4 { font-size: 0.78rem; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; color: var(--wood); }
+    .staff-notif-list { max-height: 360px; overflow-y: auto; }
+    .staff-notif-item { width: 100%; text-align: left; background: transparent; border: none; border-bottom: 1px solid #F5EDE3; padding: 12px 16px; display: flex; gap: 12px; align-items: flex-start; cursor: pointer; transition: background 0.15s; }
+    .staff-notif-item:last-child { border-bottom: none; }
+    .staff-notif-item:hover { background: #FDF8F2; }
+    .staff-notif-icon { width: 32px; height: 32px; border-radius: 10px; background: #F5EDE3; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 15px; }
+    .staff-notif-body h5 { font-size: 0.84rem; font-weight: 700; color: #2C1A11; margin-bottom: 2px; }
+    .staff-notif-body p { font-size: 0.75rem; color: #8c7a6b; line-height: 1.35; }
   </style>
 </head>
 <body>
@@ -245,9 +262,20 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
         <span class="hidden sm:flex text-xs font-bold px-3 py-1.5 bg-amber-100 text-amber-900 rounded-full items-center gap-1.5">
           <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Shift: Morning (07:00 - 15:00)
         </span>
-        <div style="position:relative; width:38px; height:38px; background:#ebdcd0; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer;">
-          <i data-lucide="bell" style="width:18px; height:18px;"></i>
-          <span style="position:absolute; top:-2px; right:-2px; background:#c0392b; color:#fff; font-size:0.6rem; width:15px; height:15px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700;">3</span>
+        <div class="staff-notif-wrap">
+          <button type="button" id="staffNotifBtn" class="staff-notif-btn" onclick="toggleStaffNotifications(event)" aria-label="Notifications" aria-expanded="false">
+            <i data-lucide="bell" style="width:18px; height:18px;"></i>
+            <span id="staffNotifBadge" class="staff-notif-badge">0</span>
+          </button>
+          <div id="staffNotifPopover" class="staff-notif-popover" role="region" aria-label="Staff alerts">
+            <div class="staff-notif-head">
+              <h4>Kitchen &amp; Stock Alerts</h4>
+              <span id="staffNotifSummary" style="font-size:0.72rem; color:#8c7a6b; font-weight:600;">Loading…</span>
+            </div>
+            <div id="staffNotifList" class="staff-notif-list">
+              <div style="padding:18px 16px; font-size:0.82rem; color:#8c7a6b;">Checking for alerts…</div>
+            </div>
+          </div>
         </div>
         <div style="width:38px; height:38px; background:var(--wood); color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700;"><?= htmlspecialchars(strtoupper(mb_substr(trim((string)($_SESSION['staff_name'] ?? 'S')), 0, 1)), ENT_QUOTES, 'UTF-8') ?></div>
       </div>
@@ -517,15 +545,129 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
       if (m) m.style.display = 'none';
     }
 
+    function closeStaffNotifications() {
+      const pop = document.getElementById('staffNotifPopover');
+      const btn = document.getElementById('staffNotifBtn');
+      if (pop) pop.classList.remove('open');
+      if (btn) btn.setAttribute('aria-expanded', 'false');
+    }
+
+    function toggleStaffNotifications(e) {
+      if (e) e.stopPropagation();
+      const pop = document.getElementById('staffNotifPopover');
+      const btn = document.getElementById('staffNotifBtn');
+      if (!pop) return;
+      const isOpen = pop.classList.toggle('open');
+      if (btn) btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    }
+
+    let staffNotifications = [];
+
+    function renderStaffNotifications() {
+      const alerts = [];
+
+      ordersData
+        .filter(o => o.status === 'NEW')
+        .forEach(o => {
+          alerts.push({
+            icon: '🧾',
+            title: `New Order #${o.id} — ${o.customer}`,
+            details: `${o.summary || 'Order received'} · ${o.total}`,
+            action: () => {
+              closeStaffNotifications();
+              switchPage('orders');
+              currentOrderFilter = 'NEW';
+              selectedOrderId = o.id;
+              document.getElementById('order-page-heading').textContent = orderTitles.NEW;
+              renderOrders();
+            }
+          });
+        });
+
+      inventoryData
+        .filter(p => Number(p.stock) <= 5)
+        .forEach(p => {
+          alerts.push({
+            icon: Number(p.stock) <= 0 ? '🚫' : '📦',
+            title: Number(p.stock) <= 0 ? `Out of Stock: ${p.name}` : `Low Stock: ${p.name}`,
+            details: `${p.stock} left in Stock Room (${p.category})`,
+            action: () => {
+              closeStaffNotifications();
+              switchPage('inventory');
+              const search = document.getElementById('inv-search');
+              if (search) search.value = p.name;
+              const cat = document.getElementById('inv-category');
+              if (cat) cat.value = 'ALL';
+              renderInventory();
+            }
+          });
+        });
+
+      pantryItems
+        .filter(i => ['expired', 'expiring', 'low'].includes(i.status))
+        .forEach(i => {
+          const icon = i.status === 'expired' ? '⛔' : (i.status === 'expiring' ? '⏳' : '⚠️');
+          alerts.push({
+            icon,
+            title: `Pantry (${i.statusText}): ${i.name}`,
+            details: `${i.quantity} · ${i.category}`,
+            action: () => {
+              closeStaffNotifications();
+              switchPage('ingredients');
+              filterIngredientsByStat(i.status);
+            }
+          });
+        });
+
+      staffNotifications = alerts;
+      const badge = document.getElementById('staffNotifBadge');
+      const summary = document.getElementById('staffNotifSummary');
+      const list = document.getElementById('staffNotifList');
+
+      if (badge) {
+        badge.textContent = alerts.length > 99 ? '99+' : String(alerts.length);
+        badge.style.display = alerts.length ? 'flex' : 'none';
+      }
+      if (summary) {
+        summary.textContent = alerts.length ? `${alerts.length} active` : 'All clear';
+      }
+      if (!list) return;
+
+      if (!alerts.length) {
+        list.innerHTML = '<div class="staff-notif-item" style="cursor:default;"><div class="staff-notif-icon">✓</div><div class="staff-notif-body"><h5>You’re all caught up</h5><p>No new orders, low-stock items, or pantry alerts right now.</p></div></div>';
+        return;
+      }
+
+      list.innerHTML = alerts.map((a, idx) => `
+        <button type="button" class="staff-notif-item" onclick="handleStaffNotification(${idx})">
+          <div class="staff-notif-icon">${a.icon}</div>
+          <div class="staff-notif-body">
+            <h5>${escapeScheduleText(a.title)}</h5>
+            <p>${escapeScheduleText(a.details)}</p>
+          </div>
+        </button>
+      `).join('');
+    }
+
+    function handleStaffNotification(idx) {
+      const item = staffNotifications[idx];
+      if (item && typeof item.action === 'function') item.action();
+    }
+
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         closeLogoutModal();
         closeChangePasswordModal();
+        closeStaffNotifications();
       }
     });
     document.addEventListener('click', (e) => {
       if (e.target && e.target.id === 'logoutConfirmModal') closeLogoutModal();
       if (e.target && e.target.id === 'changePasswordModal') closeChangePasswordModal();
+      const pop = document.getElementById('staffNotifPopover');
+      if (pop && pop.classList.contains('open') && !e.target.closest('#staffNotifPopover') && !e.target.closest('#staffNotifBtn')) {
+        closeStaffNotifications();
+      }
     });
 
     document.getElementById('changePasswordForm').addEventListener('submit', async function (e) {
@@ -669,6 +811,7 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
         if (!response.ok || !result.success) throw new Error(result.message || 'Stock update failed.');
         item.stock += delta;
         renderInventory();
+        renderStaffNotifications();
         loadDashboardOverview();
       } catch (error) {
         alert('Could not update stock: ' + error.message);
@@ -727,6 +870,7 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
         });
         if (!ordersData.some(o => o.id === selectedOrderId)) selectedOrderId = ordersData.length ? ordersData[0].id : null;
         renderOrders();
+        renderStaffNotifications();
         if (document.getElementById('sched-pickup-tab')?.classList.contains('active')) renderPickupSchedule();
       } catch (error) {
         listEl.innerHTML = `<div style="background:#fff;padding:24px;border-radius:14px;color:#a33;">Unable to load database orders: ${escapeScheduleText(error.message)}</div>`;
@@ -849,6 +993,7 @@ if (!$activeStaffRow || strcasecmp(trim((string)$activeStaffRow['status']), 'Act
         document.getElementById('ing-stat-expired').textContent = st.expired ?? 0;
         document.getElementById('tab-recipes').textContent = `PRODUCT RECIPES · ${st.recipe_count ?? recipeItems.length}`;
         renderIngredients();
+        renderStaffNotifications();
       } catch (error) {
         console.error('Staff ingredients:', error);
         document.getElementById('ingredients-list-container').innerHTML = `<div class="bg-white p-4 rounded-2xl text-red-700 text-sm">Could not load pantry data: ${escapeScheduleText(error.message)}</div>`;
