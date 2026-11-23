@@ -304,9 +304,7 @@
 <button type="button" onclick="showNotifications()" class="notification-btn">
     <i data-lucide="bell"></i>
 
-    <span class="notification-count" id="notificationCount">
-        
-    </span>
+    <span class="notification-count" id="notificationCount">3</span>
 </button>
 
  
@@ -384,7 +382,24 @@ style="width:38px;height:38px;background:var(--wood);color:white;border:none;bor
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-50">
-             
+              <tr>
+                <td class="py-3.5 px-2 font-bold">Sourdough Bread</td>
+                <td class="py-3.5 px-2">24 loaves</td>
+                <td class="py-3.5 px-2">Aina</td>
+                <td class="py-3.5 px-2"><span class="px-2.5 py-1 text-xs rounded-full bg-amber-100 text-amber-800 font-bold">In Oven (15m left)</span></td>
+              </tr>
+              <tr>
+                <td class="py-3.5 px-2 font-bold">Morning Croissant</td>
+                <td class="py-3.5 px-2">40 pcs</td>
+                <td class="py-3.5 px-2">Aina</td>
+                <td class="py-3.5 px-2"><span class="px-2.5 py-1 text-xs rounded-full bg-blue-100 text-blue-800 font-bold">Proofing</span></td>
+              </tr>
+              <tr>
+                <td class="py-3.5 px-2 font-bold">Cinnamon Roll</td>
+                <td class="py-3.5 px-2">18 pcs</td>
+                <td class="py-3.5 px-2">Chef Lee</td>
+                <td class="py-3.5 px-2"><span class="px-2.5 py-1 text-xs rounded-full bg-emerald-100 text-emerald-800 font-bold">Ready on Counter</span></td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -680,7 +695,29 @@ style="width:38px;height:38px;background:var(--wood);color:white;border:none;bor
     // DATA & LOGIK 1: INVENTORY
     // ==========================================
     const inventoryData = [
-      
+      { id: 1, name: "Strawberry Cloud", category: "Cake", stock: 8, img: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=150&auto=format&fit=crop&q=80" },
+      { id: 2, name: "Morning Croissant", category: "Savory", stock: 23, img: "https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=150&auto=format&fit=crop&q=80" },
+      { id: 3, name: "Pistachio Stack", category: "Sweets", stock: 14, img: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=150&auto=format&fit=crop&q=80" },
+      { id: 4, name: "Country Rolls", category: "Bread", stock: 4, img: "https://images.unsplash.com/photo-1586444248902-2f64eddc13df?w=150&auto=format&fit=crop&q=80" },
+      { id: 5, name: "Sourdough Loaf", category: "Bread", stock: 12, img: "https://images.unsplash.com/photo-1589367920969-ab8e050bbc04?w=150&auto=format&fit=crop&q=80" },
+      { id: 6, name: "Chocolate Layer Cake", category: "Cake", stock: 6, img: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=150&auto=format&fit=crop&q=80" },
+      { id: 7, name: "French Macarons", category: "Sweets", stock: 20, img: "https://images.unsplash.com/photo-1569864358642-9d1684040f43?w=150&auto=format&fit=crop&q=80" },
+      { id: 8, name: "Berry Tart", category: "Tart", stock: 9, img: "https://images.unsplash.com/photo-1519869325930-281384150729?w=150&auto=format&fit=crop&q=80" },
+      { id: 9, name: "Cheesecake Slice", category: "Cake", stock: 15, img: "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=150&auto=format&fit=crop&q=80" },
+      { id: 10, name: "Baguette", category: "Bread", stock: 18, img: "https://images.unsplash.com/photo-1597079910443-60c43fc4f729?w=150&auto=format&fit=crop&q=80" },
+      { id: 11, name: "Rainbow Donut Box", category: "Sweets", stock: 7, img: "https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?w=150&auto=format&fit=crop&q=80" },
+      { id: 12, name: "Glazed Donut", category: "Sweets", stock: 24, img: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=150&auto=format&fit=crop&q=80" },
+      { id: 13, name: "Fudge Brownies", category: "Sweets", stock: 16, img: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=150&auto=format&fit=crop&q=80" },
+      { id: 14, name: "Apple Pie", category: "Tart", stock: 5, img: "https://images.unsplash.com/photo-1621743478914-cc8a86d7e7b5?w=150&auto=format&fit=crop&q=80" },
+      { id: 15, name: "Fresh Scones", category: "Savory", stock: 14, img: "https://images.unsplash.com/photo-1589119908995-c6837fa14848?w=150&auto=format&fit=crop&q=80" },
+      { id: 16, name: "Choc Chip Cookies", category: "Sweets", stock: 22, img: "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=150&auto=format&fit=crop&q=80" },
+      { id: 17, name: "Chocolate Cupcake", category: "Cake", stock: 19, img: "https://images.unsplash.com/photo-1576618148400-f54bed99fcfd?w=150&auto=format&fit=crop&q=80" },
+      { id: 18, name: "Rustic Boule", category: "Bread", stock: 8, img: "https://images.unsplash.com/photo-1549931319-a545dcf3bc73?w=150&auto=format&fit=crop&q=80" },
+      { id: 19, name: "Salted Caramel Cookies", category: "Cookies", stock: 18, img: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=150&auto=format&fit=crop&q=80" },
+      { id: 20, name: "Dark Chocolate Fudge Cookies", category: "Cookies", stock: 16, img: "https://images.unsplash.com/photo-1618923850107-d1a234d7a73a?w=150&auto=format&fit=crop&q=80" },
+      { id: 21, name: "Blueberry Bliss Cookies", category: "Cookies", stock: 14, img: "https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=150&auto=format&fit=crop&q=80" },
+      { id: 22, name: "Red Velvet with White Chocolate Cookies", category: "Cookies", stock: 15, img: "https://images.unsplash.com/photo-1619149651177-b09092806f1a?w=150&auto=format&fit=crop&q=80" },
+      { id: 23, name: "Matcha Oatmeal Chocolate Chip", category: "Cookies", stock: 13, img: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=150&auto=format&fit=crop&q=80" }
     ];
 
     function renderInventory() {
@@ -914,11 +951,22 @@ style="width:38px;height:38px;background:var(--wood);color:white;border:none;bor
     // DATA & LOGIK 3: INGREDIENTS & RECIPES
     // ==========================================
     const pantryItems = [
-      
+      { name: "Unsalted Butter", category: "Dairy", quantity: "12 kg", status: "expiring", statusText: "Expiring in 3 days" },
+      { name: "Organic Bread Flour", category: "Dry Goods", quantity: "150 kg", status: "ok", statusText: "In Stock" },
+      { name: "Granulated Sugar", category: "Dry Goods", quantity: "4 kg", status: "low", statusText: "Low Stock (Below 10kg)" },
+      { name: "Heavy Cream 35%", category: "Dairy", quantity: "2 L", status: "expired", statusText: "Expired yesterday" },
+      { name: "Dark Chocolate 70%", category: "Chocolate", quantity: "8 kg", status: "low", statusText: "Low Stock" },
+      { name: "Fresh Strawberries", category: "Produce", quantity: "1.5 kg", status: "expiring", statusText: "Expiring in 2 days" },
+      { name: "Whole Milk", category: "Dairy", quantity: "0 L", status: "expired", statusText: "Expired" },
+      { name: "Active Dry Yeast", category: "Baking Supplies", quantity: "250 g", status: "low", statusText: "Low Stock" },
+      { name: "Vanilla Extract", category: "Flavors", quantity: "300 ml", status: "ok", statusText: "In Stock" }
     ];
 
     const recipeItems = [
-      
+      { name: "Strawberry Cloud Cake", category: "Cake", ingredientsCount: 6, prepTime: "45 mins" },
+      { name: "Artisan Sourdough Loaf", category: "Bread", ingredientsCount: 4, prepTime: "24 hrs" },
+      { name: "French Butter Croissant", category: "Savory", ingredientsCount: 5, prepTime: "12 hrs" },
+      { name: "Dark Chocolate Fudge Brownie", category: "Sweets", ingredientsCount: 7, prepTime: "30 mins" }
     ];
 
     let ingTab = 'pantry';
@@ -978,11 +1026,21 @@ style="width:38px;height:38px;background:var(--wood);color:white;border:none;bor
     // DATA & LOGIK 4: SCHEDULE
     // ==========================================
     const pickupOrders = [
-     
+      { day: "Tue", date: "Oct 13", time: "3:00 PM", customer: "Nora Fields", order: "4 Baguettes + 1 Sourdough Loaf", type: "Everyday" },
+      { day: "Wed", date: "Oct 14", time: "10:00 AM", customer: "Hannah Brooks", order: "Chocolate Layer Cake, 8 in", type: "Birthday" },
+      { day: "Sat", date: "Oct 17", time: "11:30 AM", customer: "Daniel & Grace Kim", order: "4-tier vanilla bean wedding cake", type: "Wedding" },
+      { day: "Tue", date: "Oct 20", time: "8:30 AM", customer: "Northwind Co.", order: "3 dozen assorted pastries", type: "Everyday" },
+      { day: "Sat", date: "Oct 24", time: "2:00 PM", customer: "Isabella & Mark Rossi", order: "3-tier lemon & raspberry cake", type: "Wedding" },
+      { day: "Sun", date: "Oct 25", time: "9:30 AM", customer: "Tom Bennett", order: "Strawberry Cloud + candles", type: "Birthday" },
+      { day: "Sat", date: "Oct 31", time: "4:00 PM", customer: "Marcus Lee", order: "24 Halloween cupcakes", type: "Birthday" },
+      { day: "Sat", date: "Nov 7", time: "12:00 PM", customer: "Olivia & Ben Hart", order: "5-tier naked cake with berries", type: "Wedding" }
     ];
 
     const tableBookings = [
-      
+      { day: "Tue", date: "Oct 13", time: "9:00 AM", customer: "The Wilson Family", order: "Table for 4 · Window seat", type: "Table" },
+      { day: "Wed", date: "Oct 14", time: "12:30 PM", customer: "Maya Chen", order: "Table for 2 · Birthday note", type: "Birthday" },
+      { day: "Fri", date: "Oct 16", time: "6:00 PM", customer: "The Rivera Party", order: "Table for 6 · Patio", type: "Table" },
+      { day: "Sat", date: "Oct 17", time: "10:30 AM", customer: "Harper & Co.", order: "Table for 3 · Brunch", type: "Table" }
     ];
 
     function renderSchedule(items) {

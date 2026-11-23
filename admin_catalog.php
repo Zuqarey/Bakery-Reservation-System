@@ -41,12 +41,18 @@ if (!isset($conn) || !$conn || $conn->connect_error) {
 
 try {
 
+    // Check if the optional available_branch column exists so the catalog
+    // still works before the ALTER TABLE migration is applied.
+    $branchColCheck = $conn->query("SHOW COLUMNS FROM product LIKE 'available_branch'");
+    $hasBranchColumn = ($branchColCheck && $branchColCheck->num_rows > 0);
+
     // =====================================
     // GET PRODUCTS
     // =====================================
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
+        $branchSelect = $hasBranchColumn ? "available_branch," : "";
         $result = $conn->query("
             SELECT
                 product_id,
@@ -56,7 +62,7 @@ try {
                 category,
                 description,
                 image_path,
-                available_branch,
+                {$branchSelect}
                 is_active
             FROM product
             ORDER BY is_active DESC, product_name ASC
@@ -78,7 +84,7 @@ try {
             $row['is_active'] = (int)$row['is_active'];
 
             $row['available_branch'] =
-                $row['available_branch'] ?: 'All';
+                !empty($row['available_branch']) ? $row['available_branch'] : 'All';
 
             $products[] = $row;
         }
@@ -209,34 +215,63 @@ try {
                 ], 400);
             }
 
-            $stmt = $conn->prepare("
-                UPDATE product
-                SET
-                    product_name = ?,
-                    category = ?,
-                    price = ?,
-                    product_quantity = ?,
-                    description = ?,
-                    image_path = ?,
-                    available_branch = ?
-                WHERE product_id = ?
-            ");
+            if ($hasBranchColumn) {
+                $stmt = $conn->prepare("
+                    UPDATE product
+                    SET
+                        product_name = ?,
+                        category = ?,
+                        price = ?,
+                        product_quantity = ?,
+                        description = ?,
+                        image_path = ?,
+                        available_branch = ?
+                    WHERE product_id = ?
+                ");
 
-            if (!$stmt) {
-                throw new RuntimeException($conn->error);
+                if (!$stmt) {
+                    throw new RuntimeException($conn->error);
+                }
+
+                $stmt->bind_param(
+                    'ssdisssi',
+                    $name,
+                    $category,
+                    $price,
+                    $stock,
+                    $description,
+                    $image,
+                    $branch,
+                    $id
+                );
+            } else {
+                $stmt = $conn->prepare("
+                    UPDATE product
+                    SET
+                        product_name = ?,
+                        category = ?,
+                        price = ?,
+                        product_quantity = ?,
+                        description = ?,
+                        image_path = ?
+                    WHERE product_id = ?
+                ");
+
+                if (!$stmt) {
+                    throw new RuntimeException($conn->error);
+                }
+
+                $stmt->bind_param(
+                    'ssdissi',
+                    $name,
+                    $category,
+                    $price,
+                    $stock,
+                    $description,
+                    $image,
+                    $id
+                );
             }
-
-            $stmt->bind_param(
-                'ssdisssi',
-                $name,
-                $category,
-                $price,
-                $stock,
-                $description,
-                $image,
-                $branch,
-                $id
-            );
 
             if (!$stmt->execute()) {
                 throw new RuntimeException($stmt->error);
@@ -271,33 +306,61 @@ try {
         // INSERT NEW PRODUCT
         // =====================================
 
-        $stmt = $conn->prepare("
-            INSERT INTO product (
-                product_name,
-                category,
-                price,
-                product_quantity,
-                description,
-                image_path,
-                available_branch
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        ");
+        if ($hasBranchColumn) {
+            $stmt = $conn->prepare("
+                INSERT INTO product (
+                    product_name,
+                    category,
+                    price,
+                    product_quantity,
+                    description,
+                    image_path,
+                    available_branch
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            ");
 
-        if (!$stmt) {
-            throw new RuntimeException($conn->error);
+            if (!$stmt) {
+                throw new RuntimeException($conn->error);
+            }
+
+            $stmt->bind_param(
+                'ssdisss',
+                $name,
+                $category,
+                $price,
+                $stock,
+                $description,
+                $image,
+                $branch
+            );
+        } else {
+            $stmt = $conn->prepare("
+                INSERT INTO product (
+                    product_name,
+                    category,
+                    price,
+                    product_quantity,
+                    description,
+                    image_path
+                )
+                VALUES (?, ?, ?, ?, ?, ?)
+            ");
+
+            if (!$stmt) {
+                throw new RuntimeException($conn->error);
+            }
+
+            $stmt->bind_param(
+                'ssdiss',
+                $name,
+                $category,
+                $price,
+                $stock,
+                $description,
+                $image
+            );
         }
-
-        $stmt->bind_param(
-            'ssdisss',
-            $name,
-            $category,
-            $price,
-            $stock,
-            $description,
-            $image,
-            $branch
-        );
 
         if (!$stmt->execute()) {
             throw new RuntimeException($stmt->error);
