@@ -177,137 +177,6 @@
       .kpi-grid { grid-template-columns: repeat(2, 1fr); }
       .split-grid { grid-template-columns: 1fr; }
     }
-
-    /* PRINT / PDF REPORT TEMPLATE */
-    .print-only-header,
-    .print-only-footer { display: none; }
-
-    @media print {
-      @page {
-        size: A4 landscape;
-        margin: 14mm;
-      }
-
-      body {
-        background: #FFFFFF !important;
-        color: #1A1A1A !important;
-        display: block !important;
-        min-height: auto !important;
-      }
-
-      .sidebar,
-      .top-header,
-      .report-filters,
-      .btn-primary,
-      .btn-soft,
-      .btn-danger-outline,
-      .notif-popover,
-      .modal-backdrop,
-      .page-section:not(.active),
-      #tab-reports .eyebrow,
-      #tab-reports .script-heading,
-      #tab-reports .page-subtitle {
-        display: none !important;
-      }
-
-      .main-wrapper { margin-left: 0 !important; }
-      .content-container { padding: 0 !important; max-width: 100% !important; }
-
-      .print-only-header {
-        display: flex !important;
-        justify-content: space-between;
-        align-items: flex-end;
-        border-bottom: 2px solid #5C2C16;
-        padding-bottom: 10px;
-        margin-bottom: 16px;
-      }
-      .print-only-header h1 {
-        font-family: 'Instrument Serif', serif;
-        font-size: 28px;
-        font-weight: 400;
-        color: #3E1C0C;
-        line-height: 1.1;
-      }
-      .print-only-header p {
-        font-size: 11px;
-        color: #6B5B4E;
-        letter-spacing: 0.8px;
-        text-transform: uppercase;
-        margin-top: 2px;
-      }
-      .print-meta {
-        text-align: right;
-        font-size: 11px;
-        color: #555555;
-        line-height: 1.5;
-      }
-
-      #tab-reports .kpi-grid {
-        grid-template-columns: repeat(3, 1fr) !important;
-        gap: 10px !important;
-        margin-bottom: 16px !important;
-      }
-      #tab-reports .kpi-card {
-        background: #FDFBF7 !important;
-        color: #1A1A1A !important;
-        border: 1px solid #D6C3B0 !important;
-        border-radius: 10px !important;
-        box-shadow: none !important;
-        min-height: auto !important;
-        padding: 10px 14px !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-      }
-      #tab-reports .kpi-label { font-size: 9.5px !important; color: #6B5B4E !important; opacity: 1 !important; }
-      #tab-reports .kpi-value { font-size: 20px !important; margin: 4px 0 2px !important; color: #3E1C0C !important; }
-      #tab-reports .kpi-sub { font-size: 10px !important; color: #7A6B5D !important; opacity: 1 !important; }
-
-      #tab-reports .white-card {
-        box-shadow: none !important;
-        border-radius: 0 !important;
-        padding: 0 !important;
-        background: #FFFFFF !important;
-      }
-      #tab-reports .card-header-bar { margin-bottom: 10px !important; }
-      #tab-reports .card-title { font-size: 13px !important; color: #3E1C0C !important; }
-
-      #tab-reports .data-table {
-        width: 100% !important;
-        border-collapse: collapse !important;
-        font-size: 10.5px !important;
-      }
-      #tab-reports .data-table thead { display: table-header-group; }
-      #tab-reports .data-table tr { break-inside: avoid; page-break-inside: avoid; }
-      #tab-reports .data-table th {
-        background: #F5EDE3 !important;
-        color: #3E1C0C !important;
-        border: 1px solid #D6C3B0 !important;
-        padding: 7px 8px !important;
-        font-size: 9.5px !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-      }
-      #tab-reports .data-table td {
-        border: 1px solid #E6DBD0 !important;
-        padding: 6px 8px !important;
-        font-size: 10.5px !important;
-      }
-      #tab-reports .data-table tbody tr:nth-child(even) {
-        background: #FAF7F3 !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-      }
-
-      .print-only-footer {
-        display: flex !important;
-        justify-content: space-between;
-        margin-top: 14px;
-        padding-top: 8px;
-        border-top: 1px solid #D6C3B0;
-        font-size: 10px;
-        color: #7A6B5D;
-      }
-    }
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js">
@@ -553,17 +422,6 @@
            TAB 4: ALL ORDERS & FINANCIAL REPORTS
            ========================================== -->
       <section id="tab-reports" class="page-section">
-        <div class="print-only-header">
-          <div>
-            <h1>Cozy Bake</h1>
-            <p>Financial Report &amp; Master Purchase History Ledger</p>
-          </div>
-          <div class="print-meta">
-            <div><strong>Prepared by:</strong> {{ADMIN_NAME}}</div>
-            <div id="printTimestamp">Generated: —</div>
-          </div>
-        </div>
-
         <div class="eyebrow">ACCOUNTING & ORDER ARCHIVE</div>
         <h1 class="script-heading">Financial reports</h1>
         <p class="page-subtitle">Audit all pickup, online, and dine-in orders or search through the master purchase history.</p>
@@ -597,10 +455,7 @@
         <div class="white-card">
           <div class="card-header-bar">
             <h3 class="card-title">MASTER PURCHASE HISTORY LEDGER</h3>
-            <div style="display:flex; gap:10px; flex-wrap:wrap;">
-              <button class="btn-soft" type="button" onclick="exportFinancialReportCsv()">EXPORT CSV</button>
-              <button class="btn-primary" type="button" onclick="printFinancialReport()">PRINT / SAVE PDF</button>
-            </div>
+            <button class="btn-primary" onclick="window.print()">EXPORT / PRINT</button>
           </div>
           <table class="data-table">
             <thead>
@@ -628,10 +483,6 @@
               <!-- Zufar: PHP LOOP ENDS HERE -->
             </tbody>
           </table>
-          <div class="print-only-footer">
-            <span>Cozy Bake Administration — Confidential Financial Statement</span>
-            <span id="printRecordCount">0 records</span>
-          </div>
         </div>
       </section>
 
@@ -655,6 +506,15 @@
         <div class="form-group"><label for="productStock">STOCK QUANTITY</label><input id="productStock" name="product_quantity" type="number" min="0" step="1" required placeholder="15"></div>
         <div class="form-group"><label for="productDescription">DESCRIPTION</label><textarea id="productDescription" name="description" rows="3" placeholder="Short product description"></textarea></div>
         <div class="form-group"><label for="productImage">IMAGE PATH (OPTIONAL)</label><input id="productImage" name="image_path" type="text" maxlength="255" placeholder="images/product-name.jpg"></div>
+        <div class="form-group">
+    <label for="availableBranch">AVAILABLE BRANCH</label>
+    <select id="availableBranch" name="available_branch">
+        <option value="All">All Branches</option>
+        <option value="Kedah">Kedah Only</option>
+        <option value="Perlis">Perlis Only</option>
+        <option value="Penang">Penang Only</option>
+    </select>
+</div>
         <p id="productFormMessage" role="alert" style="font-size:12px;color:#922B21;margin:8px 0;"></p>
         <button class="btn-primary" id="productSaveButton" type="submit" style="width:100%; margin-top:8px;">SAVE PRODUCT TO MENU</button>
       </form>
@@ -996,10 +856,7 @@
       document.getElementById('kpiOrdersToday').textContent = ordersToday;
       document.getElementById('kpiOrdersTodaySub').textContent = `${totalOrders} total order${totalOrders === 1 ? '' : 's'} recorded`;
       const ledger = document.getElementById('adminReportLedger');
-      window.adminReportLedgerData = data.ledger || [];
       ledger.innerHTML = data.ledger.length ? data.ledger.map(r => `<tr data-order-id="${Number(r.order_id)}"><td><strong>${r.receipt_no ? escapeHtml(r.receipt_no) : '#'+escapeHtml(r.order_id)}</strong></td><td>${escapeHtml(r.order_date || '—')}</td><td>${escapeHtml(r.customer_name || 'Unknown customer')}</td><td>${escapeHtml(r.outlet || '—')}</td><td>${escapeHtml(r.order_type || '—')}</td><td><strong>${money(r.total)}</strong></td><td>${escapeHtml(r.status_name || 'Unspecified')}</td></tr>`).join('') : '<tr><td colspan="7">No order records found yet.</td></tr>';
-      const countEl = document.getElementById('printRecordCount');
-      if (countEl) countEl.textContent = `${data.ledger.length} order record${data.ledger.length === 1 ? '' : 's'}`;
       window.adminMonthlyRevenueData = data.months || [];
       const canvas = document.getElementById('profitChart');
       if (canvas && window.Chart) {
@@ -1027,41 +884,6 @@
     }
   }
   function escapeHtml(value) { return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c])); }
-  function printFinancialReport() {
-    const ts = document.getElementById('printTimestamp');
-    if (ts) ts.textContent = 'Generated: ' + new Date().toLocaleString('en-MY');
-    window.print();
-  }
-  function exportFinancialReportCsv() {
-    const rows = window.adminReportLedgerData || [];
-    if (!rows.length) {
-      alert('No order records available to export.');
-      return;
-    }
-    const csvCell = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
-    const headers = ['Receipt ID', 'Date & Time', 'Customer', 'Store', 'Channel', 'Total (RM)', 'Payment Status'];
-    const lines = [headers.map(csvCell).join(',')];
-    rows.forEach(r => {
-      lines.push([
-        r.receipt_no || ('#' + r.order_id),
-        r.order_date || '',
-        r.customer_name || 'Unknown customer',
-        r.outlet || '',
-        r.order_type || '',
-        Number(r.total || 0).toFixed(2),
-        r.status_name || 'Unspecified'
-      ].map(csvCell).join(','));
-    });
-    const blob = new Blob(['\uFEFF' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'cozy-bake-financial-report-' + new Date().toISOString().slice(0, 10) + '.csv';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  }
   </script>
 
 <script>
@@ -1234,12 +1056,22 @@
     $('productSaveButton').textContent=id?'UPDATE PRODUCT':'SAVE PRODUCT TO MENU';
     if(id){const p=products.find(x=>Number(x.product_id)===Number(id));if(!p)return;
       $('productId').value=p.product_id;$('productName').value=p.product_name;$('productCategory').value=p.category||'';$('productPrice').value=p.price;$('productStock').value=p.product_quantity;$('productDescription').value=p.description||'';$('productImage').value=p.image_path||'';
+      $('availableBranch').value = p.available_branch || 'All';
     }
     openModal('productModal');
   };
   $('productForm').addEventListener('submit',async e=>{
     e.preventDefault();$('productFormMessage').textContent='Saving…';
-    const payload={product_id:$('productId').value,product_name:$('productName').value.trim(),category:$('productCategory').value.trim(),price:$('productPrice').value,product_quantity:$('productStock').value,description:$('productDescription').value.trim(),image_path:$('productImage').value.trim()};
+    const payload = {
+    product_id: $('productId').value,
+    product_name: $('productName').value.trim(),
+    category: $('productCategory').value.trim(),
+    price: $('productPrice').value,
+    product_quantity: $('productStock').value,
+    description: $('productDescription').value.trim(),
+    image_path: $('productImage').value.trim(),
+    available_branch: $('availableBranch').value
+};
     try{await request('save',payload);closeModal('productModal');await load();message('Product saved successfully.');}
     catch(err){$('productFormMessage').textContent=err.message;}
   });
